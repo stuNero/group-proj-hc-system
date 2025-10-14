@@ -2,6 +2,7 @@
 using System.Reflection;
 using App;
 
+List<Event> eventList = new();
 List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
@@ -74,7 +75,7 @@ while (isRunning)
       }
       break;
     case Menu.Main:
-      try{ Console.Clear(); } catch{}
+      try { Console.Clear(); } catch { }
       Console.WriteLine("[1] Logout");
 
       switch (Console.ReadLine())
@@ -88,7 +89,7 @@ while (isRunning)
           Console.ReadLine();
           break;
       }
-            
+
       break;
   }
 
