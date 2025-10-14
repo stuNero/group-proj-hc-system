@@ -25,6 +25,8 @@ foreach (string userLine in usersCsv)
   users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
 }
 
+
+
 string eventFile = @"csv-files\events-list.csv";
 if (!File.Exists(eventFile))
 {
@@ -33,15 +35,68 @@ if (!File.Exists(eventFile))
 string[] eventsCsv = File.ReadAllLines(eventFile);
 foreach (string eventLine in eventsCsv)
 {
-  Event newEvent = null;
   string[] eventSplitData = eventLine.Split("~");
-  newEvent.Title = eventSplitData[0];
-  newEvent.Description = eventSplitData[1];
-  newEvent.StartDate = DateTime.Parse(eventSplitData[2]);
-  newEvent.EndDate = DateTime.Parse(eventSplitData[3]);
-  // newEvent.Participant = eventSplitData[4]; 
+  string newEventTitle = eventSplitData[0];
+  string newEventDescription = eventSplitData[1];
+  DateTime newEventStartDate = DateTime.Parse(eventSplitData[2]);
+  DateTime newEventEndDate = DateTime.Parse(eventSplitData[3]);
+  Event.EventType eventType = Event.EventType.Request;
+
+  switch (eventSplitData[4])
+  {
+    case "Request": eventType = Event.EventType.Request; break;
+    case "Entrie": eventType = Event.EventType.Entry; break;
+    case "Appoitment": eventType = Event.EventType.Appointment; break;
+  }
+
+  List<Participant> participantsList = new();
+
+  string[] participants = eventSplitData[5].Split("^");
+  for (int i = 0; i < participants.Length; i++)
+  {
+    string[] participantSplitData = participants[i].Split("¤");
+
+    User? partUser = null;
+    Role partRole = Role.Patient;
+    foreach (User user in users)
+    {
+      if (participantSplitData[0] == user.SSN)
+      {
+        partUser = user;
+        break;
+      }
+    }
+    switch (participantSplitData[1])
+    {
+      case "Admin": partRole = Role.Admin; break;
+      case "Patient": partRole = Role.Patient; break;
+      case "Personnel": partRole = Role.Personnel; break;
+    }
+    if (partUser != null)
+    {
+      participantsList.Add(new(partUser, partRole));
+    }
+    else
+    {
+      break;
+    }
+  }
+  Event? newEvent = new(newEventTitle);
+  newEvent.Description = newEventDescription;
+  newEvent.StartDate = newEventStartDate;
+  newEvent.EndDate = newEventEndDate;
+  newEvent.MyEventType = eventType;
+  newEvent.Participant = participantsList;
+
+  eventList.Add(newEvent);
 }
 
+// TEST CODE
+/* Console.WriteLine($"{eventList[0].Title} - {eventList[0].Description} - {eventList[0].StartDate} - {eventList[0].EndDate} - {eventList[0].MyEventType}\n"
++ $"{eventList[0].Participant[0].User.SSN} - {eventList[0].Participant[0].UserRoles}\n"
++ $"{eventList[0].Participant[1].User.SSN} - {eventList[0].Participant[1].UserRoles}\n"
++ $"{eventList[0].Participant[2].User.SSN} - {eventList[0].Participant[2].UserRoles}");
+Console.ReadLine(); */
 
 bool isRunning = true;
 while (isRunning)
