@@ -1,6 +1,6 @@
 namespace App;
 
-class User : IUser
+class User
 {
     string SSN;
     string _password;

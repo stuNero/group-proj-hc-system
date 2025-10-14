@@ -5,8 +5,8 @@ using App;
 // Main Menu
 // Logout
 
-List<IUser> users = new();
-IUser? activeUser = null;
+List<User> users = new();
+User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
 bool isRunning = true;
@@ -31,7 +31,7 @@ while (isRunning)
           Debug.Assert(ssn != null);
           Debug.Assert(password != null);
 
-          foreach (IUser user in users)
+          foreach (User user in users)
           {
             if (user.TryLogin(ssn, password))
             {
