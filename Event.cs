@@ -8,7 +8,7 @@ class Event
   public DateTime StartDate;
   public DateTime EndDate;
 
-  public List<User> Users = new List<User>();
+  public List<Participant> Participant = new List<Participant>();
 
   public Event(string title)
   {
