@@ -3,11 +3,10 @@ namespace App;
 
 class Participant
 {
-
     public User User;
-    public Roles UserRoles;
+    public Role UserRoles;
 
-    public Participant (User user, Roles userRoles)
+    public Participant(User user, Role userRoles)
     {
         User = user;
         UserRoles = userRoles;
