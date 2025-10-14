@@ -2,7 +2,7 @@ namespace App;
 
 class User
 {
-    string SSN;
+    public string SSN;
     string _password;
     public string Name;
     public User(string ssn, string password, string name)
@@ -13,6 +13,6 @@ class User
     }
     public bool TryLogin(string ssn, string password)
     {
-        return ssn == SSN && password == _password;    
+        return ssn == SSN && password == _password;
     }
 }

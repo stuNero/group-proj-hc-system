@@ -6,6 +6,14 @@ List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
+string[] usersCsv = File.ReadAllLines("users-list.csv");
+foreach (string userLine in usersCsv)
+{
+  string[] userSplitData = userLine.Split(",");
+  users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
+}
+
+
 bool isRunning = true;
 while (isRunning)
 {
@@ -63,6 +71,10 @@ while (isRunning)
           Debug.Assert(newPassword != null);
           Debug.Assert(newName != null);
           users.Add(new User(newSSN, newPassword, newName));
+
+          string newUserLine = $"{newSSN},{newPassword},{newName}";
+          File.AppendAllText("users-list.csv", newUserLine + Environment.NewLine);
+
           break;
         case "3":
           isRunning = false;
@@ -74,7 +86,7 @@ while (isRunning)
       }
       break;
     case Menu.Main:
-      try{ Console.Clear(); } catch{}
+      try { Console.Clear(); } catch { }
       Console.WriteLine("[1] Logout");
 
       switch (Console.ReadLine())
@@ -88,7 +100,7 @@ while (isRunning)
           Console.ReadLine();
           break;
       }
-            
+
       break;
   }
 
