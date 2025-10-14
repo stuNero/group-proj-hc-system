@@ -1,24 +1,15 @@
 
-
 namespace App;
 
 class Participant
 {
 
-        public User User;
-    public Roles Userroles;
-    
+    public User User;
+    public Roles UserRoles;
 
-    
-
+    public Participant (User user, Roles userRoles)
+    {
+        User = user;
+        UserRoles = userRoles;
+    }
 }
-enum Roles
-{
-    Admin,
-    Patient,
-    Personnel,
-}
-    
-    
-     
-    
