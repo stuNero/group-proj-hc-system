@@ -7,7 +7,13 @@ List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
-string[] usersCsv = File.ReadAllLines("users-list.csv");
+string usersFile = @"csv-files\users-list.csv";
+if (!File.Exists(usersFile))
+{
+  Directory.CreateDirectory("csv-files");
+  File.WriteAllText(usersFile, "");
+}
+string[] usersCsv = File.ReadAllLines(usersFile);
 foreach (string userLine in usersCsv)
 {
   string[] userSplitData = userLine.Split(",");
@@ -74,7 +80,7 @@ while (isRunning)
           users.Add(new User(newSSN, newPassword, newName));
 
           string newUserLine = $"{newSSN},{newPassword},{newName}";
-          File.AppendAllText("users-list.csv", newUserLine + Environment.NewLine);
+          File.AppendAllText(usersFile, newUserLine + Environment.NewLine);
 
           break;
         case "3":
