@@ -3,9 +3,16 @@ using System.Reflection;
 using App;
 
 List<Event> eventList = new();
+List<Participant> participantList = new();
 List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
+
+users.Add(new User("1", "", "a"));
+users.Add(new User("2", "", "b"));
+Event myEvent = new("event", Event.EventType.Request);
+myEvent.Participants.Add(new Participant(users[0], Role.Patient));
+eventList.Add(myEvent);
 
 bool isRunning = true;
 while (isRunning)
@@ -76,17 +83,45 @@ while (isRunning)
       break;
     case Menu.Main:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("[1] Logout");
+      Console.WriteLine("\n[1] Send patient registeration request \n[x] Logout");
+      Console.Write("\n> ");
 
       switch (Console.ReadLine())
       {
         case "1":
+          bool ssnFound = false;
+          foreach (Event userEvent in eventList)
+          {
+            foreach (Participant part in userEvent.Participants)
+            {
+              if (part.User.SSN == activeUser.SSN)
+              {
+                Console.WriteLine($"\nRequest already exsists, you can just wait for now...\n");
+                Console.ReadLine();
+                ssnFound = true;
+                break;
+              }
+            }
+            break;
+          }
+          if (ssnFound == false)
+          {
+            Participant newParticipant = new(activeUser, Role.Patient);
+            Event newEvent = new($"New Event", Event.EventType.Request);
+            newEvent.Description = $"{activeUser.Name} is requesting to become a patient.";
+            newEvent.StartDate = DateTime.Now;
+            newEvent.Participants.Add(newParticipant);
+            eventList.Add(newEvent);
+            Console.WriteLine("\nYour request is sent!\n");
+            Console.ReadLine();
+            break;
+          }
+          break;
+
+
+        case "x":
           activeUser = null;
           currentMenu = Menu.Default;
-          break;
-        default:
-          Console.WriteLine("Something went wrong");
-          Console.ReadLine();
           break;
       }
 

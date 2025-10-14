@@ -7,13 +7,14 @@ class Event
 
   public DateTime StartDate;
   public DateTime EndDate;
-  public EventType myEventType;
+  public EventType MyEventType;
 
-  public List<Participant> Participant = new List<Participant>();
+  public List<Participant> Participants = new List<Participant>();
 
-  public Event(string title)
+  public Event(string title, EventType myEventType)
   {
     Title = title;
+    MyEventType = myEventType;
   }
 
   public enum EventType
