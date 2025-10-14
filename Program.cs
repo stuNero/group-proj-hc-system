@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using App;
 
 List<Event> eventList = new();
@@ -7,10 +8,14 @@ List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
+if (!Directory.Exists("csv-files"))
+{
+  Directory.CreateDirectory("csv-files");
+}
+
 string usersFile = @"csv-files\users-list.csv";
 if (!File.Exists(usersFile))
 {
-  Directory.CreateDirectory("csv-files");
   File.WriteAllText(usersFile, "");
 }
 string[] usersCsv = File.ReadAllLines(usersFile);
@@ -18,6 +23,23 @@ foreach (string userLine in usersCsv)
 {
   string[] userSplitData = userLine.Split(",");
   users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
+}
+
+string eventFile = @"csv-files\events-list.csv";
+if (!File.Exists(eventFile))
+{
+  File.WriteAllText(eventFile, "");
+}
+string[] eventsCsv = File.ReadAllLines(eventFile);
+foreach (string eventLine in eventsCsv)
+{
+  Event newEvent = null;
+  string[] eventSplitData = eventLine.Split("~");
+  newEvent.Title = eventSplitData[0];
+  newEvent.Description = eventSplitData[1];
+  newEvent.StartDate = DateTime.Parse(eventSplitData[2]);
+  newEvent.EndDate = DateTime.Parse(eventSplitData[3]);
+  // newEvent.Participant = eventSplitData[4]; 
 }
 
 
