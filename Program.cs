@@ -2,9 +2,6 @@
 using System.Reflection;
 using App;
 
-// Main Menu
-// Logout
-
 List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
