@@ -2,8 +2,8 @@
 using System.Reflection;
 using App;
 
-List<Event> eventList = new();
-List<User> users = new();
+HCSystem sys = new();
+
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
@@ -29,7 +29,7 @@ while (isRunning)
           Debug.Assert(ssn != null);
           Debug.Assert(password != null);
 
-          foreach (User user in users)
+          foreach (User user in sys.users)
           {
             if (user.TryLogin(ssn, password))
             {
@@ -63,7 +63,7 @@ while (isRunning)
           Debug.Assert(newSSN != null);
           Debug.Assert(newPassword != null);
           Debug.Assert(newName != null);
-          users.Add(new User(newSSN, newPassword, newName));
+          sys.users.Add(new User(newSSN, newPassword, newName));
           break;
         case "3":
           isRunning = false;
