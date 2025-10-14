@@ -21,7 +21,7 @@ class Event
   {
     Request,
     Appoitment,
-    Entrie
+    Entry
 
   }
 

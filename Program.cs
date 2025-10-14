@@ -8,11 +8,26 @@ List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
+
 users.Add(new User("1", "", "a"));
 users.Add(new User("2", "", "b"));
 Event myEvent = new("event", Event.EventType.Request);
 myEvent.Participants.Add(new Participant(users[0], Role.Patient));
 eventList.Add(myEvent);
+
+
+string usersFile = @"csv-files\users-list.csv";
+if (!File.Exists(usersFile))
+{
+  Directory.CreateDirectory("csv-files");
+  File.WriteAllText(usersFile, "");
+}
+string[] usersCsv = File.ReadAllLines(usersFile);
+foreach (string userLine in usersCsv)
+{
+  string[] userSplitData = userLine.Split(",");
+  users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
+}
 
 bool isRunning = true;
 while (isRunning)
@@ -71,6 +86,10 @@ while (isRunning)
           Debug.Assert(newPassword != null);
           Debug.Assert(newName != null);
           users.Add(new User(newSSN, newPassword, newName));
+
+          string newUserLine = $"{newSSN},{newPassword},{newName}";
+          File.AppendAllText(usersFile, newUserLine + Environment.NewLine);
+
           break;
         case "3":
           isRunning = false;
