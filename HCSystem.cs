@@ -83,7 +83,7 @@ class HCSystem
                 string[] participantSplitData = participants[i].Split("¤");
 
                 User? partUser = null;
-                Role partRole = Role.Patient;
+                Role partRole = Role.None;
                 foreach (User user in users)
                 {
                     if (participantSplitData[0] == user.SSN)
