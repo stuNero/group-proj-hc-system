@@ -94,6 +94,7 @@ while (isRunning)
           {
             foreach (Participant part in userEvent.Participants)
             {
+              Debug.Assert(activeUser != null);
               if (part.User.SSN == activeUser.SSN)
               {
                 Console.WriteLine($"\nRequest already exsists, you can just wait for now...\n");
@@ -106,6 +107,7 @@ while (isRunning)
           }
           if (ssnFound == false)
           {
+            Debug.Assert(activeUser != null);
             Participant newParticipant = new(activeUser, Role.Patient);
             Event newEvent = new($"New Event", Event.EventType.Request);
             newEvent.StartDate = DateTime.Now;
