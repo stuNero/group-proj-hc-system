@@ -3,91 +3,19 @@ using System.Reflection;
 using System.Runtime.CompilerServices;
 using App;
 
-List<Event> eventList = new();
-List<User> users = new();
+
+HCSystem sys = new();
+
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
-if (!Directory.Exists("csv-files"))
-{
-  Directory.CreateDirectory("csv-files");
-}
+Event myEvent = new("event", Event.EventType.Request);
+myEvent.Participants.Add(new Participant(sys.users[0], Role.Patient));
+sys.eventList.Add(myEvent);
 
-string usersFile = @"csv-files\users-list.csv";
-if (!File.Exists(usersFile))
-{
-  File.WriteAllText(usersFile, "");
-}
-string[] usersCsv = File.ReadAllLines(usersFile);
-foreach (string userLine in usersCsv)
-{
-  string[] userSplitData = userLine.Split(",");
-  users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
-}
-
-
-string eventFile = @"csv-files\events-list.csv";
-if (!File.Exists(eventFile))
-{
-  File.WriteAllText(eventFile, "");
-}
-string[] eventsCsv = File.ReadAllLines(eventFile);
-foreach (string eventLine in eventsCsv)
-{
-  string[] eventSplitData = eventLine.Split("~");
-  string newEventTitle = eventSplitData[0];
-  Event.EventType eventType = Event.EventType.Request;
-  string newEventDescription = eventSplitData[2];
-  DateTime newEventStartDate = DateTime.Parse(eventSplitData[3]);
-  DateTime newEventEndDate = DateTime.Parse(eventSplitData[4]);
-
-  switch (eventSplitData[1])
-  {
-    case "Request": eventType = Event.EventType.Request; break;
-    case "Enty": eventType = Event.EventType.Entry; break;
-    case "Appointment": eventType = Event.EventType.Appointment; break;
-  }
-
-  List<Participant> participantsList = new();
-
-  string[] participants = eventSplitData[5].Split("^");
-  for (int i = 0; i < participants.Length; i++)
-  {
-    string[] participantSplitData = participants[i].Split("¤");
-
-    User? partUser = null;
-    Role partRole = Role.Patient;
-    foreach (User user in users)
-    {
-      if (participantSplitData[0] == user.SSN)
-      {
-        partUser = user;
-        break;
-      }
-    }
-    switch (participantSplitData[1])
-    {
-      case "Admin": partRole = Role.Admin; break;
-      case "Patient": partRole = Role.Patient; break;
-      case "Personnel": partRole = Role.Personnel; break;
-    }
-    if (partUser != null)
-    {
-      participantsList.Add(new(partUser, partRole));
-    }
-    else
-    {
-      break;
-    }
-  }
-  Event? newEvent = new(newEventTitle, eventType);
-  newEvent.Description = newEventDescription;
-  newEvent.StartDate = newEventStartDate;
-  newEvent.EndDate = newEventEndDate;
-  newEvent.Participants = participantsList;
-
-  eventList.Add(newEvent);
-}
+// TEST CODE
+/* Console.WriteLine($"{sys.eventList[0].Title} - {sys.eventList[0].MyEventType} - {sys.eventList[0].Description} - {sys.eventList[0].StartDate} - {sys.eventList[0].EndDate}");
+Console.ReadLine(); */
 
 bool isRunning = true;
 while (isRunning)
@@ -111,7 +39,7 @@ while (isRunning)
           Debug.Assert(ssn != null);
           Debug.Assert(password != null);
 
-          foreach (User user in users)
+          foreach (User user in sys.users)
           {
             if (user.TryLogin(ssn, password))
             {
@@ -145,11 +73,9 @@ while (isRunning)
           Debug.Assert(newSSN != null);
           Debug.Assert(newPassword != null);
           Debug.Assert(newName != null);
-          users.Add(new User(newSSN, newPassword, newName));
 
-          string newUserLine = $"{newSSN},{newPassword},{newName}";
-          File.AppendAllText(usersFile, newUserLine + Environment.NewLine);
-
+          sys.users.Add(new User(newSSN, newPassword, newName));
+          sys.SaveUsersToFile();
           break;
         case "3":
           isRunning = false;
@@ -169,10 +95,11 @@ while (isRunning)
       {
         case "1":
           bool ssnFound = false;
-          foreach (Event userEvent in eventList)
+          foreach (Event userEvent in sys.eventList)
           {
             foreach (Participant part in userEvent.Participants)
             {
+              Debug.Assert(activeUser != null);
               if (part.User.SSN == activeUser.SSN)
               {
                 Console.WriteLine($"\nRequest already exsists, you can just wait for now...\n");
@@ -185,12 +112,13 @@ while (isRunning)
           }
           if (ssnFound == false)
           {
+            Debug.Assert(activeUser != null);
             Participant newParticipant = new(activeUser, Role.Patient);
             Event newEvent = new($"New Event", Event.EventType.Request);
             newEvent.StartDate = DateTime.Now;
             newEvent.Description = $"\n{activeUser.Name} is requesting to become a patient.";
             newEvent.Participants.Add(newParticipant);
-            eventList.Add(newEvent);
+            sys.eventList.Add(newEvent);
             Console.WriteLine("\nYour request is sent!\n");
             Console.ReadLine();
             break;
