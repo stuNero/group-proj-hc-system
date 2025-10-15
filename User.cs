@@ -15,4 +15,8 @@ class User
     {
         return ssn == SSN && password == _password;
     }
+    public string GetUserPassword()
+    {
+        return _password;
+    }
 }
