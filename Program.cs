@@ -38,8 +38,8 @@ if (sys.eventList.Count <= 0)
 sys.SaveEventsToFile();
 
 
-// TEST CODE
-foreach (Event events in sys.eventList)
+// TEST CODE >>>>
+/* foreach (Event events in sys.eventList)
 {
   Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
   + $"{events.StartDate} - {events.EndDate}");
@@ -50,7 +50,8 @@ foreach (Event events in sys.eventList)
   Console.WriteLine("\n----------------");
 }
 Console.Write("\nPress ENTER to continue.");
-Console.ReadLine();
+Console.ReadLine(); */
+// <<<< END OF TEST CODE
 
 
 bool isRunning = true;
