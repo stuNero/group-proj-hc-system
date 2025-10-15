@@ -5,11 +5,13 @@ class User
     public string SSN;
     string _password;
     public string Name;
-    public User(string ssn, string password, string name)
+    public Role UserRoles
+    public User(string ssn, string password, string name, Role userRoles)
     {
         SSN = ssn;
         _password = password;
         Name = name;
+        UserRoles = userRoles;
     }
     public bool TryLogin(string ssn, string password)
     {
