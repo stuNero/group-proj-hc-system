@@ -4,7 +4,6 @@ using System.Runtime.CompilerServices;
 using App;
 
 List<Event> eventList = new();
-List<Participant> participantList = new();
 List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
