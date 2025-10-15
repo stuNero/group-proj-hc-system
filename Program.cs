@@ -111,7 +111,7 @@ while (isRunning)
             Participant newParticipant = new(activeUser, Role.Patient);
             Event newEvent = new($"New Event", Event.EventType.Request);
             newEvent.StartDate = DateTime.Now;
-            newEvent.Description = $"\nDate {newEvent.StartDate} \n{activeUser.Name} is requesting to become a patient.";
+            newEvent.Description = $"\n{activeUser.Name} is requesting to become a patient.";
             newEvent.Participants.Add(newParticipant);
             sys.eventList.Add(newEvent);
             Console.WriteLine("\nYour request is sent!\n");
