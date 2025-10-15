@@ -20,7 +20,7 @@ class Event
   public enum EventType
   {
     Request,
-    Appoitment,
+    Appointment,
     Entry
 
   }
