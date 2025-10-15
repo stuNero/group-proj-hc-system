@@ -10,15 +10,16 @@ class HCSystem
 
     public HCSystem()
     {
-        users.Add(new User("1", "", "a"));
-        users.Add(new User("2", "", "b"));
+        users.Add(new User("testssn1", "", "test1"));
+        users.Add(new User("testssn2", "", "test2"));
 
         if (!Directory.Exists("csv-files"))
         { Directory.CreateDirectory("csv-files"); }
 
         if (!File.Exists(usersFile))
         { File.WriteAllText(usersFile, ""); }
-        
+
+        SaveUsersToFile();
         LoadUsersFromFile();
     }
     public void LoadUsersFromFile()
@@ -26,7 +27,7 @@ class HCSystem
         string[] usersCsv = File.ReadAllLines(usersFile);
         foreach (string userLine in usersCsv)
         {
-        string[] userSplitData = userLine.Split(",");
+        string[] userSplitData = userLine.Split("~");
         users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
         }
     }
