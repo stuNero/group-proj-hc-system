@@ -1,15 +1,57 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using App;
+
 
 HCSystem sys = new();
 
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
-Event myEvent = new("event", Event.EventType.Request);
-myEvent.Participants.Add(new Participant(sys.users[0], Role.Patient));
-sys.eventList.Add(myEvent);
+if (sys.users.Count <= 0)
+{
+  sys.users.Add(new User("testssn1", "", "test1"));
+  sys.users.Add(new User("testssn2", "", "test2"));
+  sys.users.Add(new User("testssn3", "", "test3"));
+}
+
+sys.SaveUsersToFile();
+
+
+if (sys.eventList.Count <= 0)
+{
+  Event myEvent = new("event", Event.EventType.Request);
+  myEvent.Participants.Add(new Participant(sys.users[0], Role.Patient));
+  sys.eventList.Add(myEvent);
+
+  Event mySecondEvent = new("My Appointment", Event.EventType.Appointment);
+  mySecondEvent.Description = "I have a cold.";
+  mySecondEvent.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
+  mySecondEvent.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
+  mySecondEvent.Participants.Add(new(sys.users[0], Role.Patient));
+  mySecondEvent.Participants.Add(new(sys.users[1], Role.Personnel));
+  mySecondEvent.Participants.Add(new(sys.users[2], Role.Admin));
+  sys.eventList.Add(mySecondEvent);
+}
+
+sys.SaveEventsToFile();
+
+
+// TEST CODE >>>>
+/* foreach (Event events in sys.eventList)
+{
+  Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
+  + $"{events.StartDate} - {events.EndDate}");
+  foreach (Participant participant in events.Participants)
+  {
+    Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.UserRoles}");
+  }
+  Console.WriteLine("\n----------------");
+}
+Console.Write("\nPress ENTER to continue.");
+Console.ReadLine(); */
+// <<<< END OF TEST CODE
 
 
 bool isRunning = true;
@@ -103,7 +145,6 @@ while (isRunning)
                 break;
               }
             }
-            break;
           }
           if (ssnFound == false)
           {
@@ -111,15 +152,15 @@ while (isRunning)
             Participant newParticipant = new(activeUser, Role.Patient);
             Event newEvent = new($"New Event", Event.EventType.Request);
             newEvent.StartDate = DateTime.Now;
-            newEvent.Description = $"\n{activeUser.Name} is requesting to become a patient.";
+            newEvent.Description = $"{activeUser.Name} is requesting to become a patient.";
             newEvent.Participants.Add(newParticipant);
             sys.eventList.Add(newEvent);
+            sys.SaveEventsToFile();
             Console.WriteLine("\nYour request is sent!\n");
             Console.ReadLine();
             break;
           }
           break;
-
 
         case "x":
           activeUser = null;
