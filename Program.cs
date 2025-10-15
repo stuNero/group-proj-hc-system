@@ -36,16 +36,16 @@ while (isRunning)
   {
     case Menu.Default:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("\n[1] Login \n[2] Register Account\n[3] Quit\n");
-      Console.Write("> ");
+      Console.WriteLine("\n[1] Login \n[2] Register Account\n[3] Quit");
+      Console.Write("\n> ");
       string? input = Console.ReadLine();
 
       switch (input)
       {
         case "1":
-          Console.Write("Please input your SSN: ");
+          Console.Write("\nPlease input your SSN: ");
           string? ssn = Console.ReadLine();
-          Console.Write("Please input a password: ");
+          Console.Write("\nPlease input a password: ");
           string? password = Console.ReadLine();
 
           Debug.Assert(ssn != null);
@@ -63,22 +63,22 @@ while (isRunning)
           break;
 
         case "2":
-          Console.Write("Please input your SSN: ");
+          Console.Write("\nPlease input your SSN: ");
           string? newSSN = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newSSN))
           {
-            Console.WriteLine("Invalid input");
+            Console.WriteLine("\nInvalid input");
             Console.ReadLine();
             break;
           }
 
-          Console.Write("Please input a password: ");
+          Console.Write("\nPlease input a password: ");
           string? newPassword = Console.ReadLine();
-          Console.Write("What is your name? ");
+          Console.Write("\nWhat is your name? ");
           string? newName = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newName))
           {
-            Console.WriteLine("Invalid input");
+            Console.WriteLine("\nInvalid input");
             Console.ReadLine();
             break;
           }
@@ -95,7 +95,7 @@ while (isRunning)
           isRunning = false;
           break;
         default:
-          Console.WriteLine("Please enter a valid input");
+          Console.WriteLine("\nPlease enter a valid input");
           Console.ReadLine();
           break;
       }
@@ -127,8 +127,8 @@ while (isRunning)
           {
             Participant newParticipant = new(activeUser, Role.Patient);
             Event newEvent = new($"New Event", Event.EventType.Request);
-            newEvent.Description = $"{activeUser.Name} is requesting to become a patient.";
             newEvent.StartDate = DateTime.Now;
+            newEvent.Description = $"\nDate {newEvent.StartDate} \n{activeUser.Name} is requesting to become a patient.";
             newEvent.Participants.Add(newParticipant);
             eventList.Add(newEvent);
             Console.WriteLine("\nYour request is sent!\n");
