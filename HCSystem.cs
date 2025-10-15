@@ -118,11 +118,11 @@ class HCSystem
             {
                 if (events.Participants[i] == events.Participants[0])
                 {
-                    participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].UserRoles}";
+                    participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
                 else
                 {
-                    participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].UserRoles}";
+                    participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
             }
 
