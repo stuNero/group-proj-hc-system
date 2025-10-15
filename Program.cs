@@ -4,6 +4,7 @@ using System.Runtime.CompilerServices;
 using App;
 
 List<Event> eventList = new();
+List<Participant> participantList = new();
 List<User> users = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
@@ -26,7 +27,6 @@ foreach (string userLine in usersCsv)
 }
 
 
-
 string eventFile = @"csv-files\events-list.csv";
 if (!File.Exists(eventFile))
 {
@@ -37,16 +37,16 @@ foreach (string eventLine in eventsCsv)
 {
   string[] eventSplitData = eventLine.Split("~");
   string newEventTitle = eventSplitData[0];
-  string newEventDescription = eventSplitData[1];
-  DateTime newEventStartDate = DateTime.Parse(eventSplitData[2]);
-  DateTime newEventEndDate = DateTime.Parse(eventSplitData[3]);
   Event.EventType eventType = Event.EventType.Request;
+  string newEventDescription = eventSplitData[2];
+  DateTime newEventStartDate = DateTime.Parse(eventSplitData[3]);
+  DateTime newEventEndDate = DateTime.Parse(eventSplitData[4]);
 
-  switch (eventSplitData[4])
+  switch (eventSplitData[1])
   {
     case "Request": eventType = Event.EventType.Request; break;
-    case "Entrie": eventType = Event.EventType.Entry; break;
-    case "Appoitment": eventType = Event.EventType.Appointment; break;
+    case "Enty": eventType = Event.EventType.Entry; break;
+    case "Appointment": eventType = Event.EventType.Appointment; break;
   }
 
   List<Participant> participantsList = new();
@@ -81,22 +81,14 @@ foreach (string eventLine in eventsCsv)
       break;
     }
   }
-  Event? newEvent = new(newEventTitle);
+  Event? newEvent = new(newEventTitle, eventType);
   newEvent.Description = newEventDescription;
   newEvent.StartDate = newEventStartDate;
   newEvent.EndDate = newEventEndDate;
-  newEvent.MyEventType = eventType;
-  newEvent.Participant = participantsList;
+  newEvent.Participants = participantsList;
 
   eventList.Add(newEvent);
 }
-
-// TEST CODE
-/* Console.WriteLine($"{eventList[0].Title} - {eventList[0].Description} - {eventList[0].StartDate} - {eventList[0].EndDate} - {eventList[0].MyEventType}\n"
-+ $"{eventList[0].Participant[0].User.SSN} - {eventList[0].Participant[0].UserRoles}\n"
-+ $"{eventList[0].Participant[1].User.SSN} - {eventList[0].Participant[1].UserRoles}\n"
-+ $"{eventList[0].Participant[2].User.SSN} - {eventList[0].Participant[2].UserRoles}");
-Console.ReadLine(); */
 
 bool isRunning = true;
 while (isRunning)
@@ -105,16 +97,16 @@ while (isRunning)
   {
     case Menu.Default:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("\n[1] Login \n[2] Register Account\n[3] Quit\n");
-      Console.Write("> ");
+      Console.WriteLine("\n[1] Login \n[2] Register Account\n[3] Quit");
+      Console.Write("\n> ");
       string? input = Console.ReadLine();
 
       switch (input)
       {
         case "1":
-          Console.Write("Please input your SSN: ");
+          Console.Write("\nPlease input your SSN: ");
           string? ssn = Console.ReadLine();
-          Console.Write("Please input a password: ");
+          Console.Write("\nPlease input a password: ");
           string? password = Console.ReadLine();
 
           Debug.Assert(ssn != null);
@@ -132,22 +124,22 @@ while (isRunning)
           break;
 
         case "2":
-          Console.Write("Please input your SSN: ");
+          Console.Write("\nPlease input your SSN: ");
           string? newSSN = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newSSN))
           {
-            Console.WriteLine("Invalid input");
+            Console.WriteLine("\nInvalid input");
             Console.ReadLine();
             break;
           }
 
-          Console.Write("Please input a password: ");
+          Console.Write("\nPlease input a password: ");
           string? newPassword = Console.ReadLine();
-          Console.Write("What is your name? ");
+          Console.Write("\nWhat is your name? ");
           string? newName = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newName))
           {
-            Console.WriteLine("Invalid input");
+            Console.WriteLine("\nInvalid input");
             Console.ReadLine();
             break;
           }
@@ -164,24 +156,52 @@ while (isRunning)
           isRunning = false;
           break;
         default:
-          Console.WriteLine("Please enter a valid input");
+          Console.WriteLine("\nPlease enter a valid input");
           Console.ReadLine();
           break;
       }
       break;
     case Menu.Main:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("[1] Logout");
+      Console.WriteLine("\n[1] Send patient registeration request \n[x] Logout");
+      Console.Write("\n> ");
 
       switch (Console.ReadLine())
       {
         case "1":
+          bool ssnFound = false;
+          foreach (Event userEvent in eventList)
+          {
+            foreach (Participant part in userEvent.Participants)
+            {
+              if (part.User.SSN == activeUser.SSN)
+              {
+                Console.WriteLine($"\nRequest already exsists, you can just wait for now...\n");
+                Console.ReadLine();
+                ssnFound = true;
+                break;
+              }
+            }
+            break;
+          }
+          if (ssnFound == false)
+          {
+            Participant newParticipant = new(activeUser, Role.Patient);
+            Event newEvent = new($"New Event", Event.EventType.Request);
+            newEvent.StartDate = DateTime.Now;
+            newEvent.Description = $"\n{activeUser.Name} is requesting to become a patient.";
+            newEvent.Participants.Add(newParticipant);
+            eventList.Add(newEvent);
+            Console.WriteLine("\nYour request is sent!\n");
+            Console.ReadLine();
+            break;
+          }
+          break;
+
+
+        case "x":
           activeUser = null;
           currentMenu = Menu.Default;
-          break;
-        default:
-          Console.WriteLine("Something went wrong");
-          Console.ReadLine();
           break;
       }
 
