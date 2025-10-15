@@ -1,3 +1,5 @@
+using System.Diagnostics.Tracing;
+
 namespace App;
 
 class HCSystem
@@ -7,11 +9,10 @@ class HCSystem
     public List<User> users = new();
     // PUT ALL DIRECTORIES HERE
     string usersFile = @"csv-files\users-list.csv";
+    string eventsFile = @"csv-files\events-list.csv";
 
     public HCSystem()
     {
-        users.Add(new User("testssn1", "", "test1"));
-        users.Add(new User("testssn2", "", "test2"));
 
         if (!Directory.Exists("csv-files"))
         { Directory.CreateDirectory("csv-files"); }
@@ -19,8 +20,9 @@ class HCSystem
         if (!File.Exists(usersFile))
         { File.WriteAllText(usersFile, ""); }
 
-        SaveUsersToFile();
         LoadUsersFromFile();
+        LoadEventsFromFile();
+
     }
     public void LoadUsersFromFile()
     {
@@ -105,5 +107,28 @@ class HCSystem
 
             eventList.Add(newEvent);
         }
+    }
+    public void SaveEventsToFile()
+    {
+        string eventLines = "";
+        foreach (Event events in eventList)
+        {
+            string participantLines = "";
+            for (int i = 0; i < events.Participants.Count; i++)
+            {
+                if (events.Participants[i] == events.Participants[0])
+                {
+                    participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].UserRoles}";
+                }
+                else
+                {
+                    participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].UserRoles}";
+                }
+            }
+
+            eventLines += $"{events.Title}~{events.MyEventType}~{events.Description}~{events.StartDate}~{events.EndDate}~{participantLines}";
+            eventLines += Environment.NewLine;
+        }
+        File.WriteAllText(eventsFile, eventLines);
     }
 }
