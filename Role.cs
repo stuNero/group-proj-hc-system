@@ -1,7 +1,10 @@
-namespace App; 
+namespace App;
+
 enum Role
 {
+    SuperAdmin,
     Admin,
     Patient,
     Personnel,
+    None
 }
