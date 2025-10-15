@@ -4,11 +4,11 @@ namespace App;
 class Participant
 {
     public User User;
-    public Role UserRoles;
+    public Role ParticipantRole;
 
     public Participant(User user, Role userRoles)
     {
         User = user;
-        UserRoles = userRoles;
+        ParticipantRole = userRoles;
     }
 }
