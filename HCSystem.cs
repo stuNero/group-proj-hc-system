@@ -36,7 +36,7 @@ class HCSystem
         string userLines = "";
         foreach (User user in users)
         {
-            userLines += $"{user.SSN}~{user.GetUserPassword}~{user.Name}";
+            userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}";
             userLines += Environment.NewLine;
         }
         File.WriteAllText(usersFile, userLines);
