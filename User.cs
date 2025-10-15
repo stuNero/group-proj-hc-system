@@ -5,6 +5,7 @@ class User
     public string SSN;
     string _password;
     public string Name;
+    public Role UserRole;
     public User(string ssn, string password, string name)
     {
         SSN = ssn;
