@@ -6,5 +6,6 @@ enum Role
     Admin,
     Patient,
     Personnel,
-    None
+    None,
+
 }
