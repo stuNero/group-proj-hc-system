@@ -78,6 +78,11 @@ class HCSystem
                 case "Appointment": eventType = Event.EventType.Appointment; break;
             }
 
+            Event? newEvent = new(newEventTitle, eventType);
+            newEvent.Description = newEventDescription;
+            newEvent.StartDate = newEventStartDate;
+            newEvent.EndDate = newEventEndDate;
+
             List<Participant> participantsList = new();
 
             string[] participants = eventSplitData[5].Split("^");
@@ -112,12 +117,8 @@ class HCSystem
                     break;
                 }
 
+                newEvent.Participants = participantsList;
             }
-            Event? newEvent = new(newEventTitle, eventType);
-            newEvent.Description = newEventDescription;
-            newEvent.StartDate = newEventStartDate;
-            newEvent.EndDate = newEventEndDate;
-            newEvent.Participants = participantsList;
 
             eventList.Add(newEvent);
         }
@@ -128,15 +129,24 @@ class HCSystem
         foreach (Event events in eventList)
         {
             string participantLines = "";
-            for (int i = 0; i < events.Participants.Count; i++)
+
+            if (events.Participants.Count == 0)
             {
-                if (events.Participants[i] == events.Participants[0])
+                participantLines = $"None¤None";
+            }
+            else
+            {
+                for (int i = 0; i < events.Participants.Count; i++)
                 {
-                    participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
-                }
-                else
-                {
-                    participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
+
+                    if (events.Participants[i] == events.Participants[0])
+                    {
+                        participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
+                    }
+                    else
+                    {
+                        participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
+                    }
                 }
             }
 
