@@ -155,4 +155,22 @@ class HCSystem
         }
         File.WriteAllText(eventsFile, eventLines);
     }
+
+    public bool CreatePersonnelAccount(string ssn, string password, string name)
+    {
+        // Check if user with this SSN already exists
+        foreach (User user in users)
+        {
+            if (user.SSN == ssn)
+            {
+                return false; // User already exists
+            }
+        }
+
+        // Create new personnel user
+        User newPersonnel = new(ssn, password, name, Role.Personnel);
+        users.Add(newPersonnel);
+        SaveUsersToFile();
+        return true;
+    }
 }
