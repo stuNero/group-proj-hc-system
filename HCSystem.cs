@@ -33,7 +33,15 @@ class HCSystem
         foreach (string userLine in usersCsv)
         {
             string[] userSplitData = userLine.Split("~");
-            users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2]));
+            Role userRole = Role.None;
+            switch (userSplitData[3])
+            {
+                case "Admin": userRole = Role.Admin; break;
+                case "Patient": userRole = Role.Patient; break;
+                case "Personnel": userRole = Role.Personnel; break;
+            }
+
+            users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2], userRole));
         }
     }
     public void SaveUsersToFile()
@@ -41,7 +49,7 @@ class HCSystem
         string userLines = "";
         foreach (User user in users)
         {
-            userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}";
+            userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}~{user.UserRole}";
             userLines += Environment.NewLine;
         }
         File.WriteAllText(usersFile, userLines);
@@ -78,7 +86,7 @@ class HCSystem
                 string[] participantSplitData = participants[i].Split("¤");
 
                 User? partUser = null;
-                Role partRole = Role.Patient;
+                Role partRole = Role.None;
                 foreach (User user in users)
                 {
                     if (participantSplitData[0] == user.SSN)
@@ -124,11 +132,11 @@ class HCSystem
             {
                 if (events.Participants[i] == events.Participants[0])
                 {
-                    participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].UserRoles}";
+                    participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
                 else
                 {
-                    participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].UserRoles}";
+                    participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
             }
 
