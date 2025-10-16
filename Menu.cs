@@ -4,4 +4,5 @@ enum Menu
 {
     Default,
     Main,
+    Admin,
 }
