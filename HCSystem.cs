@@ -87,11 +87,14 @@ class HCSystem
                         break;
                     }
                 }
-                switch (participantSplitData[1])
+                if (participantSplitData[1] != null)
                 {
-                    case "Admin": partRole = Role.Admin; break;
-                    case "Patient": partRole = Role.Patient; break;
-                    case "Personnel": partRole = Role.Personnel; break;
+                    switch (participantSplitData[1])
+                    {
+                        case "Admin": partRole = Role.Admin; break;
+                        case "Patient": partRole = Role.Patient; break;
+                        case "Personnel": partRole = Role.Personnel; break;
+                    }
                 }
                 if (partUser != null)
                 {
