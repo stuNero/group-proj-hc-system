@@ -20,6 +20,9 @@ class HCSystem
         if (!File.Exists(usersFile))
         { File.WriteAllText(usersFile, ""); }
 
+        if (!File.Exists(eventsFile))
+        { File.WriteAllText(eventsFile, ""); }
+
         LoadUsersFromFile();
         LoadEventsFromFile();
 
