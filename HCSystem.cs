@@ -95,15 +95,14 @@ class HCSystem
                         break;
                     }
                 }
-                if (participantSplitData[1] != null)
+
+                switch (participantSplitData[1])
                 {
-                    switch (participantSplitData[1])
-                    {
-                        case "Admin": partRole = Role.Admin; break;
-                        case "Patient": partRole = Role.Patient; break;
-                        case "Personnel": partRole = Role.Personnel; break;
-                    }
+                    case "Admin": partRole = Role.Admin; break;
+                    case "Patient": partRole = Role.Patient; break;
+                    case "Personnel": partRole = Role.Personnel; break;
                 }
+
                 if (partUser != null)
                 {
                     participantsList.Add(new(partUser, partRole));
@@ -112,6 +111,7 @@ class HCSystem
                 {
                     break;
                 }
+
             }
             Event? newEvent = new(newEventTitle, eventType);
             newEvent.Description = newEventDescription;
