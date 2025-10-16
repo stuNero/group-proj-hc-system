@@ -82,10 +82,6 @@ while (isRunning)
             {
               activeUser = user;
               currentMenu = Menu.Main;
-              if (user.UserRole == Role.Admin)
-              {
-                user.GetPermission(user.UserRole);
-              }
               break;
             }
           }
