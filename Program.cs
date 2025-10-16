@@ -39,7 +39,7 @@ sys.SaveEventsToFile();
 
 
 // TEST CODE >>>>
-/* foreach (Event events in sys.eventList)
+foreach (Event events in sys.eventList)
 {
   Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
   + $"{events.StartDate} - {events.EndDate}");
@@ -50,7 +50,7 @@ sys.SaveEventsToFile();
   Console.WriteLine("\n----------------");
 }
 Console.Write("\nPress ENTER to continue.");
-Console.ReadLine(); */
+Console.ReadLine();
 // <<<< END OF TEST CODE
 
 
@@ -61,7 +61,7 @@ while (isRunning)
   {
     case Menu.Default:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("\n[1] Login \n[2] Register Account\n[3] Quit");
+      Console.WriteLine("\n[1] Login \n[2] Request registration as a patient\n[3] Quit");
       Console.Write("\n> ");
       string? input = Console.ReadLine();
 
@@ -97,8 +97,8 @@ while (isRunning)
             break;
           }
 
-          Console.Write("\nPlease input a password: ");
-          string? newPassword = Console.ReadLine();
+          Console.Write("\nPlease input an email: ");
+          string? newEmail = Console.ReadLine();
           Console.Write("\nWhat is your name? ");
           string? newName = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newName))
@@ -108,12 +108,17 @@ while (isRunning)
             break;
           }
           Debug.Assert(newSSN != null);
-          Debug.Assert(newPassword != null);
+          Debug.Assert(newEmail != null);
           Debug.Assert(newName != null);
 
-          sys.users.Add(new User(newSSN, newPassword, newName));
-          sys.SaveUsersToFile();
+          sys.eventList.Add(new($"{newSSN} patient request", Event.EventType.Request));
+          sys.SaveEventsToFile();
+
+          Console.WriteLine($"\nYour request have been registered. We'll let you know at {newEmail} when we have made a decision.");
+          Console.Write("\nPress ENTER to go back to continue. ");
+          Console.ReadLine();
           break;
+
         case "3":
           isRunning = false;
           break;
@@ -123,52 +128,24 @@ while (isRunning)
           break;
       }
       break;
+
     case Menu.Main:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("\n[1] Send patient registeration request \n[x] Logout");
+      Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
       switch (Console.ReadLine())
       {
-        case "1":
-          bool ssnFound = false;
-          foreach (Event userEvent in sys.eventList)
-          {
-            foreach (Participant part in userEvent.Participants)
-            {
-              Debug.Assert(activeUser != null);
-              if (part.User.SSN == activeUser.SSN)
-              {
-                Console.WriteLine($"\nRequest already exsists, you can just wait for now...\n");
-                Console.ReadLine();
-                ssnFound = true;
-                break;
-              }
-            }
-          }
-          if (ssnFound == false)
-          {
-            Debug.Assert(activeUser != null);
-            Participant newParticipant = new(activeUser, Role.Patient);
-            Event newEvent = new($"New Event", Event.EventType.Request);
-            newEvent.StartDate = DateTime.Now;
-            newEvent.Description = $"{activeUser.Name} is requesting to become a patient.";
-            newEvent.Participants.Add(newParticipant);
-            sys.eventList.Add(newEvent);
-            sys.SaveEventsToFile();
-            Console.WriteLine("\nYour request is sent!\n");
-            Console.ReadLine();
-            break;
-          }
-          break;
-
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
           break;
-      }
 
+        default:
+          Console.Write("\nInvalid input. Press ENTER to continue. ");
+          Console.ReadLine();
+          break;
+      }
       break;
   }
-
 }
