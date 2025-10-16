@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using App;
 
@@ -39,18 +40,18 @@ sys.SaveEventsToFile();
 
 
 // TEST CODE >>>>
-foreach (Event events in sys.eventList)
+/* foreach (Event events in sys.eventList)
 {
   Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
   + $"{events.StartDate} - {events.EndDate}");
   foreach (Participant participant in events.Participants)
   {
-    Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.UserRoles}");
+    Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.ParticipantRole}");
   }
   Console.WriteLine("\n----------------");
 }
 Console.Write("\nPress ENTER to continue.");
-Console.ReadLine();
+Console.ReadLine(); */
 // <<<< END OF TEST CODE
 
 
@@ -88,6 +89,9 @@ while (isRunning)
           break;
 
         case "2":
+
+          bool foundSSN = false;
+
           Console.Write("\nPlease input your SSN: ");
           string? newSSN = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newSSN))
@@ -97,26 +101,45 @@ while (isRunning)
             break;
           }
 
-          Console.Write("\nPlease input an email: ");
-          string? newEmail = Console.ReadLine();
-          Console.Write("\nWhat is your name? ");
-          string? newName = Console.ReadLine();
-          if (string.IsNullOrWhiteSpace(newName))
+          foreach (Event events in sys.eventList)
           {
-            Console.WriteLine("\nInvalid input");
-            Console.ReadLine();
-            break;
+            if (events.Title == newSSN)
+            {
+              Console.WriteLine("\nThere is already a patient request with the given SSN.");
+              Console.Write("\nPress ENTER to go back to previous menu. ");
+              Console.ReadLine();
+              foundSSN = true;
+              break;
+            }
           }
-          Debug.Assert(newSSN != null);
-          Debug.Assert(newEmail != null);
-          Debug.Assert(newName != null);
 
-          sys.eventList.Add(new($"{newSSN} patient request", Event.EventType.Request));
-          sys.SaveEventsToFile();
+          if (!foundSSN)
+          {
+            Console.Write("\nPlease input an email: ");
+            string? newEmail = Console.ReadLine();
+            Console.Write("\nWhat is your name? ");
+            string? newName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+              Console.WriteLine("\nInvalid input");
+              Console.ReadLine();
+              break;
+            }
+            Debug.Assert(newSSN != null);
+            Debug.Assert(newEmail != null);
+            Debug.Assert(newName != null);
 
-          Console.WriteLine($"\nYour request have been registered. We'll let you know at {newEmail} when we have made a decision.");
-          Console.Write("\nPress ENTER to go back to continue. ");
-          Console.ReadLine();
+            string newDescription = $"{newSSN} request to be a patient. Name: {newName} - Email: {newEmail}";
+            Event? newEvent = new(newSSN, Event.EventType.Request);
+            newEvent.Description = newDescription;
+
+            sys.eventList.Add(newEvent);
+            sys.SaveEventsToFile();
+
+            Console.WriteLine($"\nYour request have been registered. We'll let you know at {newEmail} when we have made a decision.");
+            Console.Write("\nPress ENTER to go back to continue. ");
+            Console.ReadLine();
+          }
           break;
 
         case "3":
