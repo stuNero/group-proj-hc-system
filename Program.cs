@@ -9,12 +9,13 @@ HCSystem sys = new();
 
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
+Console.WriteLine("hello");
 
 if (sys.users.Count <= 0)
 {
-  sys.users.Add(new User("testssn1", "", "test1"));
-  sys.users.Add(new User("testssn2", "", "test2"));
-  sys.users.Add(new User("testssn3", "", "test3"));
+  sys.users.Add(new User("admin123", "admin", "Admin User", Role.Admin));
+  sys.users.Add(new User("testssn1", "test1", "Test Patient", Role.Patient));
+  sys.users.Add(new User("testssn2", "test2", "Test Personnel", Role.Personnel));
 }
 
 sys.SaveUsersToFile();
@@ -154,11 +155,154 @@ while (isRunning)
 
     case Menu.Main:
       try { Console.Clear(); } catch { }
+      Console.WriteLine($"\nWelcome, {activeUser?.Name} ({activeUser?.UserRole})");
+
+      // Show role-specific options
+      if (activeUser?.UserRole == Role.Admin)
+      {
+        Console.WriteLine("\n[1] Admin Menu");
+      }
+      else if (activeUser?.UserRole == Role.Patient)
+      {
+        Console.WriteLine("\n[1] Patient Options");
+      }
+      else if (activeUser?.UserRole == Role.Personnel)
+      {
+        Console.WriteLine("\n[1] Personnel Options");
+      }
+
       Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
-      switch (Console.ReadLine())
+      string? mainInput = Console.ReadLine();
+      switch (mainInput)
       {
+        case "1":
+          if (activeUser?.UserRole == Role.Admin)
+          {
+            currentMenu = Menu.Admin;
+          }
+          else
+          {
+            Console.Write("\nThis feature is not yet implemented. Press ENTER to continue. ");
+            Console.ReadLine();
+          }
+          break;
+
+        case "x":
+          activeUser = null;
+          currentMenu = Menu.Default;
+          break;
+
+        default:
+          Console.Write("\nInvalid input. Press ENTER to continue. ");
+          Console.ReadLine();
+          break;
+      }
+      break;
+
+    case Menu.Admin:
+      try { Console.Clear(); } catch { }
+      Console.WriteLine($"\n=== ADMIN MENU ===");
+      Console.WriteLine($"Welcome, {activeUser?.Name}");
+      Console.WriteLine("\n[1] Create Personnel Account");
+      Console.WriteLine("[2] View All Users");
+      Console.WriteLine("[3] View All Events");
+      Console.WriteLine("\n[b] Back to Main Menu");
+      Console.WriteLine("[x] Logout");
+      Console.Write("\n> ");
+
+      string? adminInput = Console.ReadLine();
+      switch (adminInput)
+      {
+        case "1":
+          // Create Personnel Account
+          Console.Write("\nEnter SSN for new personnel: ");
+          string? newSSN = Console.ReadLine();
+
+          if (string.IsNullOrWhiteSpace(newSSN))
+          {
+            Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
+            Console.ReadLine();
+            break;
+          }
+
+          Console.Write("Enter password for new personnel: ");
+          string? newPassword = Console.ReadLine();
+
+          if (string.IsNullOrWhiteSpace(newPassword))
+          {
+            Console.WriteLine("\nInvalid password. Press ENTER to continue.");
+            Console.ReadLine();
+            break;
+          }
+
+          Console.Write("Enter name for new personnel: ");
+          string? newName = Console.ReadLine();
+
+          if (string.IsNullOrWhiteSpace(newName))
+          {
+            Console.WriteLine("\nInvalid name. Press ENTER to continue.");
+            Console.ReadLine();
+            break;
+          }
+
+          if (sys.CreatePersonnelAccount(newSSN, newPassword, newName))
+          {
+            Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
+          }
+          else
+          {
+            Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
+          }
+
+          Console.Write("\nPress ENTER to continue.");
+          Console.ReadLine();
+          break;
+
+        case "2":
+          // View All Users
+          Console.WriteLine("\n=== ALL USERS ===");
+          foreach (User user in sys.users)
+          {
+            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN} | Role: {user.UserRole}");
+          }
+          Console.Write("\nPress ENTER to continue.");
+          Console.ReadLine();
+          break;
+
+        case "3":
+          // View All Events
+          Console.WriteLine("\n=== ALL EVENTS ===");
+          if (sys.eventList.Count == 0)
+          {
+            Console.WriteLine("No events found.");
+          }
+          else
+          {
+            foreach (Event events in sys.eventList)
+            {
+              Console.WriteLine($"\nTitle: {events.Title}");
+              Console.WriteLine($"Type: {events.MyEventType}");
+              Console.WriteLine($"Description: {events.Description}");
+              Console.WriteLine($"Start: {events.StartDate}");
+              Console.WriteLine($"End: {events.EndDate}");
+              Console.WriteLine("Participants:");
+              foreach (Participant participant in events.Participants)
+              {
+                Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+              }
+              Console.WriteLine("------------------------");
+            }
+          }
+          Console.Write("\nPress ENTER to continue.");
+          Console.ReadLine();
+          break;
+
+        case "b":
+          currentMenu = Menu.Main;
+          break;
+
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
