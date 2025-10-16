@@ -7,6 +7,44 @@ class HCSystem
     // SYSTEM LISTS
     public List<Event> eventList = new();
     public List<User> users = new();
+
+    public static Dictionary<Role, List<Permission>> rolePermissionDict = new()
+    {
+        {Role.SuperAdmin, new List<Permission>
+            {
+            Permission.HandlePermissionSystem,
+            Permission.AssignAdminsRegion,
+            Permission.HandleRegistrations,
+            Permission.AddLocations,
+            Permission.HandlePermissionSystemForAdmins
+
+            }
+        },
+        {Role.Admin, new List<Permission>
+            {
+                Permission.HandleRegistrations,
+                Permission.AddLocations
+            }
+
+        },
+        {Role.Personnel, new List<Permission>
+            {
+                Permission.ViewPatientJournal,
+                Permission.RegisterAppointments
+            }
+        },
+        {Role.Patient, new List<Permission>
+            {
+                Permission.ViewOwnJournal,
+                 Permission.RequestAppointment
+            }
+        },
+        {Role.None, new List<Permission>
+            {
+                Permission.RequestRegistration
+            }
+        }
+    };
     // PUT ALL DIRECTORIES HERE
     string usersFile = @"csv-files\users-list.csv";
     string eventsFile = @"csv-files\events-list.csv";
