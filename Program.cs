@@ -137,7 +137,7 @@ while (isRunning)
             sys.SaveEventsToFile();
 
             Console.WriteLine($"\nYour request have been registered. We'll let you know at {newEmail} when we have made a decision.");
-            Console.Write("\nPress ENTER to go back to continue. ");
+            Console.Write("\nPress ENTER to continue. ");
             Console.ReadLine();
           }
           break;
