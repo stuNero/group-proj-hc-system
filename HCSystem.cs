@@ -156,8 +156,7 @@ class HCSystem
         }
         File.WriteAllText(eventsFile, eventLines);
     }
-
-    public bool CreatePersonnelAccount(string ssn, string password, string name)
+    public bool CheckPersonnel(string ssn, string password, string name)
     {
         // Check if user with this SSN already exists
         foreach (User user in users)
@@ -169,9 +168,54 @@ class HCSystem
         }
 
         // Create new personnel user
-        User newPersonnel = new(ssn, password, name, Role.Personnel);
-        users.Add(newPersonnel);
-        SaveUsersToFile();
+
         return true;
+    }
+    public void CreatePersonnelAccount()
+    {
+        Console.Write("\nEnter SSN for new personnel: ");
+        string? newSSN = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(newSSN))
+        {
+            Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.Write("Enter password for new personnel: ");
+        string? newPassword = Console.ReadLine();
+
+        if (newPassword == null)
+        {
+            Console.WriteLine("\nInvalid password. Press ENTER to continue.");
+            Console.ReadLine();
+            return;
+        }
+
+        Console.Write("Enter name for new personnel: ");
+        string? newName = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(newName))
+        {
+            Console.WriteLine("\nInvalid name. Press ENTER to continue.");
+            Console.ReadLine();
+            return;
+        }
+
+        if (CheckPersonnel(newSSN, newPassword, newName))
+        {
+            User newPersonnel = new(newSSN, newPassword, newName, Role.Personnel);
+            users.Add(newPersonnel);
+            SaveUsersToFile();
+            Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
+        }
+        else
+        {
+            Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
+        }
+
+        Console.Write("\nPress ENTER to continue.");
+        Console.ReadLine();
     }
 }
