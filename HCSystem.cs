@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.Tracing;
 
 namespace App;
@@ -29,6 +30,7 @@ class HCSystem
         { File.WriteAllText(locationsFile, ""); }
 
         LoadUsersFromFile();
+        LoadLocationsFromFile();
         LoadEventsFromFile();
 
     }
@@ -91,18 +93,27 @@ class HCSystem
             string newEventDescription = eventSplitData[2];
             DateTime newEventStartDate = DateTime.Parse(eventSplitData[3]);
             DateTime newEventEndDate = DateTime.Parse(eventSplitData[4]);
-            Location newEventLocation = null;
+            Location? newEventLocation = null;
 
-
+            foreach (Location location in locations)
+            {
+                if (location.Name == eventSplitData[5])
+                {
+                    newEventLocation = location;
+                    break;
+                }
+            }
 
             Event? newEvent = new(newEventTitle, eventType);
             newEvent.Description = newEventDescription;
             newEvent.StartDate = newEventStartDate;
             newEvent.EndDate = newEventEndDate;
+            newEvent.Location = newEventLocation;
+            // Debug.Assert(newEventLocation != null);
 
             List<Participant> participantsList = new();
 
-            string[] participants = eventSplitData[5].Split("^");
+            string[] participants = eventSplitData[6].Split("^");
             for (int i = 0; i < participants.Length; i++)
             {
                 string[] participantSplitData = participants[i].Split("¤");
@@ -133,10 +144,8 @@ class HCSystem
                 {
                     break;
                 }
-
                 newEvent.Participants = participantsList;
             }
-
             eventList.Add(newEvent);
         }
     }
@@ -155,21 +164,47 @@ class HCSystem
             {
                 for (int i = 0; i < events.Participants.Count; i++)
                 {
-
-                    if (events.Participants[i] == events.Participants[0])
+                    if (i != 0)
                     {
-                        participantLines = $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
+                        participantLines += "^";
                     }
-                    else
-                    {
-                        participantLines += $"^{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
-                    }
+                    participantLines += $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
             }
+            string eventLocation = "";
+            if (events.Location != null)
+            {
+                eventLocation = events.Location.Name;
+            }
 
-            eventLines += $"{events.Title}~{events.MyEventType}~{events.Description}~{events.StartDate}~{events.EndDate}~{participantLines}";
+            eventLines += $"{events.Title}~{events.MyEventType}~{events.Description}~{events.StartDate}~{events.EndDate}~{eventLocation}~{participantLines}";
             eventLines += Environment.NewLine;
+
         }
         File.WriteAllText(eventsFile, eventLines);
+    }
+    public void LoadLocationsFromFile()
+    {
+        string[] locationsCsv = File.ReadAllLines(locationsFile);
+        foreach (string locationLine in locationsCsv)
+        {
+            string[] locationSplitData = locationLine.Split("~");
+
+            Region newRegion = Enum.Parse<Region>(locationSplitData[2]);
+
+            Location? location = new(locationSplitData[0], locationSplitData[1], newRegion);
+            locations.Add(location);
+        }
+    }
+    public void SaveLocationsToFile()
+    {
+        string locationLines = "";
+        foreach (Location location in locations)
+        {
+            locationLines += $"{location.Name}~{location.Address}~{location.Region}";
+
+            locationLines += Environment.NewLine;
+        }
+        File.WriteAllText(locationsFile, locationLines);
     }
 }
