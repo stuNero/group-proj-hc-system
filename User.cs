@@ -16,7 +16,6 @@ class User
         _password = password;
         Name = name;
         UserRole = userRole;
-        Permissions = HCSystem.rolePermissionDict[userRole];
     }
     public bool TryLogin(string ssn, string password)
     {

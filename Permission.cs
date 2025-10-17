@@ -1,22 +1,23 @@
 namespace App;
 
-
 enum Permission
 {
-  // Basic User Permissions
-
-  RequestRegistration,
-  // Patient Permissions
-  ViewOwnJournal,
-  RequestAppointment,
-  // Personnel Permissions
-  ViewPatientJournal,
-  RegisterAppointments,
-  // Admin Permissions
-  HandleRegistrations,
-  AddLocations,
-  HandlePermissionSystem,
-  // Super Admin Permissions
-  AssignAdminsRegion,
-  HandlePermissionSystemForAdmins,
+  None,
+  HandleAccount,
+  // - Create Account
+  HandleRegistration,
+  // - Accept 
+  // - Deny   
+  HandleAppointment,
+  // - Register
+  // - Modify 
+  // - Approve
+  JournalEntries,
+  // - Mark with Read Permission
+  AddLocation,
+  // - View Patient Journal
+  ScheduleOfLocation,
+  AssignRegion,
+  ViewPermissionList,
+  PermHandlePerm,
 }
