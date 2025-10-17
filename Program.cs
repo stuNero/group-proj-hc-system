@@ -9,26 +9,14 @@ HCSystem sys = new();
 
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
+Console.WriteLine("hello");
 
 if (sys.users.Count <= 0)
 {
-  sys.users.Add(new User("testssn1", "", "test1"));
-  sys.users.Add(new User("testssn2", "", "test2"));
-  sys.users.Add(new User("testssn3", "", "test3"));
+  sys.users.Add(new User("admin123", "admin", "Admin User"));
+  sys.users.Add(new User("testssn1", "test1", "Test Patient"));
+  sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
 }
-
-
-foreach (User user in sys.users)
-{
-  Console.WriteLine($"\n{user.SSN} - {user.Name}");
-  for (int i = 0; i < user.Permissions.Count; i++)
-  {
-    Console.WriteLine($"\n{user.Permissions[i]}");
-  }
-  Console.WriteLine("\n------------------");
-}
-Console.ReadLine();
-
 
 sys.SaveUsersToFile();
 
@@ -60,11 +48,25 @@ sys.SaveEventsToFile();
 
 
 // TEST CODE >>>>
-/* foreach (Location loc in sys.locations)
+/* 
+foreach (User user in sys.users)
+{
+  Console.WriteLine($"\n{user.SSN} - {user.Name}");
+  for (int i = 0; i < user.Permissions.Count; i++)
+  {
+    Console.WriteLine($"\n{user.Permissions[i]}");
+  }
+  Console.WriteLine("\n------------------");
+}
+Console.ReadLine();
+
+
+foreach (Location loc in sys.locations)
 {
   Console.WriteLine($"{loc.Name} {loc.Address} {loc.Region}");
 }
 Console.ReadLine();
+
 
 foreach (Event events in sys.eventList)
 {
@@ -182,11 +184,33 @@ while (isRunning)
 
     case Menu.Main:
       try { Console.Clear(); } catch { }
+      Console.WriteLine($"\nWelcome, {activeUser?.Name}");
+      Console.WriteLine("\n[1] Create Personnel Account");
+      Console.WriteLine("[2] View All Users");
+      Console.WriteLine("[3] View Events by Type");
+
       Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
       switch (Console.ReadLine())
       {
+        case "1":
+          sys.CreatePersonnelAccount();
+          break;
+        case "2":
+          // View All Users
+          Console.WriteLine("\n=== ALL USERS ===");
+          foreach (User user in sys.users)
+          {
+            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN}");
+          }
+          Console.Write("\nPress ENTER to continue.");
+          Console.ReadLine();
+          break;
+        case "3":
+          sys.ViewEvents();
+          break;
+
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
