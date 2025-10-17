@@ -7,6 +7,7 @@ class HCSystem
     // SYSTEM LISTS
     public List<Event> eventList = new();
     public List<User> users = new();
+
     // PUT ALL DIRECTORIES HERE
     string usersFile = @"csv-files\users-list.csv";
     string eventsFile = @"csv-files\events-list.csv";
