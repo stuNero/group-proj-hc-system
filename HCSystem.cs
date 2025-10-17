@@ -218,4 +218,109 @@ class HCSystem
         Console.Write("\nPress ENTER to continue.");
         Console.ReadLine();
     }
+    public void ViewEvents()
+    {
+        Console.WriteLine("\n=== VIEW EVENTS BY TYPE ===");
+          Console.WriteLine("[1] Request Events");
+          Console.WriteLine("[2] Appointment Events");
+          Console.WriteLine("[3] Entry Events");
+          Console.WriteLine("[4] All Events");
+          Console.WriteLine("\n[b] Back to Admin Menu");
+          Console.Write("\n> ");
+
+          string? eventTypeChoice = Console.ReadLine();
+          Event.EventType? selectedType = null;
+          string typeTitle = "";
+
+          switch (eventTypeChoice)
+          {
+            case "1":
+              selectedType = Event.EventType.Request;
+              typeTitle = "REQUEST EVENTS";
+              break;
+            case "2":
+              selectedType = Event.EventType.Appointment;
+              typeTitle = "APPOINTMENT EVENTS";
+              break;
+            case "3":
+              selectedType = Event.EventType.Entry;
+              typeTitle = "ENTRY EVENTS";
+              break;
+            case "4":
+              selectedType = null;
+              typeTitle = "ALL EVENTS";
+              break;
+            case "b":
+              break;
+            default:
+              Console.Write("\nInvalid input. Press ENTER to continue.");
+              Console.ReadLine();
+              break;
+          }
+
+          if (eventTypeChoice != "b" && eventTypeChoice != null && (eventTypeChoice == "1" || eventTypeChoice == "2" || eventTypeChoice == "3" || eventTypeChoice == "4"))
+          {
+            Console.WriteLine($"\n=== {typeTitle} ===");
+
+            List<Event> filteredEvents = new List<Event>();
+            if (selectedType.HasValue)
+            {
+              foreach (Event singleEvent in eventList)
+              {
+                if (singleEvent.MyEventType == selectedType.Value)
+                {
+                  filteredEvents.Add(singleEvent);
+                }
+              }
+            }
+            else
+            {
+              foreach (Event singleEvent in eventList)
+              {
+                filteredEvents.Add(singleEvent);
+              }
+            }
+
+            if (filteredEvents.Count == 0)
+            {
+              Console.WriteLine($"No {typeTitle.ToLower()} found.");
+            }
+            else
+            {
+              foreach (Event events in filteredEvents)
+              {
+                Console.WriteLine($"\nTitle: {events.Title}");
+                Console.WriteLine($"Type: {events.MyEventType}");
+                if (string.IsNullOrWhiteSpace(events.Description))
+                { }
+                else
+                {
+                  Console.WriteLine($"Description: {events.Description}");
+                }
+                if (events.StartDate == default(DateTime)) { }
+                else
+                {
+                  Console.WriteLine($"Start: {events.StartDate}");
+                }
+
+                if (events.EndDate == default(DateTime))
+                {
+
+                }
+                else
+                {
+                  Console.WriteLine($"End: {events.EndDate}");
+                }
+                Console.WriteLine("Participants:");
+                foreach (Participant participant in events.Participants)
+                {
+                  Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+                }
+                Console.WriteLine("------------------------");
+              }
+            }
+            Console.Write("\nPress ENTER to continue.");
+            Console.ReadLine();
+          }
+    }
 }
