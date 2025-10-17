@@ -7,7 +7,7 @@ class Event
   public string? Description;
   public DateTime StartDate;
   public DateTime EndDate;
-  public Location Location;
+  public Location? Location;
 
   public List<Participant> Participants = new List<Participant>();
 
