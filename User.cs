@@ -8,14 +8,14 @@ class User
     public string SSN;
     string _password;
     public string Name;
+    public Region UserRegion;
     public List<Permission> Permissions = new();
-    public Role UserRole;
-    public User(string ssn, string password, string name, Role userRole = Role.None)
+    public User(string ssn, string password, string name, Region userRegion = Region.None)
     {
         SSN = ssn;
         _password = password;
         Name = name;
-        UserRole = userRole;
+        UserRegion = userRegion;
     }
     public bool TryLogin(string ssn, string password)
     {
