@@ -171,7 +171,9 @@ while (isRunning)
         Console.WriteLine("\n[1] Personnel Menu");
       }
 
-      Console.WriteLine("\n[x] Logout");
+
+
+      Console.WriteLine("[2] Manage Permissions \n\n[x] Logout");
       Console.Write("\n> ");
 
       string? mainInput = Console.ReadLine();
@@ -189,6 +191,71 @@ while (isRunning)
           }
           break;
 
+        case "2": // Manage permessions
+          try { Console.Clear(); } catch { }
+          Console.WriteLine("\n=== List of Users ===\n");
+          int userIndex = 1;
+          foreach (User user in sys.users)
+          {
+            Console.WriteLine($"[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
+            userIndex++;
+          }
+
+          Console.Write("\nSelect a user to manage permission: ");
+          int.TryParse(Console.ReadLine(), out int selectedUser);
+          User targetUser = sys.users[selectedUser - 1];
+
+          int permIndex = 1;
+          try { Console.Clear(); } catch { }
+          bool givingPerm = true;
+          List<Permission> permList = new();
+
+          Console.WriteLine($"\n=== You have selected [{targetUser.Name}] ===\n");
+          Console.WriteLine("\nList of all permissions:\n");
+          foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+          {
+            Console.WriteLine($"[{permIndex}]   {perm}");
+            permList.Add(perm);
+            permIndex++;
+          }
+          Console.WriteLine("====================");
+          Console.WriteLine("\nWrite 'done' when you are satisfied.");
+          Console.WriteLine("\nSelect permissions to give: ");
+          while (givingPerm)
+          {
+            string userInput = Console.ReadLine().ToLower().Trim();
+            int.TryParse(userInput, out int selectedPerm);
+            if (string.IsNullOrWhiteSpace(userInput) || selectedPerm < 1 || selectedPerm > permList.Count)
+            {
+              Console.WriteLine("Please en a valid permission..");
+            }
+            if (userInput == "done")
+            {
+              givingPerm = false;
+              break;
+            }
+            else
+            {
+              Permission perm = permList[selectedPerm - 1];
+              targetUser.Permissions.Add(perm);
+            }
+
+          }
+          try { Console.Clear(); } catch { }
+
+          Console.WriteLine($"\nPermissions given to {targetUser.Name} :\n");
+          for (int i = 0; i < targetUser.Permissions.Count; i++)
+          {
+            Permission perm = targetUser.Permissions[i];
+            Console.WriteLine($"[{i + 1}]  {perm}");
+
+          }
+
+          Console.WriteLine("\nPress ENTER to continue.");
+          Console.ReadLine();
+
+          break;
+
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
@@ -201,6 +268,7 @@ while (isRunning)
       }
       break;
 
+
     case Menu.Admin:
       try { Console.Clear(); } catch { }
       Console.WriteLine($"\n=== ADMIN MENU ===");
@@ -208,6 +276,7 @@ while (isRunning)
       Console.WriteLine("\n[1] Create Personnel Account");
       Console.WriteLine("[2] View All Users");
       Console.WriteLine("[3] View Events by Type");
+      Console.WriteLine("[4] Manage Permissions");
       Console.WriteLine("\n[b] Back to Main Menu");
       Console.WriteLine("[x] Logout");
       Console.Write("\n> ");
@@ -375,6 +444,7 @@ while (isRunning)
             Console.ReadLine();
           }
           break;
+
 
         case "b":
           currentMenu = Menu.Main;
