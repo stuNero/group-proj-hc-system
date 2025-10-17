@@ -13,13 +13,19 @@ Console.WriteLine("hello");
 
 if (sys.users.Count <= 0)
 {
-  sys.users.Add(new User("admin123", "admin", "Admin User", Role.Admin));
-  sys.users.Add(new User("testssn1", "test1", "Test Patient", Role.Patient));
-  sys.users.Add(new User("testssn2", "test2", "Test Personnel", Role.Personnel));
+  sys.users.Add(new User("admin123", "admin", "Admin User"));
+  sys.users.Add(new User("testssn1", "test1", "Test Patient"));
+  sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
 }
 
 sys.SaveUsersToFile();
 
+if (sys.locations.Count <= 0)
+{
+  sys.locations.Add(new("testVC", "Main Street 1"));
+}
+
+sys.SaveLocationsToFile();
 
 if (sys.eventList.Count <= 0)
 {
@@ -31,6 +37,7 @@ if (sys.eventList.Count <= 0)
   mySecondEvent.Description = "I have a cold.";
   mySecondEvent.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
   mySecondEvent.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
+  mySecondEvent.Location = sys.locations[0];
   mySecondEvent.Participants.Add(new(sys.users[0], Role.Patient));
   mySecondEvent.Participants.Add(new(sys.users[1], Role.Personnel));
   mySecondEvent.Participants.Add(new(sys.users[2], Role.Admin));
@@ -41,10 +48,32 @@ sys.SaveEventsToFile();
 
 
 // TEST CODE >>>>
-/* foreach (Event events in sys.eventList)
+/* 
+foreach (User user in sys.users)
+{
+  Console.WriteLine($"\n{user.SSN} - {user.Name}");
+  for (int i = 0; i < user.Permissions.Count; i++)
+  {
+    Console.WriteLine($"\n{user.Permissions[i]}");
+  }
+  Console.WriteLine("\n------------------");
+}
+Console.ReadLine();
+
+
+foreach (Location loc in sys.locations)
+{
+  Console.WriteLine($"{loc.Name} {loc.Address} {loc.Region}");
+}
+Console.ReadLine();
+
+
+foreach (Event events in sys.eventList)
 {
   Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
   + $"{events.StartDate} - {events.EndDate}");
+  if (events.Location != null)
+  { Console.WriteLine($"\nLocation: {events.Location.Name} - Adress: {events.Location.Address} - Region: {events.Location.Region}"); }
   foreach (Participant participant in events.Participants)
   {
     Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.ParticipantRole}");
@@ -155,87 +184,31 @@ while (isRunning)
 
     case Menu.Main:
       try { Console.Clear(); } catch { }
-      Console.WriteLine($"\nWelcome, {activeUser?.Name} ({activeUser?.UserRole})");
-
-      // Show role-specific options
-      if (activeUser?.UserRole == Role.Admin)
-      {
-        Console.WriteLine("\n[1] Admin Menu");
-      }
-      else if (activeUser?.UserRole == Role.Patient)
-      {
-        Console.WriteLine("\n[1] Patient Menu");
-      }
-      else if (activeUser?.UserRole == Role.Personnel)
-      {
-        Console.WriteLine("\n[1] Personnel Menu");
-      }
+      Console.WriteLine($"\nWelcome, {activeUser?.Name}");
+      Console.WriteLine("\n[1] Create Personnel Account");
+      Console.WriteLine("[2] View All Users");
+      Console.WriteLine("[3] View Events by Type");
 
       Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
-      string? mainInput = Console.ReadLine();
-      switch (mainInput)
-      {
-        case "1":
-          if (activeUser?.UserRole == Role.Admin)
-          {
-            currentMenu = Menu.Admin;
-          }
-          else
-          {
-            Console.Write("\nThis feature is not yet implemented. Press ENTER to continue. ");
-            Console.ReadLine();
-          }
-          break;
-
-        case "x":
-          activeUser = null;
-          currentMenu = Menu.Default;
-          break;
-
-        default:
-          Console.Write("\nInvalid input. Press ENTER to continue. ");
-          Console.ReadLine();
-          break;
-      }
-      break;
-
-    case Menu.Admin:
-      try { Console.Clear(); } catch { }
-      Console.WriteLine($"\n=== ADMIN MENU ===");
-      Console.WriteLine($"Welcome, {activeUser?.Name}");
-      Console.WriteLine("\n[1] Create Personnel Account");
-      Console.WriteLine("[2] View All Users");
-      Console.WriteLine("[3] View Events by Type");
-      Console.WriteLine("\n[b] Back to Main Menu");
-      Console.WriteLine("[x] Logout");
-      Console.Write("\n> ");
-
-      string? adminInput = Console.ReadLine();
-      switch (adminInput)
+      switch (Console.ReadLine())
       {
         case "1":
           sys.CreatePersonnelAccount();
           break;
-
         case "2":
           // View All Users
           Console.WriteLine("\n=== ALL USERS ===");
           foreach (User user in sys.users)
           {
-            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN} | Role: {user.UserRole}");
+            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN}");
           }
           Console.Write("\nPress ENTER to continue.");
           Console.ReadLine();
           break;
-
         case "3":
           sys.ViewEvents();
-          break;
-
-        case "b":
-          currentMenu = Menu.Main;
           break;
 
         case "x":
