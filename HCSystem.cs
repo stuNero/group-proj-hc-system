@@ -7,6 +7,7 @@ class HCSystem
     // SYSTEM LISTS
     public List<Event> eventList = new();
     public List<User> users = new();
+    public List<Location> locations = new();
 
     // PUT ALL DIRECTORIES HERE
     string usersFile = @"csv-files\users-list.csv";
@@ -34,23 +35,39 @@ class HCSystem
         foreach (string userLine in usersCsv)
         {
             string[] userSplitData = userLine.Split("~");
-            Role userRole = Role.None;
-            switch (userSplitData[3])
+            Region userRegion = Enum.Parse<Region>(userSplitData[3]);
+            List<Permission> userPermissions = new();
+
+            string[] permissionData = userSplitData[4].Split("^");
+            foreach (string permission in permissionData)
             {
-                case "Admin": userRole = Role.Admin; break;
-                case "Patient": userRole = Role.Patient; break;
-                case "Personnel": userRole = Role.Personnel; break;
+                userPermissions.Add(Enum.Parse<Permission>(permission));
             }
 
-            users.Add(new(userSplitData[0], userSplitData[1], userSplitData[2], userRole));
+            User? user = new(userSplitData[0], userSplitData[1], userSplitData[2], userRegion);
+            user.Permissions = userPermissions;
+            users.Add(user);
         }
     }
     public void SaveUsersToFile()
     {
         string userLines = "";
+        string userPermissionLine = "";
         foreach (User user in users)
         {
-            userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}~{user.UserRole}";
+            for (int i = 0; i < user.Permissions.Count; i++)
+            {
+                if (user.Permissions[i] == user.Permissions[0])
+                {
+                    userPermissionLine = $"{user.Permissions[i]}";
+                }
+                else
+                {
+                    userPermissionLine += $"^{user.Permissions[i]}";
+                }
+            }
+
+            userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}~{user.UserRegion}~{userPermissionLine}";
             userLines += Environment.NewLine;
         }
         File.WriteAllText(usersFile, userLines);
@@ -67,17 +84,13 @@ class HCSystem
         {
             string[] eventSplitData = eventLine.Split("~");
             string newEventTitle = eventSplitData[0];
-            Event.EventType eventType = Event.EventType.Request;
+            Event.EventType eventType = Enum.Parse<Event.EventType>(eventSplitData[1]);
             string newEventDescription = eventSplitData[2];
             DateTime newEventStartDate = DateTime.Parse(eventSplitData[3]);
             DateTime newEventEndDate = DateTime.Parse(eventSplitData[4]);
+            Location newEventLocation = null;
 
-            switch (eventSplitData[1])
-            {
-                case "Request": eventType = Event.EventType.Request; break;
-                case "Enty": eventType = Event.EventType.Entry; break;
-                case "Appointment": eventType = Event.EventType.Appointment; break;
-            }
+
 
             Event? newEvent = new(newEventTitle, eventType);
             newEvent.Description = newEventDescription;
