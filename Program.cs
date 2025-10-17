@@ -216,48 +216,7 @@ while (isRunning)
       switch (adminInput)
       {
         case "1":
-          // Create Personnel Account
-          Console.Write("\nEnter SSN for new personnel: ");
-          string? newSSN = Console.ReadLine();
-
-          if (string.IsNullOrWhiteSpace(newSSN))
-          {
-            Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
-            Console.ReadLine();
-            break;
-          }
-
-          Console.Write("Enter password for new personnel: ");
-          string? newPassword = Console.ReadLine();
-
-          if (newPassword == null)
-          {
-            Console.WriteLine("\nInvalid password. Press ENTER to continue.");
-            Console.ReadLine();
-            break;
-          }
-
-          Console.Write("Enter name for new personnel: ");
-          string? newName = Console.ReadLine();
-
-          if (string.IsNullOrWhiteSpace(newName))
-          {
-            Console.WriteLine("\nInvalid name. Press ENTER to continue.");
-            Console.ReadLine();
-            break;
-          }
-
-          if (sys.CreatePersonnelAccount(newSSN, newPassword, newName))
-          {
-            Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
-          }
-          else
-          {
-            Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
-          }
-
-          Console.Write("\nPress ENTER to continue.");
-          Console.ReadLine();
+          sys.CreatePersonnelAccount();
           break;
 
         case "2":
@@ -272,108 +231,7 @@ while (isRunning)
           break;
 
         case "3":
-          Console.WriteLine("\n=== VIEW EVENTS BY TYPE ===");
-          Console.WriteLine("[1] Request Events");
-          Console.WriteLine("[2] Appointment Events");
-          Console.WriteLine("[3] Entry Events");
-          Console.WriteLine("[4] All Events");
-          Console.WriteLine("\n[b] Back to Admin Menu");
-          Console.Write("\n> ");
-
-          string? eventTypeChoice = Console.ReadLine();
-          Event.EventType? selectedType = null;
-          string typeTitle = "";
-
-          switch (eventTypeChoice)
-          {
-            case "1":
-              selectedType = Event.EventType.Request;
-              typeTitle = "REQUEST EVENTS";
-              break;
-            case "2":
-              selectedType = Event.EventType.Appointment;
-              typeTitle = "APPOINTMENT EVENTS";
-              break;
-            case "3":
-              selectedType = Event.EventType.Entry;
-              typeTitle = "ENTRY EVENTS";
-              break;
-            case "4":
-              selectedType = null;
-              typeTitle = "ALL EVENTS";
-              break;
-            case "b":
-              break;
-            default:
-              Console.Write("\nInvalid input. Press ENTER to continue.");
-              Console.ReadLine();
-              break;
-          }
-
-          if (eventTypeChoice != "b" && eventTypeChoice != null && (eventTypeChoice == "1" || eventTypeChoice == "2" || eventTypeChoice == "3" || eventTypeChoice == "4"))
-          {
-            Console.WriteLine($"\n=== {typeTitle} ===");
-
-            List<Event> filteredEvents = new List<Event>();
-            if (selectedType.HasValue)
-            {
-              foreach (Event singleEvent in sys.eventList)
-              {
-                if (singleEvent.MyEventType == selectedType.Value)
-                {
-                  filteredEvents.Add(singleEvent);
-                }
-              }
-            }
-            else
-            {
-              foreach (Event singleEvent in sys.eventList)
-              {
-                filteredEvents.Add(singleEvent);
-              }
-            }
-
-            if (filteredEvents.Count == 0)
-            {
-              Console.WriteLine($"No {typeTitle.ToLower()} found.");
-            }
-            else
-            {
-              foreach (Event events in filteredEvents)
-              {
-                Console.WriteLine($"\nTitle: {events.Title}");
-                Console.WriteLine($"Type: {events.MyEventType}");
-                if (string.IsNullOrWhiteSpace(events.Description))
-                { }
-                else
-                {
-                  Console.WriteLine($"Description: {events.Description}");
-                }
-                if (events.StartDate == default(DateTime)) { }
-                else
-                {
-                  Console.WriteLine($"Start: {events.StartDate}");
-                }
-
-                if (events.EndDate == default(DateTime))
-                {
-
-                }
-                else
-                {
-                  Console.WriteLine($"End: {events.EndDate}");
-                }
-                Console.WriteLine("Participants:");
-                foreach (Participant participant in events.Participants)
-                {
-                  Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                }
-                Console.WriteLine("------------------------");
-              }
-            }
-            Console.Write("\nPress ENTER to continue.");
-            Console.ReadLine();
-          }
+          sys.ViewEvents();
           break;
 
         case "b":
