@@ -17,8 +17,27 @@ if (sys.users.Count <= 0)
   sys.users.Add(new User("testssn3", "", "test3"));
 }
 
+
+foreach (User user in sys.users)
+{
+  Console.WriteLine($"\n{user.SSN} - {user.Name}");
+  for (int i = 0; i < user.Permissions.Count; i++)
+  {
+    Console.WriteLine($"\n{user.Permissions[i]}");
+  }
+  Console.WriteLine("\n------------------");
+}
+Console.ReadLine();
+
+
 sys.SaveUsersToFile();
 
+if (sys.locations.Count <= 0)
+{
+  sys.locations.Add(new("testVC", "Main Street 1"));
+}
+
+sys.SaveLocationsToFile();
 
 if (sys.eventList.Count <= 0)
 {
@@ -30,6 +49,7 @@ if (sys.eventList.Count <= 0)
   mySecondEvent.Description = "I have a cold.";
   mySecondEvent.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
   mySecondEvent.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
+  mySecondEvent.Location = sys.locations[0];
   mySecondEvent.Participants.Add(new(sys.users[0], Role.Patient));
   mySecondEvent.Participants.Add(new(sys.users[1], Role.Personnel));
   mySecondEvent.Participants.Add(new(sys.users[2], Role.Admin));
@@ -40,10 +60,18 @@ sys.SaveEventsToFile();
 
 
 // TEST CODE >>>>
-/* foreach (Event events in sys.eventList)
+/* foreach (Location loc in sys.locations)
+{
+  Console.WriteLine($"{loc.Name} {loc.Address} {loc.Region}");
+}
+Console.ReadLine();
+
+foreach (Event events in sys.eventList)
 {
   Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
   + $"{events.StartDate} - {events.EndDate}");
+  if (events.Location != null)
+  { Console.WriteLine($"\nLocation: {events.Location.Name} - Adress: {events.Location.Address} - Region: {events.Location.Region}"); }
   foreach (Participant participant in events.Participants)
   {
     Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.ParticipantRole}");
