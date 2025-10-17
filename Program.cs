@@ -1,5 +1,6 @@
 ﻿using System.Diagnostics;
 using System.Reflection;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using App;
 
@@ -45,7 +46,7 @@ sys.SaveEventsToFile();
   + $"{events.StartDate} - {events.EndDate}");
   foreach (Participant participant in events.Participants)
   {
-    Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.UserRoles}");
+    Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.ParticipantRole}");
   }
   Console.WriteLine("\n----------------");
 }
@@ -61,7 +62,7 @@ while (isRunning)
   {
     case Menu.Default:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("\n[1] Login \n[2] Register Account\n[3] Quit");
+      Console.WriteLine("\n[1] Login \n[2] Request registration as a patient\n[3] Quit");
       Console.Write("\n> ");
       string? input = Console.ReadLine();
 
@@ -88,6 +89,9 @@ while (isRunning)
           break;
 
         case "2":
+
+          bool foundSSN = false;
+
           Console.Write("\nPlease input your SSN: ");
           string? newSSN = Console.ReadLine();
           if (string.IsNullOrWhiteSpace(newSSN))
@@ -97,23 +101,47 @@ while (isRunning)
             break;
           }
 
-          Console.Write("\nPlease input a password: ");
-          string? newPassword = Console.ReadLine();
-          Console.Write("\nWhat is your name? ");
-          string? newName = Console.ReadLine();
-          if (string.IsNullOrWhiteSpace(newName))
+          foreach (Event events in sys.eventList)
           {
-            Console.WriteLine("\nInvalid input");
-            Console.ReadLine();
-            break;
+            if (events.Title == newSSN)
+            {
+              Console.WriteLine("\nThere is already a patient request with the given SSN.");
+              Console.Write("\nPress ENTER to go back to previous menu. ");
+              Console.ReadLine();
+              foundSSN = true;
+              break;
+            }
           }
-          Debug.Assert(newSSN != null);
-          Debug.Assert(newPassword != null);
-          Debug.Assert(newName != null);
 
-          sys.users.Add(new User(newSSN, newPassword, newName));
-          sys.SaveUsersToFile();
+          if (!foundSSN)
+          {
+            Console.Write("\nPlease input an email: ");
+            string? newEmail = Console.ReadLine();
+            Console.Write("\nWhat is your name? ");
+            string? newName = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(newName))
+            {
+              Console.WriteLine("\nInvalid input");
+              Console.ReadLine();
+              break;
+            }
+            Debug.Assert(newSSN != null);
+            Debug.Assert(newEmail != null);
+            Debug.Assert(newName != null);
+
+            string newDescription = $"{newSSN} request to be a patient. Name: {newName} - Email: {newEmail}";
+            Event? newEvent = new(newSSN, Event.EventType.Request);
+            newEvent.Description = newDescription;
+
+            sys.eventList.Add(newEvent);
+            sys.SaveEventsToFile();
+
+            Console.WriteLine($"\nYour request have been registered. We'll let you know at {newEmail} when we have made a decision.");
+            Console.Write("\nPress ENTER to continue. ");
+            Console.ReadLine();
+          }
           break;
+
         case "3":
           isRunning = false;
           break;
@@ -123,52 +151,24 @@ while (isRunning)
           break;
       }
       break;
+
     case Menu.Main:
       try { Console.Clear(); } catch { }
-      Console.WriteLine("\n[1] Send patient registeration request \n[x] Logout");
+      Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
       switch (Console.ReadLine())
       {
-        case "1":
-          bool ssnFound = false;
-          foreach (Event userEvent in sys.eventList)
-          {
-            foreach (Participant part in userEvent.Participants)
-            {
-              Debug.Assert(activeUser != null);
-              if (part.User.SSN == activeUser.SSN)
-              {
-                Console.WriteLine($"\nRequest already exsists, you can just wait for now...\n");
-                Console.ReadLine();
-                ssnFound = true;
-                break;
-              }
-            }
-          }
-          if (ssnFound == false)
-          {
-            Debug.Assert(activeUser != null);
-            Participant newParticipant = new(activeUser, Role.Patient);
-            Event newEvent = new($"New Event", Event.EventType.Request);
-            newEvent.StartDate = DateTime.Now;
-            newEvent.Description = $"{activeUser.Name} is requesting to become a patient.";
-            newEvent.Participants.Add(newParticipant);
-            sys.eventList.Add(newEvent);
-            sys.SaveEventsToFile();
-            Console.WriteLine("\nYour request is sent!\n");
-            Console.ReadLine();
-            break;
-          }
-          break;
-
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
           break;
-      }
 
+        default:
+          Console.Write("\nInvalid input. Press ENTER to continue. ");
+          Console.ReadLine();
+          break;
+      }
       break;
   }
-
 }
