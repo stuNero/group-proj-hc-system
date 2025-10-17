@@ -10,9 +10,9 @@ class HCSystem
     public List<Location> locations = new();
 
     // PUT ALL DIRECTORIES HERE
-    string usersFile = @"csv-files\users-list.csv";
-    string eventsFile = @"csv-files\events-list.csv";
-
+    string usersFile = @"csv-files/users-list.csv";
+    string eventsFile = @"csv-files/events-list.csv";
+    string locationsFile = @"csv-files/locations-list.csv";
     public HCSystem()
     {
 
@@ -24,6 +24,9 @@ class HCSystem
 
         if (!File.Exists(eventsFile))
         { File.WriteAllText(eventsFile, ""); }
+
+        if (!File.Exists(locationsFile))
+        { File.WriteAllText(locationsFile, ""); }
 
         LoadUsersFromFile();
         LoadEventsFromFile();
