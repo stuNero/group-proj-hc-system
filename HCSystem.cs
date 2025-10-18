@@ -60,18 +60,25 @@ class HCSystem
         string userPermissionLine = "";
         foreach (User user in users)
         {
-            for (int i = 0; i < user.Permissions.Count; i++)
+            if (user.Permissions.Count == 0)
             {
-                if (user.Permissions[i] == user.Permissions[0])
+                userPermissionLine = "None";
+            }
+            else
+            {
+                for (int i = 0; i < user.Permissions.Count; i++)
                 {
-                    userPermissionLine = $"{user.Permissions[i]}";
-                }
-                else
-                {
-                    userPermissionLine += $"^{user.Permissions[i]}";
+                    if (i != 0)
+                    {
+                        userPermissionLine += "^";
+                    }
+                    else
+                    {
+                        userPermissionLine += $"{user.Permissions[i]}";
+                    }
+
                 }
             }
-
             userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}~{user.UserRegion}~{userPermissionLine}";
             userLines += Environment.NewLine;
         }
