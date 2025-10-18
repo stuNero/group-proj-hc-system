@@ -48,7 +48,6 @@ class HCSystem
             {
                 userPermissions.Add(Enum.Parse<Permission>(permission));
             }
-
             User? user = new(userSplitData[0], userSplitData[1], userSplitData[2], userRegion);
             user.Permissions = userPermissions;
             users.Add(user);
@@ -57,9 +56,9 @@ class HCSystem
     public void SaveUsersToFile()
     {
         string userLines = "";
-        string userPermissionLine = "";
         foreach (User user in users)
         {
+            string userPermissionLine = "";
             if (user.Permissions.Count == 0)
             {
                 userPermissionLine = "None";
@@ -72,10 +71,7 @@ class HCSystem
                     {
                         userPermissionLine += "^";
                     }
-                    else
-                    {
-                        userPermissionLine += $"{user.Permissions[i]}";
-                    }
+                    userPermissionLine += $"{user.Permissions[i]}";
                 }
             }
             userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}~{user.UserRegion}~{userPermissionLine}";
@@ -115,8 +111,6 @@ class HCSystem
             newEvent.StartDate = newEventStartDate;
             newEvent.EndDate = newEventEndDate;
             newEvent.Location = newEventLocation;
-            // Debug.Assert(newEventLocation != null);
-
             List<Participant> participantsList = new();
 
             string[] participants = eventSplitData[6].Split("^");
