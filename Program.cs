@@ -80,7 +80,7 @@ while (isRunning)
     case Menu.Default:
       try { Console.Clear(); } catch { }
       Console.WriteLine("\n[1] Login \n[2] Request registration as a patient\n[3] Quit");
-      Console.Write("\n> ");
+      Console.Write("\n► ");
       string? input = Console.ReadLine();
 
       switch (input)
@@ -190,7 +190,7 @@ while (isRunning)
 
 
       Console.WriteLine("[2] Manage Permissions \n\n[x] Logout");
-      Console.Write("\n> ");
+      Console.Write("\n► ");
 
       string? mainInput = Console.ReadLine();
       switch (mainInput)
@@ -209,46 +209,40 @@ while (isRunning)
 
         case "2": // Manage permessions
           try { Console.Clear(); } catch { }
-          Console.WriteLine("\n=== List of Users ===\n");
-          int userIndex = 1;
-          foreach (User user in sys.users)
-          {
-            Console.WriteLine($"[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
-            userIndex++;
-          }
-          Console.WriteLine("========================================");
-          Console.WriteLine("\nWrite 'done' if you want to go back.");
-          Console.Write("\nSelect a user to manage permission: ");
           User targetUser = null;
           bool isSelectingUser = true;
           while (isSelectingUser)
           {
-            string userInput = Console.ReadLine().ToLower().Trim();
-            if (string.IsNullOrEmpty(userInput))
+            Console.WriteLine("\n=== List of Users ===\n");
+            int userIndex = 1;
+            foreach (User user in sys.users)
             {
-
-              Console.WriteLine("\nPlease select a valid user: ");
+              Console.WriteLine($"[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
+              userIndex++;
             }
-            else if (userInput == "done")
+            Console.WriteLine("========================================");
+            Console.WriteLine("\nWrite 'done' if you want to go back.");
+            Console.Write("\nSelect a user to manage permission: ");
+
+            string userInput = Console.ReadLine().ToLower().Trim();
+            if (userInput == "done")
             {
               isSelectingUser = false;
               break;
             }
+            else if (string.IsNullOrEmpty(userInput))
+            {
 
+              Console.Write("\nPlease select a valid user: ");
+            }
             else
             {
-              if (!int.TryParse(userInput, out int selectedUser))
+              if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > sys.users.Count)
               {
-                Console.WriteLine("\nPlease select a valid user:");
+                Console.Write("\nPlease select a valid user: ");
               }
               else
               {
-                if (selectedUser < 1 || selectedUser > sys.users.Count)
-                {
-                  Console.WriteLine("\nPlease select a valid user:");
-                  break;
-                }
-
                 targetUser = sys.users[selectedUser - 1];
 
                 if (targetUser.SSN != activeUser.SSN)
@@ -258,32 +252,54 @@ while (isRunning)
                 }
                 else
                 {
-                  Console.Write("\nObs! please select a different user than yourself: ");
+                  Console.Write("\nOpps! please select a different user than yourself...");
+                  Console.ReadLine();
+
                 }
-
               }
-
-
             }
-
+            try { Console.Clear(); } catch { }
           }
-          int permIndex = 1;
           try { Console.Clear(); } catch { }
           List<Permission> permList = new();
-
-          Console.WriteLine("\nPermissions:\n");
-          foreach (Permission perm in activeUser.Permissions)
-          {
-            Console.WriteLine($"[{permIndex}]   {perm}");
-            permList.Add(perm);
-            permIndex++;
-          }
-          Console.WriteLine("==========================");
-          Console.WriteLine("\nWrite 'done' when you are satisfied.");
-          Console.WriteLine($"\nSelect permissions to give to: [{targetUser.Name}]");
           bool isSelectingperm = true;
           while (isSelectingperm)
           {
+            int permIndex = 1;
+            if (targetUser == null)
+            {
+              break;
+            }
+            Debug.Assert(targetUser != null);
+            Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
+            foreach (Permission perm in activeUser.Permissions)
+            {
+              bool targetUserPermBool = false;
+
+              Debug.Assert(targetUser != null);
+              if (targetUser.Permissions.Contains(perm))
+              {
+                targetUserPermBool = true;
+                string index = $"[{permIndex}]".PadRight(4);
+                string permName = perm.ToString().PadRight(21);
+                Console.WriteLine($"{index}   {permName}{targetUserPermBool}");
+              }
+              else
+              {
+                targetUserPermBool = false;
+                string index = $"[{permIndex}]".PadRight(4);
+                string permName = perm.ToString().PadRight(21);
+                Console.WriteLine($"{index}   {permName}{targetUserPermBool}");
+              }
+
+              permList.Add(perm);
+              permIndex++;
+            }
+            Console.WriteLine("==================================");
+            Console.WriteLine("\nWrite 'done' when you are satisfied.");
+            Console.WriteLine($"\nSelect permission to give to: [{targetUser.Name}]");
+            Console.Write("\n► ");
+
             string userInput = Console.ReadLine().ToLower().Trim();
             if (string.IsNullOrEmpty(userInput))
             {
@@ -296,31 +312,40 @@ while (isRunning)
             }
             else
             {
-              if (!int.TryParse(userInput, out int selectedPerm))
+              if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > activeUser.Permissions.Count)
               {
                 Console.WriteLine("\nPlease select a valid permission:");
               }
               else
               {
                 Permission perm = permList[selectedPerm - 1];
-                targetUser.Permissions.Add(perm);
-
+                if (!targetUser.Permissions.Contains(perm))
+                {
+                  targetUser.Permissions.Add(perm);
+                }
+                else
+                {
+                  targetUser.Permissions.Remove(perm);
+                }
               }
             }
-
-          }
-          try { Console.Clear(); } catch { }
-
-          Console.WriteLine($"\nPermissions given to [{targetUser.Name}] :\n");
-          for (int i = 0; i < targetUser.Permissions.Count; i++)
-          {
-            Permission perm = targetUser.Permissions[i];
-            Console.WriteLine($"[{i + 1}]  {perm}");
-
+            try { Console.Clear(); } catch { }
           }
 
-          Console.WriteLine("\nPress ENTER to continue.");
-          Console.ReadLine();
+
+
+
+
+          // Console.WriteLine($"\nPermissions given to [{targetUser.Name}] :\n");
+          // for (int i = 0; i < targetUser.Permissions.Count; i++)
+          // {
+          //   Permission perm = targetUser.Permissions[i];
+          //   Console.WriteLine($"[{i + 1}]  {perm}");
+
+          // }
+
+          // Console.WriteLine("\nPress ENTER to continue.");
+          // Console.ReadLine();
 
           break;
 
@@ -346,7 +371,7 @@ while (isRunning)
       Console.WriteLine("[3] View Events by Type");
       Console.WriteLine("\n[b] Back to Main Menu");
       Console.WriteLine("[x] Logout");
-      Console.Write("\n> ");
+      Console.Write("\n► ");
 
       string? adminInput = Console.ReadLine();
       switch (adminInput)
@@ -414,7 +439,7 @@ while (isRunning)
           Console.WriteLine("[3] Entry Events");
           Console.WriteLine("[4] All Events");
           Console.WriteLine("\n[b] Back to Admin Menu");
-          Console.Write("\n> ");
+          Console.Write("\n► ");
 
           string? eventTypeChoice = Console.ReadLine();
           Event.EventType? selectedType = null;
