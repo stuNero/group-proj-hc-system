@@ -76,7 +76,6 @@ class HCSystem
                     {
                         userPermissionLine += $"{user.Permissions[i]}";
                     }
-
                 }
             }
             userLines += $"{user.SSN}~{user.GetUserPassword()}~{user.Name}~{user.UserRegion}~{userPermissionLine}";
