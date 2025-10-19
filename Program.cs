@@ -21,6 +21,7 @@ if (sys.users.Count <= 0)
 sys.SaveUsersToFile();
 
 // Hard coding all the permission to admins permission list.
+List<Permission> allPermList = new();
 foreach (User user in sys.users)
 {
   if (user.SSN == "admin123")
@@ -30,6 +31,7 @@ foreach (User user in sys.users)
       foreach (Permission perm in Enum.GetValues(typeof(Permission)))
       {
         user.Permissions.Add(perm);
+        allPermList.Add(perm);
         permIndex++;
       }
     }
@@ -415,7 +417,8 @@ while (isRunning)
                     }
                     Debug.Assert(targetUser != null);
                     Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
-                    foreach (Permission perm in activeUser.Permissions)
+
+                    foreach (Permission perm in targetUser.Permissions)
                     {
                       bool targetUserPermBool = false;
 
