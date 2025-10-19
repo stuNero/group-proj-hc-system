@@ -189,7 +189,7 @@ while (isRunning)
 
 
 
-      Console.WriteLine("[2] Manage Permissions \n\n[x] Logout");
+      Console.WriteLine("[m] Manage Permissions \n[v] View Permissions\n\n[x] Logout");
       Console.Write("\n► ");
 
       string? mainInput = Console.ReadLine();
@@ -207,7 +207,7 @@ while (isRunning)
           }
           break;
 
-        case "2": // Manage permessions
+        case "m": // Manage permessions
           try { Console.Clear(); } catch { }
           if (activeUser.Permissions.Contains(Permission.PermHandlePerm))
           {
@@ -215,14 +215,14 @@ while (isRunning)
             bool isSelectingUser = true;
             while (isSelectingUser)
             {
-              Console.WriteLine("\n=== List of Users ===\n");
               int userIndex = 1;
               List<User> selectableUser = new();
+              // List of all users
               foreach (User user in sys.users)
               {
                 if (user != activeUser)
                 {
-                  Console.WriteLine($"[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
+                  Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
                   selectableUser.Add(user);
                   userIndex++;
                 }
@@ -248,20 +248,21 @@ while (isRunning)
                 {
                   Console.Write("\nPlease select a valid user: ");
                 }
+
                 else
                 {
                   targetUser = selectableUser[selectedUser - 1];
+                  if (targetUser.Permissions.Contains(Permission.SysPermissions) && !activeUser.Permissions.Contains(Permission.SysPermissions))
+                  {
+                    Console.WriteLine($"\nYou are not authorized to manage [{targetUser.Name}'s] Permissions.");
+                    Console.WriteLine("\nPress enter to continue...");
+                    Console.ReadLine();
 
-                  if (targetUser.SSN != activeUser.SSN)
+                  }
+                  else if (targetUser.SSN != activeUser.SSN)
                   {
                     isSelectingUser = false;
                     break;
-                  }
-                  else
-                  {
-                    Console.Write("\nOpps! please select a different user than yourself...");
-                    Console.ReadLine();
-
                   }
                 }
               }
@@ -289,14 +290,14 @@ while (isRunning)
                   targetUserPermBool = true;
                   string index = $"[{permIndex}]".PadRight(4);
                   string permName = perm.ToString().PadRight(21);
-                  Console.WriteLine($"{index}   {permName}{targetUserPermBool}");
+                  Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
                 }
                 else
                 {
                   targetUserPermBool = false;
                   string index = $"[{permIndex}]".PadRight(4);
                   string permName = perm.ToString().PadRight(21);
-                  Console.WriteLine($"{index}   {permName}{targetUserPermBool}");
+                  Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
                 }
 
                 permList.Add(perm);
@@ -332,7 +333,9 @@ while (isRunning)
                   }
                   else
                   {
+
                     targetUser.Permissions.Remove(perm);
+
                   }
                 }
               }
@@ -345,21 +348,113 @@ while (isRunning)
             Console.WriteLine("\nPress enter to continue...");
             Console.ReadLine();
           }
+          break;
 
+        case "v": // View permissions
+          try { Console.Clear(); } catch { }
+          if (activeUser.Permissions.Contains(Permission.ViewPermissionList))
+          {
+            User targetUser = null;
+            bool isSelectingUser = true;
+            while (isSelectingUser)
+            {
+              int userIndex = 1;
+              List<User> selectableUser = new();
+              // List of all users
+              foreach (User user in sys.users)
+              {
+                if (user != activeUser)
+                {
+                  Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
+                  selectableUser.Add(user);
+                  userIndex++;
+                }
+              }
+              Console.WriteLine("========================================");
+              Console.WriteLine("\nWrite 'done' if you want to go back.");
+              Console.Write("\nSelect a user to view permission: ");
 
+              string userInput = Console.ReadLine().ToLower().Trim();
+              if (userInput == "done")
+              {
+                isSelectingUser = false;
+                currentMenu = Menu.Main;
+                break;
+              }
+              else if (string.IsNullOrEmpty(userInput))
+              {
 
+                Console.Write("\nPlease select a valid user: ");
+              }
+              else
+              {
+                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > selectableUser.Count)
+                {
+                  Console.Write("\nPlease select a valid user: ");
+                }
+                else
+                {
+                  targetUser = selectableUser[selectedUser - 1];
+                  if (targetUser.Permissions.Count == 0)
+                  {
+                    try { Console.Clear(); } catch { }
+                    Console.WriteLine($"\n{targetUser.Name} has no permissions.");
+                    Console.WriteLine($"\nPress enter to continue...");
+                    Console.ReadLine();
+                  }
+                  else
+                  {
+                    try { Console.Clear(); } catch { }
+                    List<Permission> permList = new();
 
-          // Console.WriteLine($"\nPermissions given to [{targetUser.Name}] :\n");
-          // for (int i = 0; i < targetUser.Permissions.Count; i++)
-          // {
-          //   Permission perm = targetUser.Permissions[i];
-          //   Console.WriteLine($"[{i + 1}]  {perm}");
+                    int permIndex = 1;
+                    if (targetUser == null)
+                    {
+                      currentMenu = Menu.Main;
+                      break;
+                    }
+                    Debug.Assert(targetUser != null);
+                    Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
+                    foreach (Permission perm in activeUser.Permissions)
+                    {
+                      bool targetUserPermBool = false;
 
-          // }
+                      Debug.Assert(targetUser != null);
+                      if (targetUser.Permissions.Contains(perm))
+                      {
+                        targetUserPermBool = true;
+                        string index = $"[{permIndex}]".PadRight(4);
+                        string permName = perm.ToString().PadRight(21);
+                        Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
+                      }
+                      else
+                      {
+                        targetUserPermBool = false;
+                        string index = $"[{permIndex}]".PadRight(4);
+                        string permName = perm.ToString().PadRight(21);
+                        Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
+                      }
 
-          // Console.WriteLine("\nPress ENTER to continue.");
-          // Console.ReadLine();
+                      permList.Add(perm);
+                      permIndex++;
+                    }
+                    Console.WriteLine("==================================");
+                    Console.WriteLine("\nPress enter to continue...");
+                    Console.ReadLine();
+                    break;
+                  }
 
+                }
+              }
+              try { Console.Clear(); } catch { }
+            }
+          }
+          else
+          {
+            Console.WriteLine("\nSorry you are not authorized to view permissions.");
+            Console.WriteLine("\nPress enter to continue...");
+            Console.ReadLine();
+          }
           break;
 
         case "x":
