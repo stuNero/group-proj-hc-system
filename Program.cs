@@ -291,6 +291,7 @@ while (isRunning)
               Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
               foreach (Permission perm in activeUser.Permissions)
               {
+
                 bool targetUserPermBool = false;
 
                 Debug.Assert(targetUser != null);
@@ -312,6 +313,7 @@ while (isRunning)
                 permList.Add(perm);
                 permIndex++;
               }
+
 
               Console.WriteLine("==================================");
               Console.WriteLine("\nWrite 'done' when you are satisfied.");
@@ -347,6 +349,12 @@ while (isRunning)
 
                     targetUser.Permissions.Remove(perm);
 
+                  }
+                  // Nond permisson logic
+                  if (targetUser.Permissions.Count > 1 && targetUser.Permissions.Contains(Permission.None))
+                  {
+                    targetUser.Permissions.Remove(Permission.None);
+                    Console.WriteLine("\nAll permissions must be false for None to be true...");
                   }
                 }
               }
