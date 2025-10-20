@@ -2,6 +2,7 @@ namespace App;
 
 enum Region
 {
+  None,
   Blekinge,
   Dalarna,
   Gotland,

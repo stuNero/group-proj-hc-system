@@ -13,31 +13,38 @@ Console.WriteLine("hello");
 
 if (sys.users.Count <= 0)
 {
-  sys.users.Add(new User("admin123", "admin", "Admin User", Role.Admin));
-  sys.users.Add(new User("testssn1", "test1", "Test Patient", Role.Patient));
-  sys.users.Add(new User("testssn2", "test2", "Test Personnel", Role.Personnel));
+  sys.users.Add(new User("admin123", "admin", "Admin User"));
+  sys.users.Add(new User("testssn1", "test1", "Test Patient"));
+  sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  // Hard coding all the permission to admins permission list.
+  foreach (User user in sys.users)
+  {
+    if (user.SSN == "admin123")
+    {
+      int permIndex = 1;
+      {
+        foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+        {
+          user.Permissions.Add(perm);
+          permIndex++;
+        }
+      }
+    }
+    break;
+  }
 }
 
 sys.SaveUsersToFile();
 
-// Hard coding all the permission to admins permission list.
-List<Permission> allPermList = new();
-foreach (User user in sys.users)
+
+
+
+if (sys.locations.Count <= 0)
 {
-  if (user.SSN == "admin123")
-  {
-    int permIndex = 1;
-    {
-      foreach (Permission perm in Enum.GetValues(typeof(Permission)))
-      {
-        user.Permissions.Add(perm);
-        allPermList.Add(perm);
-        permIndex++;
-      }
-    }
-  }
-  break;
+  sys.locations.Add(new("testVC", "Main Street 1"));
 }
+
+sys.SaveLocationsToFile();
 
 if (sys.eventList.Count <= 0)
 {
@@ -49,6 +56,7 @@ if (sys.eventList.Count <= 0)
   mySecondEvent.Description = "I have a cold.";
   mySecondEvent.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
   mySecondEvent.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
+  mySecondEvent.Location = sys.locations[0];
   mySecondEvent.Participants.Add(new(sys.users[0], Role.Patient));
   mySecondEvent.Participants.Add(new(sys.users[1], Role.Personnel));
   mySecondEvent.Participants.Add(new(sys.users[2], Role.Admin));
@@ -59,10 +67,32 @@ sys.SaveEventsToFile();
 
 
 // TEST CODE >>>>
-/* foreach (Event events in sys.eventList)
+/* 
+foreach (User user in sys.users)
+{
+  Console.WriteLine($"\n{user.SSN} - {user.Name}");
+  for (int i = 0; i < user.Permissions.Count; i++)
+  {
+    Console.WriteLine($"\n{user.Permissions[i]}");
+  }
+  Console.WriteLine("\n------------------");
+}
+Console.ReadLine();
+
+
+foreach (Location loc in sys.locations)
+{
+  Console.WriteLine($"{loc.Name} {loc.Address} {loc.Region}");
+}
+Console.ReadLine();
+
+
+foreach (Event events in sys.eventList)
 {
   Console.WriteLine($"\n{events.Title} - {events.MyEventType} - {events.Description}\n"
   + $"{events.StartDate} - {events.EndDate}");
+  if (events.Location != null)
+  { Console.WriteLine($"\nLocation: {events.Location.Name} - Adress: {events.Location.Address} - Region: {events.Location.Region}"); }
   foreach (Participant participant in events.Participants)
   {
     Console.WriteLine($"{participant.User.Name} - {participant.User.SSN} - {participant.ParticipantRole}");
@@ -173,40 +203,17 @@ while (isRunning)
 
     case Menu.Main:
       try { Console.Clear(); } catch { }
-      Console.WriteLine($"\nWelcome, {activeUser?.Name} ({activeUser?.UserRole})");
-
-      // Show role-specific options
-      if (activeUser?.UserRole == Role.Admin)
-      {
-        Console.WriteLine("\n[1] Admin Menu");
-      }
-      else if (activeUser?.UserRole == Role.Patient)
-      {
-        Console.WriteLine("\n[1] Patient Menu");
-      }
-      else if (activeUser?.UserRole == Role.Personnel)
-      {
-        Console.WriteLine("\n[1] Personnel Menu");
-      }
-
-
-
+      Console.WriteLine($"\nWelcome, {activeUser?.Name}");
+      Console.WriteLine("\n[1] Create Personnel Account");
+      Console.WriteLine("[2] View All Users");
+      Console.WriteLine("[3] View Events by Type");
       Console.WriteLine("[m] Manage Permissions \n[v] View Permissions\n\n[x] Logout");
       Console.Write("\n► ");
 
-      string? mainInput = Console.ReadLine();
-      switch (mainInput)
+      switch (Console.ReadLine())
       {
         case "1":
-          if (activeUser?.UserRole == Role.Admin)
-          {
-            currentMenu = Menu.Admin;
-          }
-          else
-          {
-            Console.Write("\nThis feature is not yet implemented. Press ENTER to continue. ");
-            Console.ReadLine();
-          }
+          sys.CreatePersonnelAccount();
           break;
 
         case "m": // Manage permessions
@@ -224,7 +231,7 @@ while (isRunning)
               {
                 if (user != activeUser)
                 {
-                  Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
+                  Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
                   selectableUser.Add(user);
                   userIndex++;
                 }
@@ -305,6 +312,7 @@ while (isRunning)
                 permList.Add(perm);
                 permIndex++;
               }
+
               Console.WriteLine("==================================");
               Console.WriteLine("\nWrite 'done' when you are satisfied.");
               Console.WriteLine($"\nSelect permission to give to: [{targetUser.Name}]");
@@ -318,6 +326,7 @@ while (isRunning)
               else if (userInput == "done")
               {
                 isSelectingperm = false;
+                sys.SaveUsersToFile();
                 break;
               }
               else
@@ -367,7 +376,7 @@ while (isRunning)
               {
                 if (user != activeUser)
                 {
-                  Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN} | Role: {user.UserRole} ");
+                  Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN} ");
                   selectableUser.Add(user);
                   userIndex++;
                 }
@@ -460,197 +469,19 @@ while (isRunning)
           }
           break;
 
-        case "x":
-          activeUser = null;
-          currentMenu = Menu.Default;
-          break;
-
-        default:
-          Console.Write("\nInvalid input. Press ENTER to continue. ");
-          Console.ReadLine();
-          break;
-      }
-      break;
-
-
-    case Menu.Admin:
-      try { Console.Clear(); } catch { }
-      Console.WriteLine($"\n=== ADMIN MENU ===");
-      Console.WriteLine($"Welcome, {activeUser?.Name}");
-      Console.WriteLine("\n[1] Create Personnel Account");
-      Console.WriteLine("[2] View All Users");
-      Console.WriteLine("[3] View Events by Type");
-      Console.WriteLine("\n[b] Back to Main Menu");
-      Console.WriteLine("[x] Logout");
-      Console.Write("\n► ");
-
-      string? adminInput = Console.ReadLine();
-      switch (adminInput)
-      {
-        case "1":
-          // Create Personnel Account
-          Console.Write("\nEnter SSN for new personnel: ");
-          string? newSSN = Console.ReadLine();
-
-          if (string.IsNullOrWhiteSpace(newSSN))
-          {
-            Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
-            Console.ReadLine();
-            break;
-          }
-
-          Console.Write("Enter password for new personnel: ");
-          string? newPassword = Console.ReadLine();
-
-          if (newPassword == null)
-          {
-            Console.WriteLine("\nInvalid password. Press ENTER to continue.");
-            Console.ReadLine();
-            break;
-          }
-
-          Console.Write("Enter name for new personnel: ");
-          string? newName = Console.ReadLine();
-
-          if (string.IsNullOrWhiteSpace(newName))
-          {
-            Console.WriteLine("\nInvalid name. Press ENTER to continue.");
-            Console.ReadLine();
-            break;
-          }
-
-          if (sys.CreatePersonnelAccount(newSSN, newPassword, newName))
-          {
-            Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
-          }
-          else
-          {
-            Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
-          }
-
-          Console.Write("\nPress ENTER to continue.");
-          Console.ReadLine();
-          break;
 
         case "2":
           // View All Users
           Console.WriteLine("\n=== ALL USERS ===");
           foreach (User user in sys.users)
           {
-            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN} | Role: {user.UserRole}");
+            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN}");
           }
           Console.Write("\nPress ENTER to continue.");
           Console.ReadLine();
           break;
-
         case "3":
-          Console.WriteLine("\n=== VIEW EVENTS BY TYPE ===");
-          Console.WriteLine("[1] Request Events");
-          Console.WriteLine("[2] Appointment Events");
-          Console.WriteLine("[3] Entry Events");
-          Console.WriteLine("[4] All Events");
-          Console.WriteLine("\n[b] Back to Admin Menu");
-          Console.Write("\n► ");
-
-          string? eventTypeChoice = Console.ReadLine();
-          Event.EventType? selectedType = null;
-          string typeTitle = "";
-
-          switch (eventTypeChoice)
-          {
-            case "1":
-              selectedType = Event.EventType.Request;
-              typeTitle = "REQUEST EVENTS";
-              break;
-            case "2":
-              selectedType = Event.EventType.Appointment;
-              typeTitle = "APPOINTMENT EVENTS";
-              break;
-            case "3":
-              selectedType = Event.EventType.Entry;
-              typeTitle = "ENTRY EVENTS";
-              break;
-            case "4":
-              selectedType = null;
-              typeTitle = "ALL EVENTS";
-              break;
-            case "b":
-              break;
-            default:
-              Console.Write("\nInvalid input. Press ENTER to continue.");
-              Console.ReadLine();
-              break;
-          }
-
-          if (eventTypeChoice != "b" && eventTypeChoice != null && (eventTypeChoice == "1" || eventTypeChoice == "2" || eventTypeChoice == "3" || eventTypeChoice == "4"))
-          {
-            Console.WriteLine($"\n=== {typeTitle} ===");
-
-            List<Event> filteredEvents = new List<Event>();
-            if (selectedType.HasValue)
-            {
-              foreach (Event singleEvent in sys.eventList)
-              {
-                if (singleEvent.MyEventType == selectedType.Value)
-                {
-                  filteredEvents.Add(singleEvent);
-                }
-              }
-            }
-            else
-            {
-              foreach (Event singleEvent in sys.eventList)
-              {
-                filteredEvents.Add(singleEvent);
-              }
-            }
-
-            if (filteredEvents.Count == 0)
-            {
-              Console.WriteLine($"No {typeTitle.ToLower()} found.");
-            }
-            else
-            {
-              foreach (Event events in filteredEvents)
-              {
-                Console.WriteLine($"\nTitle: {events.Title}");
-                Console.WriteLine($"Type: {events.MyEventType}");
-                if (string.IsNullOrWhiteSpace(events.Description))
-                { }
-                else
-                {
-                  Console.WriteLine($"Description: {events.Description}");
-                }
-                if (events.StartDate == default(DateTime)) { }
-                else
-                {
-                  Console.WriteLine($"Start: {events.StartDate}");
-                }
-
-                if (events.EndDate == default(DateTime))
-                {
-
-                }
-                else
-                {
-                  Console.WriteLine($"End: {events.EndDate}");
-                }
-                Console.WriteLine("Participants:");
-                foreach (Participant participant in events.Participants)
-                {
-                  Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                }
-                Console.WriteLine("------------------------");
-              }
-            }
-            Console.Write("\nPress ENTER to continue.");
-            Console.ReadLine();
-          }
-          break;
-
-
-        case "b":
-          currentMenu = Menu.Main;
+          sys.ViewEvents();
           break;
 
         case "x":

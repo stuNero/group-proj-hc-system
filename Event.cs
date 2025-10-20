@@ -3,11 +3,11 @@ namespace App;
 class Event
 {
   public string Title;
+  public EventType MyEventType;
   public string? Description;
-
   public DateTime StartDate;
   public DateTime EndDate;
-  public EventType MyEventType;
+  public Location? Location;
 
   public List<Participant> Participants = new List<Participant>();
 
@@ -19,10 +19,10 @@ class Event
 
   public enum EventType
   {
+    None,
     Request,
     Appointment,
-    Entry
-
+    Entry,
   }
 
 }
