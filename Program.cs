@@ -16,9 +16,28 @@ if (sys.users.Count <= 0)
   sys.users.Add(new User("admin123", "admin", "Admin User"));
   sys.users.Add(new User("testssn1", "test1", "Test Patient"));
   sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  // Hard coding all the permission to admins permission list.
+  foreach (User user in sys.users)
+  {
+    if (user.SSN == "admin123")
+    {
+      int permIndex = 1;
+      {
+        foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+        {
+          user.Permissions.Add(perm);
+          permIndex++;
+        }
+      }
+    }
+    break;
+  }
 }
 
 sys.SaveUsersToFile();
+
+
+
 
 if (sys.locations.Count <= 0)
 {
@@ -93,7 +112,7 @@ while (isRunning)
     case Menu.Default:
       try { Console.Clear(); } catch { }
       Console.WriteLine("\n[1] Login \n[2] Request registration as a patient\n[3] Quit");
-      Console.Write("\n> ");
+      Console.Write("\n► ");
       string? input = Console.ReadLine();
 
       switch (input)
@@ -188,15 +207,15 @@ while (isRunning)
       Console.WriteLine("\n[1] Create Personnel Account");
       Console.WriteLine("[2] View All Users");
       Console.WriteLine("[3] View Events by Type");
-
-      Console.WriteLine("\n[x] Logout");
-      Console.Write("\n> ");
+      Console.WriteLine("[m] Manage Permissions \n[v] View Permissions\n\n[x] Logout");
+      Console.Write("\n► ");
 
       switch (Console.ReadLine())
       {
         case "1":
           sys.CreatePersonnelAccount();
           break;
+
         case "2":
           // View All Users
           Console.WriteLine("\n=== ALL USERS ===");
@@ -207,8 +226,17 @@ while (isRunning)
           Console.Write("\nPress ENTER to continue.");
           Console.ReadLine();
           break;
+
         case "3":
           sys.ViewEvents();
+          break;
+
+        case "m": // Manage permessions
+          sys.ManagePermissions(activeUser);
+          break;
+
+        case "v": // View permissions
+          sys.ViewPermissions(activeUser, currentMenu);
           break;
 
         case "x":
