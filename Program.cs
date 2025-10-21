@@ -213,7 +213,7 @@ while (isRunning)
       switch (Console.ReadLine())
       {
         case "1":
-          sys.CreatePersonnelAccount();
+          sys.CreateAccount();
           break;
 
         case "2":
