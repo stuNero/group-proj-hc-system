@@ -69,7 +69,7 @@ while (isRunning)
   switch (currentMenu)
   {
     case Menu.Default:
-      // try { Console.Clear(); } catch { }
+      try { Console.Clear(); } catch { }
       Console.WriteLine("\n[1] Login \n[2] Request registration as a patient\n[3] Quit");
       Console.Write("\n► ");
       string? input = Console.ReadLine();
@@ -180,7 +180,7 @@ while (isRunning)
         case "1":
           if (!activeUser.HasPermission(Permission.HandleAccount))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true);break; }
-          sys.CreatePersonnelAccount();
+          sys.CreateAccount();
           break;
         // HandleRegistration
         case "2":

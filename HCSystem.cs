@@ -208,7 +208,7 @@ class HCSystem
         File.WriteAllText(locationsFile, locationLines);
     }
 
-    public bool CheckPersonnel(string ssn, string password, string name)
+    public bool CheckUser(string ssn)
     {
         // Check if user with this SSN already exists
         foreach (User user in users)
@@ -495,7 +495,7 @@ class HCSystem
 
 
 
-    public void CreatePersonnelAccount()
+    public void CreateAccount()
     {
         Console.Write("\nEnter SSN for new personnel: ");
         string? newSSN = Console.ReadLine();
@@ -527,7 +527,7 @@ class HCSystem
             return;
         }
 
-        if (CheckPersonnel(newSSN, newPassword, newName))
+        if (CheckUser(newSSN))
         {
             User newPersonnel = new(newSSN, newPassword, newName);
             users.Add(newPersonnel);
