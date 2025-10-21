@@ -23,6 +23,22 @@ if (sys.users.Count <= 0)
   sys.users.Add(admin1);
   sys.users.Add(new User("testssn1", "test1", "Test Patient"));
   sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  // Hard coding all the permission to admins permission list.
+  foreach (User user in sys.users)
+  {
+    if (user.SSN == "admin123")
+    {
+      int permIndex = 1;
+      {
+        foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+        {
+          user.Permissions.Add(perm);
+          permIndex++;
+        }
+      }
+    }
+    break;
+  }
 }
 if (sys.locations.Count <= 0) { sys.locations.Add(new("testVC", "Main Street 1")); }
 
@@ -55,7 +71,7 @@ while (isRunning)
     case Menu.Default:
       // try { Console.Clear(); } catch { }
       Console.WriteLine("\n[1] Login \n[2] Request registration as a patient\n[3] Quit");
-      Console.Write("\n> ");
+      Console.Write("\n► ");
       string? input = Console.ReadLine();
 
       switch (input)
@@ -153,10 +169,11 @@ while (isRunning)
       Console.WriteLine("\n[7] Assign User to a Region");
       Console.WriteLine("\n[8] View A Users List of Permissions");
       Console.WriteLine("\n[9] Give Permission to Handle Permissions"); 
-      Console.WriteLine("\n[2] View All Users");
-      Console.WriteLine("\n[3] View Events by Type");
-      Console.WriteLine("\n[x] Logout");
+      Console.WriteLine("\n[j] View All Users");
+      Console.WriteLine("\n[k] View Events by Type");
+      Console.WriteLine("\n[m] Manage Permissions \n\n[v] View Permissions\n\n[x] Logout");
       Console.Write("\n> ");
+
       switch (Console.ReadLine())
       {
         // HandleAccount
@@ -205,12 +222,7 @@ while (isRunning)
           int.TryParse(Console.ReadLine(), out int nr);
           Region locRegion = (Region)(nr);
           sys.locations.Add(new Location(locName, locAddress, locRegion));
-          foreach (Location location in sys.locations)
-          {
-            Console.WriteLine(location.Name);
-            Console.WriteLine(location.Address);
-            Console.WriteLine(location.Region);
-          }
+          sys.SaveLocationsToFile();
           Console.ReadKey(true);
           break;
         // ScheduleOfLocation
@@ -247,6 +259,15 @@ while (isRunning)
         case "k":
           sys.ViewEvents();
           break;
+
+        case "m": // Manage permissions
+          sys.ManagePermissions(activeUser);
+          break;
+
+        case "v": // View permissions
+          sys.ViewPermissions(activeUser, currentMenu);
+          break;
+
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;

@@ -1,6 +1,6 @@
 namespace App;
 
-enum Permission
+public enum Permission
 {
   None,
   HandleAccount,
@@ -20,4 +20,6 @@ enum Permission
   AssignRegion,
   ViewPermissionList,
   PermHandlePerm,
+  SysPermissions,
 }
+
