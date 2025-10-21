@@ -299,7 +299,7 @@ class HCSystem
                 }
                 Debug.Assert(targetUser != null);
                 Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
-                foreach (Permission perm in activeUser.Permissions)
+                foreach (Permission perm in users[0].Permissions)
                 {
 
                     bool targetUserPermBool = false;
@@ -342,13 +342,13 @@ class HCSystem
                 }
                 else
                 {
-                    if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > activeUser.Permissions.Count)
+                    if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > users[0].Permissions.Count)
                     {
                         Console.WriteLine("\nPlease select a valid permission:");
                     }
                     else
                     {
-                        Permission perm = permList[selectedPerm - 1];
+                        Permission perm = users[0].Permissions[selectedPerm - 1];
                         if (!targetUser.Permissions.Contains(perm))
                         {
                             targetUser.Permissions.Add(perm);
