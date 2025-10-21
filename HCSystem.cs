@@ -208,7 +208,7 @@ class HCSystem
         File.WriteAllText(locationsFile, locationLines);
     }
 
-    public bool CheckPersonnel(string ssn, string password, string name)
+    public bool CheckUser(string ssn)
     {
         // Check if user with this SSN already exists
         foreach (User user in users)
@@ -495,7 +495,7 @@ class HCSystem
 
 
 
-    public void CreatePersonnelAccount()
+    public void CreateAccount()
     {
         Console.Write("\nEnter SSN for new personnel: ");
         string? newSSN = Console.ReadLine();
@@ -527,7 +527,7 @@ class HCSystem
             return;
         }
 
-        if (CheckPersonnel(newSSN, newPassword, newName))
+        if (CheckUser(newSSN))
         {
             User newPersonnel = new(newSSN, newPassword, newName);
             users.Add(newPersonnel);
@@ -579,10 +579,10 @@ class HCSystem
             default:
                 Console.Write("\nInvalid input. Press ENTER to continue.");
                 Console.ReadLine();
-                break;
+                return;
         }
 
-        if (eventTypeChoice != "b" && eventTypeChoice != null && (eventTypeChoice == "1" || eventTypeChoice == "2" || eventTypeChoice == "3" || eventTypeChoice == "4"))
+        if (eventTypeChoice != "b" && eventTypeChoice != null)
         {
             Console.WriteLine($"\n=== {typeTitle} ===");
 
@@ -615,26 +615,21 @@ class HCSystem
                 {
                     Console.WriteLine($"\nTitle: {events.Title}");
                     Console.WriteLine($"Type: {events.MyEventType}");
-                    if (string.IsNullOrWhiteSpace(events.Description))
-                    { }
-                    else
+                    if (!string.IsNullOrWhiteSpace(events.Description))
                     {
                         Console.WriteLine($"Description: {events.Description}");
                     }
-                    if (events.StartDate == default(DateTime)) { }
-                    else
+
+                    if (events.StartDate != default)
                     {
                         Console.WriteLine($"Start: {events.StartDate}");
                     }
 
-                    if (events.EndDate == default(DateTime))
-                    {
-
-                    }
-                    else
+                    if (events.EndDate != default)
                     {
                         Console.WriteLine($"End: {events.EndDate}");
                     }
+
                     Console.WriteLine("Participants:");
                     foreach (Participant participant in events.Participants)
                     {
