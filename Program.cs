@@ -201,11 +201,18 @@ while (isRunning)
         case "5":
           if (!activeUser.HasPermission(Permission.AddLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Location newLocation = null;
+          try{ Console.Clear(); }catch{}
 
           Console.WriteLine("Name of Location?");
           Console.Write(">");
           string locName = Console.ReadLine();
+          bool check = false;
+          foreach (Location location in sys.locations)
+          {
+            if (location.Name == locName) ; check = true; break;
+          }
+          if(!check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); break; }
+          try{ Console.Clear(); }catch{}
           Console.WriteLine("Address of Location?");
           Console.Write(">");
           string locAddress = Console.ReadLine();
@@ -214,11 +221,12 @@ while (isRunning)
           {
             regionList.Add(region);
           }
-                    
+
           for (int i = 1; i < regionList.Count; i++)
           {
             Console.WriteLine($"[{i}] {regionList[i].ToString()}");
           }
+          Console.Write("Choose region for location: ");
           int.TryParse(Console.ReadLine(), out int nr);
           Region locRegion = (Region)(nr);
           sys.locations.Add(new Location(locName, locAddress, locRegion));
@@ -229,7 +237,37 @@ while (isRunning)
         case "6":
           if (!activeUser.HasPermission(Permission.ScheduleOfLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          
+          try{ Console.Clear(); }catch{}
+          Console.WriteLine("Which location do you want to see schedule of?");
+          for (int i = 0; i < sys.locations.Count; i++)
+          {
+            Console.WriteLine($"[{i + 1}]\nName: {sys.locations[i].Name} \nAddress: {sys.locations[i].Name}");
+          }
+          Console.Write(">");
+          string choice = Console.ReadLine();
+
+          if (!int.TryParse(choice, out nr))
+          {
+            Console.WriteLine("Invalid Location");
+            break;
+          }
+          try{ Console.Clear(); }catch{}
+          foreach (Event scheduledEvent in sys.eventList)
+          {
+            if (scheduledEvent.Location == sys.locations[nr - 1])
+            {
+              Console.WriteLine("____________________________________________");
+              Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
+              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+              Console.WriteLine("Participants: ");
+              foreach (Participant participant in scheduledEvent.Participants)
+              {
+                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+              }
+              Console.WriteLine("____________________________________________");
+            }
+          }
+          Console.ReadKey(true);
           break;
         // AssignRegion
         case "7":
