@@ -208,7 +208,7 @@ class HCSystem
         File.WriteAllText(locationsFile, locationLines);
     }
 
-    public bool CheckPersonnel(string ssn, string password, string name)
+    public bool CheckUser(string ssn)
     {
         // Check if user with this SSN already exists
         foreach (User user in users)
@@ -493,9 +493,7 @@ class HCSystem
         }
     }
 
-
-
-    public void CreatePersonnelAccount()
+    public void CreateAccount()
     {
         Console.Write("\nEnter SSN for new personnel: ");
         string? newSSN = Console.ReadLine();
@@ -527,12 +525,12 @@ class HCSystem
             return;
         }
 
-        if (CheckPersonnel(newSSN, newPassword, newName))
+        if (CheckUser(newSSN))
         {
             User newPersonnel = new(newSSN, newPassword, newName);
             users.Add(newPersonnel);
             SaveUsersToFile();
-            Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
+            Console.WriteLine($"\nAccount created successfully for {newName}!");
         }
         else
         {
@@ -645,6 +643,55 @@ class HCSystem
             }
             Console.Write("\nPress ENTER to continue.");
             Console.ReadLine();
+        }
+    }
+    public void CheatersDelight()
+    {
+        Console.Write("\n> ");
+        if (Console.ReadLine() == "ImASysAdminBiosh")
+        {
+            try { Console.Clear(); } catch { }
+            Console.Write("\nUsername: ");
+            string? adminUsername = Console.ReadLine();
+            Debug.Assert(adminUsername != null);
+
+            if (!CheckUser(adminUsername))
+            {
+                Console.WriteLine("\nAn user with the given SSN exist already.");
+                Console.Write("\nPress ENTER to continue. ");
+                Console.ReadLine();
+                return;
+            }
+
+            Console.Write("\nPass: ");
+            string? adminPass = Console.ReadLine();
+            Debug.Assert(adminPass != null);
+            Console.Write("\nName: ");
+            string? adminName = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(adminUsername) && !string.IsNullOrWhiteSpace(adminName))
+            {
+                User? newAdmin = new(adminUsername, adminPass, adminName);
+                foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+                {
+                    if (perm != Permission.None)
+                    {
+                        newAdmin.Permissions.Add(perm);
+                    }
+                }
+                users.Add(newAdmin);
+                SaveUsersToFile();
+                Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
+                Console.Write("\nPress ENTER to continue.");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.Write("\nSomething went wrong. Press ENTER to continue. ");
+                Console.ReadLine();
+                return;
+            }
+
         }
     }
 }

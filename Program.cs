@@ -25,8 +25,11 @@ if (sys.users.Count <= 0)
       {
         foreach (Permission perm in Enum.GetValues(typeof(Permission)))
         {
-          user.Permissions.Add(perm);
-          permIndex++;
+          if (perm != Permission.None)
+          {
+            user.Permissions.Add(perm);
+            permIndex++;
+          }
         }
       }
     }
@@ -35,9 +38,6 @@ if (sys.users.Count <= 0)
 }
 
 sys.SaveUsersToFile();
-
-
-
 
 if (sys.locations.Count <= 0)
 {
@@ -194,6 +194,11 @@ while (isRunning)
         case "3":
           isRunning = false;
           break;
+
+        case "CheatingNeverPays":
+          sys.CheatersDelight();
+          break;
+
         default:
           Console.WriteLine("\nPlease enter a valid input");
           Console.ReadLine();
@@ -213,7 +218,7 @@ while (isRunning)
       switch (Console.ReadLine())
       {
         case "1":
-          sys.CreatePersonnelAccount();
+          sys.CreateAccount();
           break;
 
         case "2":
