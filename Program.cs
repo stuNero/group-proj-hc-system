@@ -18,14 +18,12 @@ if (sys.users.Count <= 0)
   {
     if (user.SSN == "admin123")
     {
-      int permIndex = 1;
       {
         foreach (Permission perm in Enum.GetValues(typeof(Permission)))
         {
           if (perm != Permission.None)
           {
             user.Permissions.Add(perm);
-            permIndex++;
           }
         }
       }
@@ -146,7 +144,7 @@ while (isRunning)
             Debug.Assert(newName != null);
 
             string newDescription = $"{newSSN} request to be a patient. Name: {newName} - Email: {newEmail}";
-            Event? newEvent = new(newSSN, Event.EventType.Request);
+            Event? newEvent = new($"{newSSN} PatReq", Event.EventType.Request);
             newEvent.Description = newDescription;
 
             sys.eventList.Add(newEvent);
@@ -212,8 +210,8 @@ while (isRunning)
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.HandleAppointment))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
-          Console.ReadKey(true);
+          sys.HandleAppointment();
+          // Console.ReadKey(true);
           break;
         // JournalEntries
         case "4":
@@ -285,11 +283,11 @@ while (isRunning)
             {
               Console.WriteLine("____________________________________________");
               Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
-              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType: {scheduledEvent.MyEventType}");
               Console.WriteLine("Participants: ");
               foreach (Participant participant in scheduledEvent.Participants)
               {
-                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+                Console.WriteLine($"Name: {participant.User.Name}\nSSN: {participant.User.SSN}\nRole: {participant.ParticipantRole}");
               }
               Console.WriteLine("____________________________________________");
             }
