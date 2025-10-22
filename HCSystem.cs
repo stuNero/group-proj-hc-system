@@ -577,17 +577,12 @@ class HCSystem
             { Console.WriteLine($"[{regionIndex}] {region}"); }
         }
         Console.Write("\nRegion [1-21]: ");
-        int selectedRegion = Convert.ToInt32(Console.ReadLine());
-        Location? selectedLocation = null;
+        string? selectedRegionIndex = Console.ReadLine();
 
-        if (selectedRegion < 1 || selectedRegion > 21)
+
+        if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 1 && selectedRegion < 21)
         {
-            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-            Console.ReadLine();
-            return;
-        }
-        else
-        {
+            Location? selectedLocation = null;
             bool foundLocation = false;
             Console.WriteLine("");
             foreach (Location location in locations)
@@ -680,6 +675,13 @@ class HCSystem
                 return;
             }
         }
+        else
+        {
+            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+            Console.ReadLine();
+            return;
+        }
+
     }
     public void HandleAppointment()
     {
