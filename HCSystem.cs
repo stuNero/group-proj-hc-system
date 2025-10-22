@@ -219,7 +219,7 @@ class HCSystem
             }
         }
 
-        // Create new personnel user
+        // Create new user
 
         return true;
     }
@@ -497,7 +497,7 @@ class HCSystem
 
     public bool CreateAccount()
     {
-        Console.Write("\nEnter SSN for new personnel: ");
+        Console.Write("\nEnter SSN for new User: ");
         string? newSSN = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newSSN))
@@ -507,7 +507,7 @@ class HCSystem
             return false;
         }
 
-        Console.Write("Enter password for new personnel: ");
+        Console.Write("Enter password for new User: ");
         string? newPassword = Console.ReadLine();
 
         if (newPassword == null)
@@ -517,7 +517,7 @@ class HCSystem
             return false;
         }
 
-        Console.Write("Enter name for new personnel: ");
+        Console.Write("Enter name for new User: ");
         string? newName = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newName))
@@ -529,10 +529,10 @@ class HCSystem
 
         if (CheckUser(newSSN))
         {
-            User newPersonnel = new(newSSN, newPassword, newName);
-            users.Add(newPersonnel);
+            User newUser = new(newSSN, newPassword, newName);
+            users.Add(newUser);
             SaveUsersToFile();
-            Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
+            Console.WriteLine($"\nUser account created successfully for {newName}!");
             return true;
         }
         else
