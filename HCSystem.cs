@@ -123,7 +123,8 @@ class HCSystem
                 string[] participantSplitData = participants[i].Split("¤");
 
                 User? partUser = null;
-                Role partRole = Role.None;
+                Role partRole = Enum.Parse<Role>(participantSplitData[1]);
+
                 foreach (User user in users)
                 {
                     if (participantSplitData[0] == user.SSN)
@@ -131,13 +132,6 @@ class HCSystem
                         partUser = user;
                         break;
                     }
-                }
-
-                switch (participantSplitData[1])
-                {
-                    case "Admin": partRole = Role.Admin; break;
-                    case "Patient": partRole = Role.Patient; break;
-                    case "Personnel": partRole = Role.Personnel; break;
                 }
 
                 if (partUser != null)
