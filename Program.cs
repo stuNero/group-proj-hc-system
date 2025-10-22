@@ -185,13 +185,12 @@ while (isRunning)
       Console.WriteLine("\n[5] Add a Location");
       Console.WriteLine("\n[6] Schedule of a Location");
       Console.WriteLine("\n[7] Assign User to a Region");
-      Console.WriteLine("\n[8] View A Users List of Permissions");
-      Console.WriteLine("\n[9] Give Permission to Handle Permissions");
+      Console.WriteLine("\n[8] View Permissions");
       Console.WriteLine("\n[g] View My Journal");
       Console.WriteLine("\n[h] View My Schedule");
       Console.WriteLine("\n[j] View All Users");
       Console.WriteLine("\n[k] View Events by Type");
-      Console.WriteLine("\n[m] Manage Permissions \n\n[v] View Permissions\n\n[x] Logout");
+      Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
       switch (Console.ReadLine())
@@ -308,21 +307,11 @@ while (isRunning)
           Console.WriteLine("W I P");
           Console.ReadKey(true);
           break;
-        // ViewPermissionList
-        case "8":
-          try { Console.Clear(); } catch { }
-          if (!activeUser!.HasPermission(Permission.ViewPermissionList))
-          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
-          Console.ReadKey(true);
-          break;
-        // PermHandlePerm
-        case "9":
+        case "8": // Permissions
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.PermHandlePerm))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
-          Console.ReadKey(true);
+          sys.PermissionSystem(activeUser);
           break;
         // View My Journal
         case "g":
@@ -354,15 +343,6 @@ while (isRunning)
           sys.ViewEvents();
           break;
 
-        case "m": // Manage permissions
-          try { Console.Clear(); } catch { }
-          sys.ManagePermissions(activeUser);
-          break;
-
-        case "v": // View permissions
-          try { Console.Clear(); } catch { }
-          sys.ViewPermissions(activeUser);
-          break;
 
         case "x":
           activeUser = null;

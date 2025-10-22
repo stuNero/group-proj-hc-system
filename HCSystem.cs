@@ -226,60 +226,61 @@ class HCSystem
     }
 
 
-    public void ManagePermissions(User? activeUser) // Permission method for managing all the permissions. only users with sufficient permission has acces to this.
+    public void PermissionSystem(User? activeUser)
     {
+        Debug.Assert(activeUser != null);
         bool isRunning = true;
         while (isRunning)
         {
             try { Console.Clear(); } catch { }
-            Debug.Assert(activeUser != null);
+            User? targetUser = null;
+            bool isSelectingUser = true;
+            while (isSelectingUser)
+            {
+                int userIndex = 1;
+                List<User> selectableUser = new();
+                // List of all users except activeuser
+                foreach (User user in users)
+                {
+                    if (user != activeUser)
+                    {
+                        Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
+                        selectableUser.Add(user);
+                        userIndex++;
+                    }
+                }
+                Console.WriteLine("========================================");
+                Console.WriteLine("\nPress [b] if you want to go back.");
+                Console.Write("\nSelect a user to manage permission: ");
+
+                string userInput = Console.ReadLine() ?? "".ToLower().Trim();
+                if (userInput == "b")
+                {
+                    return;
+                }
+                else if (string.IsNullOrEmpty(userInput))
+                {
+
+                    Console.Write("\nPlease select a valid user: ");
+                    try { Console.Clear(); } catch { }
+                    continue;
+                }
+
+                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > selectableUser.Count)
+                {
+                    Console.Write("\nPlease select a valid user: ");
+                }
+
+                else
+                {
+                    targetUser = selectableUser[selectedUser - 1];
+                    break;
+                }
+                try { Console.Clear(); } catch { }
+            }
+            // MANAGE PERMISSION WITH VIEW
             if (activeUser.HasPermission(Permission.PermHandlePerm))
             {
-                User? targetUser = null;
-                bool isSelectingUser = true;
-                while (isSelectingUser)
-                {
-                    int userIndex = 1;
-                    List<User> selectableUser = new();
-                    // List of all users accepet activeuser
-                    foreach (User user in users)
-                    {
-                        if (user != activeUser)
-                        {
-                            Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
-                            selectableUser.Add(user);
-                            userIndex++;
-                        }
-                    }
-                    Console.WriteLine("========================================");
-                    Console.WriteLine("\nPress [b] if you want to go back.");
-                    Console.Write("\nSelect a user to manage permission: ");
-
-                    string userInput = Console.ReadLine() ?? "".ToLower().Trim();
-                    if (userInput == "b")
-                    {
-                        return;
-                    }
-                    else if (string.IsNullOrEmpty(userInput))
-                    {
-
-                        Console.Write("\nPlease select a valid user: ");
-                        try { Console.Clear(); } catch { }
-                        continue;
-                    }
-
-                    if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > selectableUser.Count)
-                    {
-                        Console.Write("\nPlease select a valid user: ");
-                    }
-
-                    else
-                    {
-                        targetUser = selectableUser[selectedUser - 1];
-                        break;
-                    }
-                    try { Console.Clear(); } catch { }
-                }
                 try { Console.Clear(); } catch { }
                 bool isSelectingperm = true;
                 while (isSelectingperm)
@@ -323,10 +324,7 @@ class HCSystem
                     {
                         Console.WriteLine("\nPlease select a valid permission:");
                     }
-                    else if (userInput == "done")
-                    {
-                        break;
-                    }
+                    else if (userInput == "done") { break; }
                     else
                     {
                         if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > allPermissionList.Count)
@@ -337,93 +335,37 @@ class HCSystem
                         {
                             // add and remove permisson logic
                             Permission perm = allPermissionList[selectedPerm - 1];
-                            if (!targetUser.Permissions.Contains(perm))
-                            {
-                                targetUser.Permissions.Add(perm);
-                            }
-                            else
-                            {
-                                targetUser.Permissions.Remove(perm);
-                            }
+                            if (!targetUser.HasPermission(perm))
+                            { targetUser.Permissions.Add(perm); }
 
-                            if (targetUser.Permissions.Count > 1 && targetUser.Permissions.Contains(Permission.None))
-                            {
-                                // if a user has other permissions than remove none.
-                                targetUser.Permissions.Remove(Permission.None);
-                            }
-                            else if (targetUser.Permissions.Count == 0)
-                            {
-                                targetUser.Permissions.Add(Permission.None);
-                            }
+                            else { targetUser.Permissions.Remove(perm); }
+
+                            // if a user has permhandelperm than the user should also have viewpermissionlist
+                            if (targetUser.HasPermission(Permission.PermHandlePerm))
+                            { targetUser.Permissions.Add(Permission.ViewPermissionList); }
+
+                            // if a user has other permissions than remove none.
+                            if (targetUser.HasPermission(Permission.None))
+                            { targetUser.Permissions.Remove(Permission.None); }
+
+
+                            // if a user selects none than remove all other permissions.
                             if (selectedPerm == 1)
                             {
-                                // if a user selects none than remove all other permissions.
                                 targetUser.Permissions.Clear();
                                 targetUser.Permissions.Add(Permission.None);
                             }
+                            SaveUsersToFile();
                         }
                     }
                     try { Console.Clear(); } catch { }
                 }
             }
-            else
+            // VIEW PERMISSIONS ONLY
+            else if (!activeUser.HasPermission(Permission.PermHandlePerm))
             {
-                Console.WriteLine("\nSorry you are not authorized to manage permissions.");
-                Console.WriteLine("\nPress enter to continue...");
-                Console.ReadLine();
-                break;
-            }
-        }
-
-    }
-
-    public void ViewPermissions(User? activeUser) // Method for vewing all the permissions and only users with sufficent permission can view this.
-    {
-
-        try { Console.Clear(); } catch { }
-        Debug.Assert(activeUser != null);
-        if (activeUser.HasPermission(Permission.ViewPermissionList) || activeUser.HasPermission(Permission.PermHandlePerm))
-        {
-            User? targetUser = null;
-            bool isSelectingUser = true;
-            while (isSelectingUser)
-            {
-                int userIndex = 1;
-                List<User> selectableUser = new();
-                // List of all users accept activeuser, to view permissions.
-                foreach (User user in users)
+                while (true)
                 {
-                    if (user != activeUser)
-                    {
-                        Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN} ");
-                        selectableUser.Add(user);
-                        userIndex++;
-                    }
-                }
-                Console.WriteLine("========================================");
-                Console.WriteLine("\nPress [b] if you want to go back.");
-                Console.Write("\nSelect a user to view permission: ");
-
-                string userInput = Console.ReadLine() ?? "".ToLower().Trim();
-                if (userInput == "b")
-                {
-                    return;
-                }
-                else if (string.IsNullOrEmpty(userInput))
-                {
-
-                    Console.Write("\nPlease select a valid user: ");
-                    try { Console.Clear(); } catch { }
-                    continue;
-                }
-
-                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > selectableUser.Count)
-                {
-                    Console.Write("\nPlease select a valid user: ");
-                }
-                else
-                {
-                    targetUser = selectableUser[selectedUser - 1];
                     if (targetUser.Permissions.Contains(Permission.None))
                     {
                         try { Console.Clear(); } catch { }
@@ -460,21 +402,12 @@ class HCSystem
                         Console.WriteLine("==================================");
                         Console.WriteLine("\nPress enter to continue...");
                         Console.ReadLine();
+                        break;
                     }
                 }
-                try { Console.Clear(); } catch { }
             }
         }
-        else
-        {
-            Console.WriteLine("\nSorry you are not authorized to view permissions.");
-            Console.WriteLine("\nPress enter to continue...");
-            Console.ReadLine();
-        }
     }
-
-
-
     public void CreateAccount()
     {
         Console.Write("\nEnter SSN for new personnel: ");
@@ -627,7 +560,7 @@ class HCSystem
             Console.ReadLine();
         }
     }
-    public void ViewEvent(Event.EventType eventType,User activeUser)
+    public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
         {
@@ -636,7 +569,7 @@ class HCSystem
         else
         {
             Console.WriteLine("Your Appointment");
-        }        
+        }
         foreach (Event event1 in eventList)
         {
             if (event1.MyEventType == Event.EventType.Entry)
