@@ -457,31 +457,20 @@ class HCSystem
 
         
     }
-    public void ViewEvents(Event.EventType? eventType)
+    public void ViewUserRequests()
     {
-        string typeTitle = "";
-
-        if (eventType == Event.EventType.Request)
-        {
-            typeTitle = "REQUEST EVENTS";
-        }
-        else if (eventType == Event.EventType.Appointment)
-        {
-            typeTitle = "APPOINTMENT EVENTS";
-        }
-
-
+        Event.EventType? eventType = Event.EventType.Request;
         Console.Clear();
-        Console.WriteLine($"\n=== {typeTitle} ===");
+        Console.WriteLine($"\n=== User Requests ===");
 
-        List<Event> filteredEvents = new List<Event>();
+        List<Event> userRequestList = new List<Event>();
         if (eventType != null)
         {
             foreach (Event singleEvent in eventList)
             {
                 if (singleEvent.MyEventType == eventType)
                 {
-                    filteredEvents.Add(singleEvent);
+                    userRequestList.Add(singleEvent);
                 }
             }
         }
@@ -492,14 +481,14 @@ class HCSystem
             return;
         }
 
-        if (filteredEvents.Count == 0)
+        if (userRequestList.Count == 0)
         {
-            Console.WriteLine($"No {typeTitle.ToLower()} found.");
+            Console.WriteLine($"No user requests found.");
         }
         else
         {
             int index = 1;
-            foreach (Event events in filteredEvents)
+            foreach (Event events in userRequestList)
             {
                 Console.WriteLine($"\n --- {index++} ---");
                 Console.WriteLine($"\nTitle: {events.Title}");
@@ -508,25 +497,6 @@ class HCSystem
                 {
                     Console.WriteLine($"Description: {events.Description}");
                 }
-
-                // if (events.StartDate != default)
-                // {
-                //     Console.WriteLine($"Start: {events.StartDate}");
-                // }
-
-                // if (events.EndDate != default)
-                // {
-                //     Console.WriteLine($"End: {events.EndDate}");
-                // }
-
-                // if (events.Participants.Count != 0)
-                // {
-                //     Console.WriteLine("Participants:");
-                //     foreach (Participant participant in events.Participants)
-                //     {
-                //         Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                //     }
-                // }
 
                 Console.WriteLine("------------------------");
             }
@@ -539,12 +509,12 @@ class HCSystem
         {
             return;
         }
-        else if (int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= filteredEvents.Count)
+        else if (int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= userRequestList.Count)
         {
-            Event SelectedRequest = filteredEvents[selectedRequest - 1];
+            Event SelectedRequest = userRequestList[selectedRequest - 1];
             Console.Clear();
             Console.WriteLine($"\n === Selected Events ===");
-            Console.WriteLine($"\nTitle: {SelectedRequest.Title}");
+            Console.WriteLine($"\nSSN: {SelectedRequest.Title}");
             Console.WriteLine($"Type: {SelectedRequest.MyEventType}");
             if (!string.IsNullOrWhiteSpace(SelectedRequest.Description))
             {
