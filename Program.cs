@@ -10,19 +10,9 @@ Menu currentMenu = Menu.Default;
 
 if (sys.users.Count <= 0)
 {
-  User admin1 = new User("admin123", "admin", "admin User");
-  foreach (Permission perm in Enum.GetValues(typeof(Permission)))
-  {
-    Console.WriteLine(perm);
-    admin1.Permissions.Add(perm);
-  }
-  foreach (Permission perm in admin1.Permissions)
-  {
-    Console.WriteLine(perm);
-  }
-  sys.users.Add(admin1);
-  sys.users.Add(new User("testssn1", "test1", "Test Patient"));
-  sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  sys.users.Add(new("admin123", "admin", "admin User"));
+  sys.users.Add(new("testssn1", "test1", "Test Patient"));
+  sys.users.Add(new("testssn2", "test2", "Test Personnel"));
   // Hard coding all the permission to admins permission list.
   foreach (User user in sys.users)
   {
@@ -44,14 +34,12 @@ if (sys.users.Count <= 0)
   }
 }
 
-sys.SaveUsersToFile();
-
 if (sys.locations.Count <= 0)
 {
   sys.locations.Add(new("testVC", "Main Street 1"));
+  sys.locations.Add(new("Halmstad Sjukhus", "Lasarettvägen"));
+  sys.locations[1].Region = Region.Halland;
 }
-
-sys.SaveLocationsToFile();
 
 if (sys.eventList.Count <= 0)
 {
@@ -163,10 +151,6 @@ while (isRunning)
           isRunning = false;
           break;
 
-        case "CheatingNeverPays":
-          sys.CheatersDelight();
-          break;
-
         default:
           Console.WriteLine("\nPlease enter a valid input");
           Console.ReadKey(true);
@@ -176,18 +160,23 @@ while (isRunning)
     case Menu.Main:
       try { Console.Clear(); } catch { }
       Console.WriteLine($"\nWelcome, {activeUser?.Name}");
-      Console.WriteLine("\n[1] Handle Accounts");
-      Console.WriteLine("\n[2] Handle Registrations");
-      Console.WriteLine("\n[3] Handle Appointment");
-      Console.WriteLine("\n[4] Handle Journal Entries");
-      Console.WriteLine("\n[5] Add a Location");
-      Console.WriteLine("\n[6] Schedule of a Location");
-      Console.WriteLine("\n[7] Assign User to a Region");
-      Console.WriteLine("\n[8] View A Users List of Permissions");
-      Console.WriteLine("\n[9] Give Permission to Handle Permissions");
-      Console.WriteLine("\n[j] View All Users");
-      Console.WriteLine("\n[k] View Events by Type");
-      Console.WriteLine("\n[m] Manage Permissions \n\n[v] View Permissions\n\n[x] Logout");
+      if (!activeUser.Permissions.Contains(Permission.None))
+      {
+        Console.WriteLine("\n[1] Handle Accounts");
+        Console.WriteLine("\n[2] Handle Registrations");
+        Console.WriteLine("\n[3] Handle Appointment");
+        Console.WriteLine("\n[4] Handle Journal Entries");
+        Console.WriteLine("\n[5] Add a Location");
+        Console.WriteLine("\n[6] Schedule of a Location");
+        Console.WriteLine("\n[7] Assign User to a Region");
+        Console.WriteLine("\n[8] View A Users List of Permissions");
+        Console.WriteLine("\n[9] Give Permission to Handle Permissions");
+        Console.WriteLine("\n[j] View All Users");
+        Console.WriteLine("\n[k] View Events by Type");
+        Console.WriteLine("\n[m] Manage Permissions \n\n[v] View Permissions\n");
+      }
+      Console.WriteLine("\n[a] Request an apointment.");
+      Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
       switch (Console.ReadLine())
@@ -325,6 +314,10 @@ while (isRunning)
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
+          break;
+
+        case "a":
+          sys.RequestAppointment(activeUser);
           break;
 
         default:

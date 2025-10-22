@@ -645,53 +645,101 @@ class HCSystem
             Console.ReadLine();
         }
     }
-    public void CheatersDelight()
+    public void RequestAppointment(User activeUser)
     {
-        Console.Write("\n> ");
-        if (Console.ReadLine() == "ImASysAdminBiosh")
-        {
-            try { Console.Clear(); } catch { }
-            Console.Write("\nUsername: ");
-            string? adminUsername = Console.ReadLine();
-            Debug.Assert(adminUsername != null);
+        try { Console.Clear(); } catch { }
+        Console.WriteLine("\nRequest Appointment\n");
+        Console.WriteLine("\nSelect region\n");
 
-            if (!CheckUser(adminUsername))
+        foreach (Region region in Region.GetValues(typeof(Region)))
+        {
+            int regionIndex = (int)region;
+            if (region != Region.None)
+            { Console.WriteLine($"[{regionIndex}] {region}"); }
+        }
+        Console.Write("\nRegion [1-21]: ");
+        int selectedRegion = Convert.ToInt32(Console.ReadLine());
+        Location? selectedLocation = null;
+
+        if (selectedRegion < 1 || selectedRegion > 21)
+        {
+            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+            Console.ReadLine();
+            return;
+        }
+        else
+        {
+            bool foundLocation = false;
+            Console.WriteLine("");
+            foreach (Location location in locations)
             {
-                Console.WriteLine("\nAn user with the given SSN exist already.");
-                Console.Write("\nPress ENTER to continue. ");
-                Console.ReadLine();
-                return;
+                if (selectedRegion == (int)location.Region)
+                {
+                    Console.WriteLine($"ID: [{locations.IndexOf(location) + 1}] - [{location.Name}]");
+                    Console.WriteLine($"{location.Address}");
+                    foundLocation = true;
+                }
             }
 
-            Console.Write("\nPass: ");
-            string? adminPass = Console.ReadLine();
-            Debug.Assert(adminPass != null);
-            Console.Write("\nName: ");
-            string? adminName = Console.ReadLine();
-
-            if (!string.IsNullOrWhiteSpace(adminUsername) && !string.IsNullOrWhiteSpace(adminName))
+            if (foundLocation)
             {
-                User? newAdmin = new(adminUsername, adminPass, adminName);
-                foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+                Console.Write("\nSelect location ID: ");
+                int selectedLocID = Convert.ToInt32(Console.ReadLine());
+                selectedLocation = locations[selectedLocID - 1];
+
+                Console.WriteLine("\nDescribe the reason of the appointment:");
+                Console.Write("► ");
+                string? newReason = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(newReason))
                 {
-                    if (perm != Permission.None)
+                    Console.WriteLine("\nReason can't be empty.");
+                    Console.Write("\nPress ENTER to go back to previous menu. ");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("\nDo you have a desired date and time?\nKeep in mind that the appointment time is subject to availability.");
+                    Console.WriteLine("Please use (YY-MM-DD - HH:mm) format.");
+                    Console.Write("► ");
+
+                    string? desiredTime = Console.ReadLine();
+
+                    try { Console.Clear(); } catch { }
+                    Console.WriteLine("\nReview the appointment request before sending:");
+                    Console.WriteLine($"\nYour name: {activeUser.Name}\nYour SSN: {activeUser.SSN}");
+                    Console.WriteLine($"Reason of the appointment:\n"
+                    + $"'{newReason}'");
+                    if (!string.IsNullOrWhiteSpace(desiredTime))
                     {
-                        newAdmin.Permissions.Add(perm);
+                        Console.WriteLine($"\nYour disired time: {desiredTime}");
+                    }
+                    Console.WriteLine($"\nAt: {selectedLocation.Name} - Address: {selectedLocation.Address}");
+
+                    Console.WriteLine("\nIs the information correct?");
+                    Console.Write("Y/N? ('N' would take you back to previous menu): ");
+                    switch (Console.ReadLine().ToLower())
+                    {
+                        case "y":
+                            Event? newEvent = new($"{activeUser.Name} Appointment", Event.EventType.Request);
+                            newEvent.Description = $"{newReason}. Desired time: {(desiredTime == "" ? "no" : desiredTime)}";
+                            newEvent.Location = selectedLocation;
+                            SaveEventsToFile();
+                            Console.WriteLine("\nYour appoinment request has been registered.");
+                            Console.Write("\nPress ENTER to continue: ");
+                            Console.ReadLine();
+                            break;
+
+                        case "n": return;
                     }
                 }
-                users.Add(newAdmin);
-                SaveUsersToFile();
-                Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
-                Console.Write("\nPress ENTER to continue.");
-                Console.ReadLine();
             }
             else
             {
-                Console.Write("\nSomething went wrong. Press ENTER to continue. ");
+                Console.Write("\nInvalid Input. Press ENTER to go back to previous menu. ");
                 Console.ReadLine();
                 return;
             }
-
         }
     }
 }
