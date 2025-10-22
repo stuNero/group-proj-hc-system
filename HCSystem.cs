@@ -771,13 +771,13 @@ class HCSystem
                             }
                             else
                             {
-                                Console.Write("\nInvalid input. Press ENTER to go back to previos menu. ");
+                                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
                                 return;
                             }
                         }
                         else
                         {
-                            Console.Write("\nInvalid input. Press ENTER to go back to previos menu. ");
+                            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
                             return;
                         }
 
@@ -785,7 +785,7 @@ class HCSystem
                         Debug.Assert(newEvent != null);
                         newEvent.MyEventType = Event.EventType.None;
                         SaveEventsToFile();
-                        Console.WriteLine("\nAppointment rejected. Press ENTER to go back to previos menu. ");
+                        Console.WriteLine("\nAppointment rejected. Press ENTER to go back to previous menu. ");
                         return;
 
                     default:
