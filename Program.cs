@@ -10,27 +10,35 @@ Menu currentMenu = Menu.Default;
 
 if (sys.users.Count <= 0)
 {
-  sys.users.Add(new("admin123", "admin", "admin User"));
-  sys.users.Add(new("testssn1", "test1", "Test Patient"));
-  sys.users.Add(new("testssn2", "test2", "Test Personnel"));
-  // Hard coding all the permission to admins permission list.
-  foreach (User user in sys.users)
+  User admin1 = new User("admin123", "admin", "admin User");
+  foreach (Permission perm in Enum.GetValues(typeof(Permission)))
   {
-    if (user.SSN == "admin123")
-    {
-      {
-        foreach (Permission perm in Enum.GetValues(typeof(Permission)))
-        {
-          if (perm != Permission.None)
-          {
-            user.Permissions.Add(perm);
-          }
-        }
-      }
-    }
-    break;
+    Console.WriteLine(perm);
+    admin1.Permissions.Add(perm);
   }
+  foreach (Permission perm in admin1.Permissions)
+  {
+    Console.WriteLine(perm);
+  }
+  sys.users.Add(admin1);
+  sys.users.Add(new User("testssn1", "test1", "Test Patient"));
+  sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  // Hard coding all the permission to admins permission list.
+  foreach (Permission perm in sys.allPermissionList)
+  {
+    if (perm != Permission.None)
+    {
+      sys.users[0].Permissions.Add(perm);
+    }
+  }
+
 }
+
+foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+{
+  sys.allPermissionList.Add(perm);
+}
+sys.SaveUsersToFile();
 
 if (sys.locations.Count <= 0)
 {
@@ -38,6 +46,8 @@ if (sys.locations.Count <= 0)
   sys.locations.Add(new("Halmstad Sjukhus", "Lasarettvägen"));
   sys.locations[1].Region = Region.Halland;
 }
+
+sys.SaveLocationsToFile();
 
 if (sys.eventList.Count <= 0)
 {
@@ -302,21 +312,11 @@ while (isRunning)
           Console.WriteLine("W I P");
           Console.ReadKey(true);
           break;
-        // ViewPermissionList
-        case "8":
-          try { Console.Clear(); } catch { }
-          if (!activeUser!.HasPermission(Permission.ViewPermissionList))
-          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
-          Console.ReadKey(true);
-          break;
-        // PermHandlePerm
-        case "9":
+        case "8": // Permissions
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.PermHandlePerm))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
-          Console.ReadKey(true);
+          sys.PermissionSystem(activeUser);
           break;
         // View My Journal
         case "g":
@@ -346,16 +346,6 @@ while (isRunning)
         case "k":
           try { Console.Clear(); } catch { }
           sys.ViewEvents();
-          break;
-
-        case "m": // Manage permissions
-          try { Console.Clear(); } catch { }
-          sys.ManagePermissions(activeUser);
-          break;
-
-        case "v": // View permissions
-          try { Console.Clear(); } catch { }
-          sys.ViewPermissions(activeUser, currentMenu);
           break;
 
         case "x":
