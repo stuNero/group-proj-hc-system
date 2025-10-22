@@ -8,21 +8,19 @@ HCSystem sys = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
+
+foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+{
+  sys.allPermissionList.Add(perm);
+}
+
 if (sys.users.Count <= 0)
 {
-  User admin1 = new User("admin123", "admin", "admin User");
-  foreach (Permission perm in Enum.GetValues(typeof(Permission)))
-  {
-    Console.WriteLine(perm);
-    admin1.Permissions.Add(perm);
-  }
-  foreach (Permission perm in admin1.Permissions)
-  {
-    Console.WriteLine(perm);
-  }
-  sys.users.Add(admin1);
+  sys.users.Add(new User("admin123", "admin", "admin User"));
   sys.users.Add(new User("testssn1", "test1", "Test Patient"));
   sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  sys.users[1].Permissions.Add(Permission.None);
+  sys.users[2].Permissions.Add(Permission.None);
   // Hard coding all the permission to admins permission list.
   foreach (Permission perm in sys.allPermissionList)
   {
@@ -31,13 +29,8 @@ if (sys.users.Count <= 0)
       sys.users[0].Permissions.Add(perm);
     }
   }
-
 }
 
-foreach (Permission perm in Enum.GetValues(typeof(Permission)))
-{
-  sys.allPermissionList.Add(perm);
-}
 sys.SaveUsersToFile();
 
 if (sys.locations.Count <= 0)
