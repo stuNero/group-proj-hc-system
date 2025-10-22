@@ -582,9 +582,11 @@ class HCSystem
                 Console.WriteLine($"No {typeTitle.ToLower()} found.");
             }
             else
-            {
+        {
+            int index = 1;
                 foreach (Event events in filteredEvents)
             {
+                Console.WriteLine($"\n --- {index++} ---");
                     Console.WriteLine($"\nTitle: {events.Title}");
                     Console.WriteLine($"Type: {events.MyEventType}");
                     if (!string.IsNullOrWhiteSpace(events.Description))
@@ -614,8 +616,14 @@ class HCSystem
                     Console.WriteLine("------------------------");
                 }
             }
-            Console.Write("\nPress ENTER to continue.");
-            Console.ReadLine();
+        Console.Write("\nPress [b] to go back or select a number to select a request.");
+
+        string? userInput = Console.ReadLine();
+        
+        if (userInput == "b")
+        {
+            return;
+        }
         
     }
 }
