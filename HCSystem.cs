@@ -794,10 +794,12 @@ class HCSystem
                 {
                     case "y":
                         Console.Write("\nAppointment time (DD/MM/YY HH:mm:ss): ");
-                        DateTime newDateTime = DateTime.Parse(Console.ReadLine());
+                        string? dateInput = Console.ReadLine();
 
-                        if (newDateTime != null)
+                        if (!string.IsNullOrWhiteSpace(dateInput))
                         {
+                            Debug.Assert(newEvent != null);
+                            DateTime newDateTime = DateTime.Parse(dateInput);
                             Console.WriteLine("\nSelect personnel: ");
                             foreach (User user in users)
                             {
@@ -816,8 +818,7 @@ class HCSystem
                             }
                             else
                             {
-                                Debug.Assert(newDateTime != null);
-                                Debug.Assert(newEvent != null);
+
                                 newEvent.Title = newEvent.Participants[0].User.SSN;
                                 Debug.Assert(newEvent.Description != null);
                                 string[] descriptionSplit = newEvent.Description.Split("|");
