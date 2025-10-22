@@ -186,7 +186,7 @@ while (isRunning)
       Console.WriteLine("\n[9] View My Schedule");
       Console.WriteLine("\n[10] Request an appointment.");
       Console.WriteLine("\n[x] Logout");
-      Console.Write("\n> ");
+      Console.Write("\n► ");
 
       switch (Console.ReadLine())
       {
