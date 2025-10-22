@@ -40,12 +40,11 @@ foreach (Permission perm in Enum.GetValues(typeof(Permission)))
 }
 sys.SaveUsersToFile();
 
-
-
-
 if (sys.locations.Count <= 0)
 {
   sys.locations.Add(new("testVC", "Main Street 1"));
+  sys.locations.Add(new("Halmstad Sjukhus", "Lasarettvägen"));
+  sys.locations[1].Region = Region.Halland;
 }
 
 sys.SaveLocationsToFile();
@@ -155,7 +154,7 @@ while (isRunning)
             Debug.Assert(newName != null);
 
             string newDescription = $"{newSSN} request to be a patient. Name: {newName} - Email: {newEmail}";
-            Event? newEvent = new(newSSN, Event.EventType.Request);
+            Event? newEvent = new($"{newSSN} PatientRequest", Event.EventType.Request);
             newEvent.Description = newDescription;
 
             sys.eventList.Add(newEvent);
@@ -169,6 +168,7 @@ while (isRunning)
         case "3":
           isRunning = false;
           break;
+
         default:
           Console.WriteLine("\nPlease enter a valid input");
           Console.ReadKey(true);
@@ -178,18 +178,23 @@ while (isRunning)
     case Menu.Main:
       try { Console.Clear(); } catch { }
       Console.WriteLine($"\nWelcome, {activeUser?.Name}");
-      Console.WriteLine("\n[1] Handle Accounts");
-      Console.WriteLine("\n[2] Handle Registrations");
-      Console.WriteLine("\n[3] Handle Appointment");
-      Console.WriteLine("\n[4] Handle Journal Entries");
-      Console.WriteLine("\n[5] Add a Location");
-      Console.WriteLine("\n[6] Schedule of a Location");
-      Console.WriteLine("\n[7] Assign User to a Region");
-      Console.WriteLine("\n[8] View Permissions");
-      Console.WriteLine("\n[g] View My Journal");
-      Console.WriteLine("\n[h] View My Schedule");
-      Console.WriteLine("\n[j] View All Users");
-      Console.WriteLine("\n[k] View Events by Type");
+      Debug.Assert(activeUser != null);
+      if (!activeUser.HasPermission(Permission.None))
+      {
+        Console.WriteLine("\n[1] Handle Accounts");
+        Console.WriteLine("\n[2] Handle Registrations");
+        Console.WriteLine("\n[3] Handle Appointment");
+        Console.WriteLine("\n[4] Handle Journal Entries");
+        Console.WriteLine("\n[5] Add a Location");
+        Console.WriteLine("\n[6] Schedule of a Location");
+        Console.WriteLine("\n[7] Assign User to a Region");
+        Console.WriteLine("\n[8] View A Users List of Permissions");
+        Console.WriteLine("\n[9] Give Permission to Handle Permissions");
+        Console.WriteLine("\n[j] View All Users");
+        Console.WriteLine("\n[k] View Events by Type");
+        Console.WriteLine("\n[m] Manage Permissions \n\n[v] View Permissions\n");
+      }
+      Console.WriteLine("\n[a] Request an apointment.");
       Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
@@ -215,7 +220,7 @@ while (isRunning)
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.HandleAppointment))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
+          sys.HandleAppointment();
           Console.ReadKey(true);
           break;
         // JournalEntries
@@ -288,11 +293,11 @@ while (isRunning)
             {
               Console.WriteLine("____________________________________________");
               Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
-              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType: {scheduledEvent.MyEventType}");
               Console.WriteLine("Participants: ");
               foreach (Participant participant in scheduledEvent.Participants)
               {
-                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+                Console.WriteLine($"Name: {participant.User.Name}\nSSN: {participant.User.SSN}\nRole: {participant.ParticipantRole}");
               }
               Console.WriteLine("____________________________________________");
             }
@@ -343,10 +348,13 @@ while (isRunning)
           sys.ViewEvents();
           break;
 
-
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
+          break;
+
+        case "a":
+          sys.RequestAppointment(activeUser);
           break;
 
         default:
