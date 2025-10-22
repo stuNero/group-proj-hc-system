@@ -210,7 +210,7 @@ class HCSystem
         File.WriteAllText(locationsFile, locationLines);
     }
 
-    public bool CheckPersonnel(string ssn, string password, string name)
+    public bool CheckUser(string ssn)
     {
         // Check if user with this SSN already exists
         foreach (User user in users)
@@ -475,7 +475,7 @@ class HCSystem
 
 
 
-    public void CreatePersonnelAccount()
+    public void CreateAccount()
     {
         Console.Write("\nEnter SSN for new personnel: ");
         string? newSSN = Console.ReadLine();
@@ -507,7 +507,7 @@ class HCSystem
             return;
         }
 
-        if (CheckPersonnel(newSSN, newPassword, newName))
+        if (CheckUser(newSSN))
         {
             User newPersonnel = new(newSSN, newPassword, newName);
             users.Add(newPersonnel);
@@ -625,6 +625,43 @@ class HCSystem
             }
             Console.Write("\nPress ENTER to continue.");
             Console.ReadLine();
+        }
+    }
+    public void ViewEvent(Event.EventType eventType,User activeUser)
+    {
+        if (eventType == Event.EventType.Entry)
+        {
+            Console.WriteLine("Your Journal");
+        }
+        else
+        {
+            Console.WriteLine("Your Appointment");
+        }        
+        foreach (Event event1 in eventList)
+        {
+            if (event1.MyEventType == Event.EventType.Entry)
+            {
+                foreach (Participant participant in event1.Participants)
+                {
+                    if (activeUser == participant.User)
+                    {
+                        Console.WriteLine("Title:       " + event1.Title);
+                        Console.WriteLine("Description: " + event1.Description);
+                        Console.WriteLine("Start Date:  " + event1.StartDate);
+                        Console.WriteLine("End Date:    " + event1.EndDate);
+                        Console.WriteLine("Location:    " + event1.Location!.Name);
+                        Console.WriteLine("             " + event1.Location.Address);
+                        Console.WriteLine("             " + event1.Location.Region);
+                        Console.WriteLine("Participants: \n_________");
+                        foreach (Participant part1 in event1.Participants)
+                        {
+                            Console.WriteLine("Name: " + part1.User.Name);
+                            Console.WriteLine("Role: " + part1.ParticipantRole);
+                            Console.WriteLine("_________");
+                        }
+                    }
+                }
+            }
         }
     }
 }

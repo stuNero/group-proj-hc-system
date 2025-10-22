@@ -1,6 +1,6 @@
 namespace App;
 
-public enum Permission
+enum Permission
 {
   None,
   HandleAccount,
