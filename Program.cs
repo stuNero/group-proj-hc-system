@@ -144,7 +144,7 @@ while (isRunning)
             Debug.Assert(newName != null);
 
             string newDescription = $"{newSSN} request to be a patient. Name: {newName} - Email: {newEmail}";
-            Event? newEvent = new($"{newSSN} PatReq", Event.EventType.Request);
+            Event? newEvent = new($"{newSSN} PatientRequest", Event.EventType.Request);
             newEvent.Description = newDescription;
 
             sys.eventList.Add(newEvent);
@@ -169,7 +169,7 @@ while (isRunning)
       try { Console.Clear(); } catch { }
       Console.WriteLine($"\nWelcome, {activeUser?.Name}");
       Debug.Assert(activeUser != null);
-      if (!activeUser.Permissions.Contains(Permission.None))
+      if (!activeUser.HasPermission(Permission.None))
       {
         Console.WriteLine("\n[1] Handle Accounts");
         Console.WriteLine("\n[2] Handle Registrations");
@@ -211,7 +211,7 @@ while (isRunning)
           if (!activeUser!.HasPermission(Permission.HandleAppointment))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.HandleAppointment();
-          // Console.ReadKey(true);
+          Console.ReadKey(true);
           break;
         // JournalEntries
         case "4":
