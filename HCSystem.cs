@@ -543,7 +543,7 @@ class HCSystem
         Console.ReadLine();
     }
     public void ViewEvents(Event.EventType? eventType)
-    {  
+    {
         string typeTitle = "";
 
         if (eventType == Event.EventType.Request)
@@ -559,63 +559,63 @@ class HCSystem
         Console.Clear();
         Console.WriteLine($"\n=== {typeTitle} ===");
 
-            List<Event> filteredEvents = new List<Event>();
-            if (eventType != null)
+        List<Event> filteredEvents = new List<Event>();
+        if (eventType != null)
+        {
+            foreach (Event singleEvent in eventList)
             {
-                foreach (Event singleEvent in eventList)
+                if (singleEvent.MyEventType == eventType)
                 {
-                    if (singleEvent.MyEventType == eventType)
-                    {
-                        filteredEvents.Add(singleEvent);
-                    }
+                    filteredEvents.Add(singleEvent);
                 }
             }
-            else
-            {
+        }
+        else
+        {
             Console.WriteLine("Something went wrong, no event type is selected");
             Console.ReadKey(true);
             return;
-            }
+        }
 
-            if (filteredEvents.Count == 0)
-            {
-                Console.WriteLine($"No {typeTitle.ToLower()} found.");
-            }
-            else
+        if (filteredEvents.Count == 0)
+        {
+            Console.WriteLine($"No {typeTitle.ToLower()} found.");
+        }
+        else
         {
             int index = 1;
-                foreach (Event events in filteredEvents)
+            foreach (Event events in filteredEvents)
             {
                 Console.WriteLine($"\n --- {index++} ---");
-                    Console.WriteLine($"\nTitle: {events.Title}");
-                    Console.WriteLine($"Type: {events.MyEventType}");
-                    if (!string.IsNullOrWhiteSpace(events.Description))
-                    {
-                        Console.WriteLine($"Description: {events.Description}");
-                    }
-
-                    if (events.StartDate != default)
-                    {
-                        Console.WriteLine($"Start: {events.StartDate}");
-                    }
-
-                    if (events.EndDate != default)
-                    {
-                        Console.WriteLine($"End: {events.EndDate}");
-                    }
-
-                    if(events.Participants.Count != 0)
-                    {
-                       Console.WriteLine("Participants:");
-                        foreach (Participant participant in events.Participants)
-                        {
-                            Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                        }
-                    }
-                   
-                    Console.WriteLine("------------------------");
+                Console.WriteLine($"\nTitle: {events.Title}");
+                Console.WriteLine($"Type: {events.MyEventType}");
+                if (!string.IsNullOrWhiteSpace(events.Description))
+                {
+                    Console.WriteLine($"Description: {events.Description}");
                 }
+
+                if (events.StartDate != default)
+                {
+                    Console.WriteLine($"Start: {events.StartDate}");
+                }
+
+                if (events.EndDate != default)
+                {
+                    Console.WriteLine($"End: {events.EndDate}");
+                }
+
+                if (events.Participants.Count != 0)
+                {
+                    Console.WriteLine("Participants:");
+                    foreach (Participant participant in events.Participants)
+                    {
+                        Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+                    }
+                }
+
+                Console.WriteLine("------------------------");
             }
+        }
         Console.Write("\nPress [b] to go back or select a number to select a request.");
 
         string? userInput = Console.ReadLine();
@@ -659,7 +659,25 @@ class HCSystem
             Console.WriteLine("[2] Deny request");
             Console.WriteLine("[b] Go back");
             Console.Write("\n► ");
-            Console.ReadLine();
+            
+
+            string? requestChoice = Console.ReadLine();
+            if (requestChoice == "1")
+            {
+                Console.Clear();
+        Console.WriteLine($"=== Accept Request ===");
+        Console.WriteLine($"\n Request: {SelectedRequest.Description}");
+        CreateAccount();
+            }
+            else if (requestChoice == "2")
+            {
+                //DenyRequest metod här
+            }
+            else if (requestChoice == "b")
+            {
+                return;
+            }
+
         }
         else
         {
@@ -667,4 +685,5 @@ class HCSystem
             Console.ReadKey(true);
         }
     }
+    
 }
