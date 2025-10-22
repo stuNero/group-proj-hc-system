@@ -206,7 +206,8 @@ while (isRunning)
       Console.WriteLine($"\nWelcome, {activeUser?.Name}");
       Console.WriteLine("\n[1] Create Personnel Account");
       Console.WriteLine("[2] View All Users");
-      Console.WriteLine("[3] View Events by Type");
+      Console.WriteLine("[3] View patient requests");
+      Console.WriteLine("[4] Appointments");
       Console.WriteLine("[m] Manage Permissions \n[v] View Permissions\n\n[x] Logout");
       Console.Write("\n► ");
 
@@ -228,9 +229,13 @@ while (isRunning)
           break;
 
         case "3":
-          sys.ViewEvents();
+          sys.ViewEvents(Event.EventType.Request);
           break;
 
+        case "4":
+          sys.ViewEvents(Event.EventType.Appointment);
+          break;
+          
         case "m": // Manage permessions
           sys.ManagePermissions(activeUser);
           break;

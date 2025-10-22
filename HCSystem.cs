@@ -542,56 +542,29 @@ class HCSystem
         Console.Write("\nPress ENTER to continue.");
         Console.ReadLine();
     }
-    public void ViewEvents()
-    {
-        Console.WriteLine("\n=== VIEW EVENTS BY TYPE ===");
-        Console.WriteLine("[1] Request Events");
-        Console.WriteLine("[2] Appointment Events");
-        Console.WriteLine("[3] Entry Events");
-        Console.WriteLine("[4] All Events");
-        Console.WriteLine("\n[b] Back to Admin Menu");
-        Console.Write("\n► ");
-
-        string? eventTypeChoice = Console.ReadLine();
-        Event.EventType? selectedType = null;
+    public void ViewEvents(Event.EventType? eventType)
+    {  
         string typeTitle = "";
 
-        switch (eventTypeChoice)
+        if (eventType == Event.EventType.Request)
         {
-            case "1":
-                selectedType = Event.EventType.Request;
-                typeTitle = "REQUEST EVENTS";
-                break;
-            case "2":
-                selectedType = Event.EventType.Appointment;
-                typeTitle = "APPOINTMENT EVENTS";
-                break;
-            case "3":
-                selectedType = Event.EventType.Entry;
-                typeTitle = "ENTRY EVENTS";
-                break;
-            case "4":
-                selectedType = null;
-                typeTitle = "ALL EVENTS";
-                break;
-            case "b":
-                break;
-            default:
-                Console.Write("\nInvalid input. Press ENTER to continue.");
-                Console.ReadLine();
-                return;
+            typeTitle = "REQUEST EVENTS";
+        }
+        else if (eventType == Event.EventType.Appointment)
+        {
+            typeTitle = "APPOINTMENT EVENTS";
         }
 
-        if (eventTypeChoice != "b" && eventTypeChoice != null)
-        {
-            Console.WriteLine($"\n=== {typeTitle} ===");
+
+        Console.Clear();
+        Console.WriteLine($"\n=== {typeTitle} ===");
 
             List<Event> filteredEvents = new List<Event>();
-            if (selectedType.HasValue)
+            if (eventType != null)
             {
                 foreach (Event singleEvent in eventList)
                 {
-                    if (singleEvent.MyEventType == selectedType.Value)
+                    if (singleEvent.MyEventType == eventType)
                     {
                         filteredEvents.Add(singleEvent);
                     }
@@ -599,10 +572,9 @@ class HCSystem
             }
             else
             {
-                foreach (Event singleEvent in eventList)
-                {
-                    filteredEvents.Add(singleEvent);
-                }
+            Console.WriteLine("Something went wrong, no event type is selected");
+            Console.ReadKey(true);
+            return;
             }
 
             if (filteredEvents.Count == 0)
@@ -612,7 +584,7 @@ class HCSystem
             else
             {
                 foreach (Event events in filteredEvents)
-                {
+            {
                     Console.WriteLine($"\nTitle: {events.Title}");
                     Console.WriteLine($"Type: {events.MyEventType}");
                     if (!string.IsNullOrWhiteSpace(events.Description))
@@ -644,6 +616,6 @@ class HCSystem
             }
             Console.Write("\nPress ENTER to continue.");
             Console.ReadLine();
-        }
+        
     }
 }
