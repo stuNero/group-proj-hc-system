@@ -630,11 +630,15 @@ class HCSystem
                         Console.WriteLine($"End: {events.EndDate}");
                     }
 
-                    Console.WriteLine("Participants:");
-                    foreach (Participant participant in events.Participants)
+                    if(events.Participants.Count != 0)
                     {
-                        Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+                       Console.WriteLine("Participants:");
+                        foreach (Participant participant in events.Participants)
+                        {
+                            Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+                        }
                     }
+                   
                     Console.WriteLine("------------------------");
                 }
             }
