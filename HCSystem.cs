@@ -624,6 +624,38 @@ class HCSystem
         {
             return;
         }
-        
+        else if(int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= filteredEvents.Count)
+        {
+            Event SelectedRequest = filteredEvents[selectedRequest - 1];
+            Console.Clear();
+            Console.WriteLine($"\n === Selected Events ===");
+            Console.WriteLine($"\nTitle: {SelectedRequest.Title}");
+            Console.WriteLine($"Type: {SelectedRequest.MyEventType}");
+            if (!string.IsNullOrWhiteSpace(SelectedRequest.Description))
+            {
+                Console.WriteLine($"Description: {SelectedRequest.Description}");
+                    }
+
+                    if (SelectedRequest.StartDate != default)
+                    {
+                        Console.WriteLine($"Start: {SelectedRequest.StartDate}");
+                    }
+
+                    if (SelectedRequest.EndDate != default)
+                    {
+                        Console.WriteLine($"End: {SelectedRequest.EndDate}");
+                    }
+
+            if (SelectedRequest.Participants.Count != 0)
+            {
+                Console.WriteLine("Participants:");
+                foreach (Participant participant in SelectedRequest.Participants)
+                {
+                    Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+                }
+            }
+            Console.WriteLine("\n Press ENTER to go back.");
+            Console.ReadKey(true);
+        }
     }
 }
