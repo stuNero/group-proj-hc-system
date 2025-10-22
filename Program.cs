@@ -37,9 +37,12 @@ foreach (Permission perm in Enum.GetValues(typeof(Permission)))
 {
   sys.allPermissionList.Add(perm);
 }
+
 if (sys.locations.Count <= 0)
 {
   sys.locations.Add(new("testVC", "Main Street 1"));
+  sys.locations.Add(new("Halmstad Sjukhus", "Lasarettvägen"));
+  sys.locations[1].Region = Region.Halland;
 }
 if (sys.eventList.Count <= 0)
 {
@@ -146,7 +149,7 @@ while (isRunning)
             Debug.Assert(newName != null);
 
             string newDescription = $"{newSSN} request to be a patient. Name: {newName} - Email: {newEmail}";
-            Event? newEvent = new(newSSN, Event.EventType.Request);
+            Event? newEvent = new($"{newSSN} PatientRequest", Event.EventType.Request);
             newEvent.Description = newDescription;
 
             sys.eventList.Add(newEvent);
@@ -160,6 +163,7 @@ while (isRunning)
         case "3":
           isRunning = false;
           break;
+
         default:
           Console.WriteLine("\nPlease enter a valid input");
           Console.ReadKey(true);
@@ -169,18 +173,20 @@ while (isRunning)
     case Menu.Main:
       try { Console.Clear(); } catch { }
       Console.WriteLine($"\nWelcome, {activeUser?.Name}");
-      Console.WriteLine("\n[1] Handle Accounts");
-      Console.WriteLine("\n[2] Handle Registrations");
-      Console.WriteLine("\n[3] Handle Appointment");
-      Console.WriteLine("\n[4] Handle Journal Entries");
-      Console.WriteLine("\n[5] Add a Location");
-      Console.WriteLine("\n[6] Schedule of a Location");
-      Console.WriteLine("\n[7] Assign User to a Region");
-      Console.WriteLine("\n[8] View Permissions");
-      Console.WriteLine("\n[g] View My Journal");
-      Console.WriteLine("\n[h] View My Schedule");
-      Console.WriteLine("\n[j] View All Users");
-      Console.WriteLine("\n[k] View Events by Type");
+      Debug.Assert(activeUser != null);
+      if (!activeUser.HasPermission(Permission.None))
+      {
+        Console.WriteLine("\n[1] Handle Accounts");
+        Console.WriteLine("\n[2] Handle Registrations");
+        Console.WriteLine("\n[3] Handle Appointment");
+        Console.WriteLine("\n[4] Handle Journal Entries");
+        Console.WriteLine("\n[5] Add a Location");
+        Console.WriteLine("\n[6] Schedule of a Location");
+        Console.WriteLine("\n[7] View Permissions");
+      }
+      Console.WriteLine("\n[8] View My Journal");
+      Console.WriteLine("\n[9] View My Schedule");
+      Console.WriteLine("\n[10] Request an appointment.");
       Console.WriteLine("\n[x] Logout");
       Console.Write("\n> ");
 
@@ -201,6 +207,14 @@ while (isRunning)
           if (!activeUser!.HasPermission(Permission.HandleRegistration))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.ViewUserRequests();
+          break;
+        // HandleAppointment
+        case "3":
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.HandleAppointment))
+          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          sys.HandleAppointment();
+          Console.ReadKey(true);
           break;
 
 
@@ -231,20 +245,10 @@ while (isRunning)
           try { Console.Clear(); } catch { }
           
           sys.ScheduleOfLocation();
-
           Console.ReadKey(true);
           break;
 
-        // AssignRegion
-        case "7":
-          try { Console.Clear(); } catch { }
-          if (!activeUser!.HasPermission(Permission.AssignRegion))
-          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          Console.WriteLine("W I P");
-          Console.ReadKey(true);
-          break;
-
-        case "8": // Permissions
+        case "7": // Permissions
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.PermHandlePerm))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
@@ -252,7 +256,7 @@ while (isRunning)
           break;
 
         // View My Journal
-        case "g":
+        case "8":
           try { Console.Clear(); } catch { }
           Debug.Assert(activeUser != null);
           sys.ViewEvent(Event.EventType.Entry, activeUser);
@@ -260,31 +264,20 @@ while (isRunning)
           break;
 
         // View My Schedule
-        case "h":
+        case "9":
           try { Console.Clear(); } catch { }
           Debug.Assert(activeUser != null);
           sys.ViewEvent(Event.EventType.Appointment, activeUser);
           Console.ReadKey(true);
           break;
-
-        // View All Users
-        case "j":
-          try { Console.Clear(); } catch { }
-          Console.WriteLine("\n=== ALL USERS ===");
-          foreach (User user in sys.users)
-          {
-            Console.WriteLine($"Name: {user.Name} | SSN: {user.SSN}");
-          }
-          Console.Write("\nPress ENTER to continue.");
-          Console.ReadKey(true);
+        case "10":
+          sys.RequestAppointment(activeUser);
           break;
-        
         // Log out
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;
           break;
-
         default:
           Console.Write("\nInvalid input. Press ENTER to continue. ");
           Console.ReadKey(true);

@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using System.Diagnostics.Tracing;
+using System.Runtime.InteropServices;
+using Microsoft.VisualBasic;
 using System.Formats.Tar;
 
 namespace App;
@@ -365,6 +367,7 @@ class HCSystem
             {
                 while (true)
                 {
+                    Debug.Assert(targetUser != null);
                     if (targetUser!.HasPermission(Permission.None))
                     {
                         try { Console.Clear(); } catch { }
@@ -454,8 +457,6 @@ class HCSystem
             Console.ReadLine();
             return false;
         }
-
-        
     }
     public void ViewUserRequests()
     {
@@ -583,6 +584,245 @@ class HCSystem
             Console.ReadKey(true);
         }
     }
+    public void RequestAppointment(User activeUser)
+    {
+        try { Console.Clear(); } catch { }
+        Console.WriteLine("\nRequest Appointment\n");
+        Console.WriteLine("\nSelect region\n");
+
+        foreach (Region region in Region.GetValues(typeof(Region)))
+        {
+            int regionIndex = (int)region;
+            if (region != Region.None)
+            { Console.WriteLine($"[{regionIndex}] {region}"); }
+        }
+        Console.Write("\nRegion [1-21]: ");
+        string? selectedRegionIndex = Console.ReadLine();
+
+
+        if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 1 && selectedRegion < 21)
+        {
+            Location? selectedLocation = null;
+            bool foundLocation = false;
+            Console.WriteLine("");
+            foreach (Location location in locations)
+            {
+                if (selectedRegion == (int)location.Region)
+                {
+                    Console.WriteLine($"ID: [{locations.IndexOf(location) + 1}] - {location.Name}");
+                    Console.WriteLine($"{location.Address}");
+                    foundLocation = true;
+                }
+            }
+
+            if (foundLocation)
+            {
+                Console.Write("\nSelect location ID: ");
+                int selectedLocID = Convert.ToInt32(Console.ReadLine());
+
+                if (selectedLocID < 0 || selectedLocID > locations.Count)
+                {
+                    Console.Write("\nInvalid input. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    return;
+                }
+
+                selectedLocation = locations[selectedLocID - 1];
+                if ((int)selectedLocation.Region != selectedRegion)
+                {
+                    Console.Write("\nInvalid input. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    return;
+                }
+
+                Console.WriteLine("\nDescribe the reason of the appointment:");
+                Console.Write("► ");
+                string? newReason = Console.ReadLine();
+
+                if (string.IsNullOrWhiteSpace(newReason))
+                {
+                    Console.WriteLine("\nReason can't be empty.");
+                    Console.Write("\nPress ENTER to go back to previous menu. ");
+                    Console.ReadLine();
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
+                    Console.WriteLine("\nPlease use (DD/MM/YY - HH:mm) format.");
+                    Console.Write("► ");
+
+                    string? desiredTime = Console.ReadLine();
+
+                    try { Console.Clear(); } catch { }
+                    Console.WriteLine("\nReview the appointment request before sending:");
+                    Console.WriteLine($"\nYour name: {activeUser.Name}\nYour SSN: {activeUser.SSN}");
+                    Console.WriteLine($"Reason of the appointment:\n"
+                    + $"'{newReason}'");
+                    Console.WriteLine($"\nDesired time: {(desiredTime == "" ? "None" : desiredTime)}");
+
+                    Console.WriteLine($"\nAt: {selectedLocation.Name} - Address: {selectedLocation.Address}");
+
+                    Console.WriteLine("\nIs the information correct?");
+                    Console.Write("Y/N? ('N' would take you back to previous menu): ");
+                    switch (Console.ReadLine()?.ToLower())
+                    {
+                        case "y":
+                            Event? newEvent = new($"AppointmentRequest", Event.EventType.Request);
+                            newEvent.Description = $"{newReason} | Desired time: {(desiredTime == "" ? "None" : desiredTime)}";
+                            newEvent.Location = selectedLocation;
+                            newEvent.Participants.Add(new(activeUser, Role.Patient));
+                            eventList.Add(newEvent);
+                            SaveEventsToFile();
+                            Console.WriteLine("\nYour appoinment request has been registered.");
+                            Console.Write("\nPress ENTER to continue. ");
+                            Console.ReadLine();
+                            break;
+
+                        case "n": return;
+
+                        default:
+                            Console.Write("\nInvalid input. Press ENTER to continue. ");
+                            Console.ReadLine();
+                            break;
+                    }
+                }
+            }
+            else
+            {
+                Console.Write("\nInvalid Input. Press ENTER to go back to previous menu. ");
+                Console.ReadLine();
+                return;
+            }
+        }
+        else
+        {
+            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+            Console.ReadLine();
+            return;
+        }
+
+    }
+    public void HandleAppointment()
+    {
+        bool foundAppointment = false;
+        Console.WriteLine("\nAppointment requests\n");
+        foreach (Event events in eventList)
+        {
+            if (events.MyEventType == Event.EventType.Request && events.Title == "AppointmentRequest")
+            {
+                Console.WriteLine($"\nAppointment request ID = [{eventList.IndexOf(events) + 1}]");
+                Console.WriteLine("\nDescription: " + events.Description);
+                Console.WriteLine("Location:    " + events.Location!.Name);
+                Console.WriteLine("             " + events.Location.Address);
+                Console.WriteLine("             " + events.Location.Region);
+                Console.WriteLine($"Patient: {events.Participants[0].User.Name}.");
+                Console.WriteLine($"------------------------");
+                foundAppointment = true;
+            }
+        }
+        if (foundAppointment)
+        {
+            Console.Write("\nSelect ID the the request you want to handle: ");
+            int requestID = Convert.ToInt32(Console.ReadLine());
+
+            if (requestID < eventList.Count || requestID > eventList.Count)
+            {
+                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+                return;
+            }
+            else
+            {
+                Event? newEvent = null;
+                foreach (Event events in eventList)
+                {
+                    if (requestID == eventList.IndexOf(events) + 1)
+                    {
+                        newEvent = events;
+                        break;
+                    }
+                }
+                Console.WriteLine("\nDo you want to accept this appointment request?");
+                Console.Write("Y/N? ('N' would take you back to previous menu): ");
+
+                switch (Console.ReadLine()?.ToLower())
+                {
+                    case "y":
+                        Console.Write("\nAppointment time (DD/MM/YY HH:mm:ss): ");
+                        string? dateInput = Console.ReadLine();
+
+                        if (!string.IsNullOrWhiteSpace(dateInput))
+                        {
+                            DateTime newDateTime;
+                            if (DateTime.TryParse(dateInput, out newDateTime))
+                            {
+
+                                Debug.Assert(newEvent != null);
+                                Console.WriteLine("\nSelect personnel: ");
+                                foreach (User user in users)
+                                {
+                                    if (user != newEvent.Participants[0].User)
+                                    {
+                                        Console.WriteLine($"\nID: [{users.IndexOf(user) + 1}] {user.Name}");
+                                    }
+                                }
+                                Console.Write("\n► ");
+                                int selectedPersonnel = Convert.ToInt32(Console.ReadLine());
+                                if (selectedPersonnel < 1 || selectedPersonnel > users.Count || users[selectedPersonnel - 1] == newEvent.Participants[0].User)
+                                {
+                                    Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+                                    return;
+                                }
+                                else
+                                {
+                                    newEvent.Title = newEvent.Participants[0].User.SSN;
+                                    Debug.Assert(newEvent.Description != null);
+                                    string[] descriptionSplit = newEvent.Description.Split("|");
+                                    newEvent.Description = descriptionSplit[0].Trim();
+                                    newEvent.MyEventType = Event.EventType.Appointment;
+                                    newEvent.StartDate = newDateTime;
+                                    newEvent.EndDate = newDateTime.AddMinutes(30);
+                                    newEvent.Participants.Add(new(users[selectedPersonnel - 1], Role.Personnel));
+                                    SaveEventsToFile();
+                                    Console.WriteLine("\nAppointment accepted.");
+                                    Console.Write("\nPress ENTER to go back to previous menu. ");
+                                    break;
+                                }
+                            }
+                            else
+                            {
+                                Console.Write("\nInvalid input. Press ENTER to go back to previos menu. ");
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            Console.Write("\nInvalid input. Press ENTER to go back to previos menu. ");
+                            return;
+                        }
+
+                    case "n":
+                        Debug.Assert(newEvent != null);
+                        newEvent.MyEventType = Event.EventType.None;
+                        SaveEventsToFile();
+                        Console.WriteLine("\nAppointment rejected. Press ENTER to go back to previos menu. ");
+                        return;
+
+                    default:
+                        Console.Write("\nInvalid input. Press ENTER to continue. ");
+                        Console.ReadLine();
+                        break;
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("\nNo appointment request found.");
+            Console.Write("\nPress ENTER to go back to previous menu. ");
+            return;
+        }
+    }
+
     public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
