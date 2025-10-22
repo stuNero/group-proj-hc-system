@@ -186,11 +186,13 @@ while (isRunning)
         case "2":
           if (!activeUser.HasPermission(Permission.HandleRegistration))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          sys.ViewEvents(Event.EventType.Request);
           break;
         // HandleAppointment
         case "3":
           if (!activeUser.HasPermission(Permission.HandleAppointment))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          sys.ViewEvents(Event.EventType.Appointment);
           break;
         // JournalEntries
         case "4":
@@ -294,10 +296,7 @@ while (isRunning)
           Console.Write("\nPress ENTER to continue.");
           Console.ReadKey(true);
           break;
-        case "k":
-          sys.ViewEvents();
-          break;
-
+        
         case "m": // Manage permissions
           sys.ManagePermissions(activeUser);
           break;
