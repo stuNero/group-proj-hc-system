@@ -718,7 +718,7 @@ class HCSystem
 
                     Console.WriteLine("\nIs the information correct?");
                     Console.Write("Y/N? ('N' would take you back to previous menu): ");
-                    switch (Console.ReadLine().ToLower())
+                    switch (Console.ReadLine()?.ToLower())
                     {
                         case "y":
                             Event? newEvent = new($"{activeUser.Name} Appointment", Event.EventType.Request);

@@ -170,6 +170,7 @@ while (isRunning)
     case Menu.Main:
       try { Console.Clear(); } catch { }
       Console.WriteLine($"\nWelcome, {activeUser?.Name}");
+      Debug.Assert(activeUser != null);
       if (!activeUser.Permissions.Contains(Permission.None))
       {
         Console.WriteLine("\n[1] Handle Accounts");
