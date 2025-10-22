@@ -200,16 +200,9 @@ while (isRunning)
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.HandleRegistration))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          sys.ViewEvents(Event.EventType.Request);
+          sys.ViewUserRequests();
           break;
 
-        // HandleAppointment
-        case "3":
-          try { Console.Clear(); } catch { }
-          if (!activeUser!.HasPermission(Permission.HandleAppointment))
-          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
-          sys.ViewEvents(Event.EventType.Appointment);
-          break;
 
         // JournalEntries
         case "4":
