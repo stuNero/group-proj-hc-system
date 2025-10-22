@@ -574,7 +574,7 @@ class HCSystem
         string? selectedRegionIndex = Console.ReadLine();
 
 
-        if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 1 && selectedRegion < 21)
+        if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 0 && selectedRegion < 21)
         {
             Location? selectedLocation = null;
             bool foundLocation = false;
@@ -592,79 +592,83 @@ class HCSystem
             if (foundLocation)
             {
                 Console.Write("\nSelect location ID: ");
-                int selectedLocID = Convert.ToInt32(Console.ReadLine());
+                string? selectedLocString = Console.ReadLine();
 
-                if (selectedLocID < 0 || selectedLocID > locations.Count)
+                if (int.TryParse(selectedLocString, out int selectedLocID) && selectedLocID > 0 && selectedLocID <= locations.Count)
                 {
-                    Console.Write("\nInvalid input. Press ENTER to continue. ");
-                    Console.ReadLine();
-                    return;
-                }
+                    selectedLocation = locations[selectedLocID - 1];
+                    if ((int)selectedLocation.Region != selectedRegion)
+                    {
+                        Console.Write("\nInvalid input. Press ENTER to continue. ");
+                        Console.ReadLine();
+                        return;
+                    }
 
-                selectedLocation = locations[selectedLocID - 1];
-                if ((int)selectedLocation.Region != selectedRegion)
-                {
-                    Console.Write("\nInvalid input. Press ENTER to continue. ");
-                    Console.ReadLine();
-                    return;
-                }
+                    Console.WriteLine("\nDescribe the reason of the appointment:");
+                    Console.Write("► ");
+                    string? newReason = Console.ReadLine();
 
-                Console.WriteLine("\nDescribe the reason of the appointment:");
-                Console.Write("► ");
-                string? newReason = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(newReason))
+                    {
+                        Console.WriteLine("\nReason can't be empty.");
+                        Console.Write("\nPress ENTER to go back to previous menu. ");
+                        Console.ReadLine();
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
+                        Console.WriteLine("\nPlease use (DD/MM/YY - HH:mm) format.");
+                        Console.Write("► ");
 
-                if (string.IsNullOrWhiteSpace(newReason))
-                {
-                    Console.WriteLine("\nReason can't be empty.");
-                    Console.Write("\nPress ENTER to go back to previous menu. ");
-                    Console.ReadLine();
-                    return;
+                        string? desiredTime = Console.ReadLine();
+
+                        try { Console.Clear(); } catch { }
+                        Console.WriteLine("\nReview the appointment request before sending:");
+                        Console.WriteLine($"\nYour name: {activeUser.Name}\nYour SSN: {activeUser.SSN}");
+                        Console.WriteLine($"Reason of the appointment:\n"
+                        + $"'{newReason}'");
+                        Console.WriteLine($"\nDesired time: {(desiredTime == "" ? "None" : desiredTime)}");
+
+                        Console.WriteLine($"\nAt: {selectedLocation.Name} - Address: {selectedLocation.Address}");
+
+                        Console.WriteLine("\nIs the information correct?");
+                        Console.Write("Y/N? ('N' would take you back to previous menu): ");
+                        switch (Console.ReadLine()?.ToLower())
+                        {
+                            case "y":
+                                Event? newEvent = new($"AppointmentRequest", Event.EventType.Request);
+                                newEvent.Description = $"{newReason} | Desired time: {(desiredTime == "" ? "None" : desiredTime)}";
+                                newEvent.Location = selectedLocation;
+                                newEvent.Participants.Add(new(activeUser, Role.Patient));
+                                eventList.Add(newEvent);
+                                SaveEventsToFile();
+                                Console.WriteLine("\nYour appoinment request has been registered.");
+                                Console.Write("\nPress ENTER to continue. ");
+                                Console.ReadLine();
+                                break;
+
+                            case "n": return;
+
+                            default:
+                                Console.Write("\nInvalid input. Press ENTER to continue. ");
+                                Console.ReadLine();
+                                break;
+                        }
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
-                    Console.WriteLine("\nPlease use (DD/MM/YY - HH:mm) format.");
-                    Console.Write("► ");
-
-                    string? desiredTime = Console.ReadLine();
-
-                    try { Console.Clear(); } catch { }
-                    Console.WriteLine("\nReview the appointment request before sending:");
-                    Console.WriteLine($"\nYour name: {activeUser.Name}\nYour SSN: {activeUser.SSN}");
-                    Console.WriteLine($"Reason of the appointment:\n"
-                    + $"'{newReason}'");
-                    Console.WriteLine($"\nDesired time: {(desiredTime == "" ? "None" : desiredTime)}");
-
-                    Console.WriteLine($"\nAt: {selectedLocation.Name} - Address: {selectedLocation.Address}");
-
-                    Console.WriteLine("\nIs the information correct?");
-                    Console.Write("Y/N? ('N' would take you back to previous menu): ");
-                    switch (Console.ReadLine()?.ToLower())
-                    {
-                        case "y":
-                            Event? newEvent = new($"AppointmentRequest", Event.EventType.Request);
-                            newEvent.Description = $"{newReason} | Desired time: {(desiredTime == "" ? "None" : desiredTime)}";
-                            newEvent.Location = selectedLocation;
-                            newEvent.Participants.Add(new(activeUser, Role.Patient));
-                            eventList.Add(newEvent);
-                            SaveEventsToFile();
-                            Console.WriteLine("\nYour appoinment request has been registered.");
-                            Console.Write("\nPress ENTER to continue. ");
-                            Console.ReadLine();
-                            break;
-
-                        case "n": return;
-
-                        default:
-                            Console.Write("\nInvalid input. Press ENTER to continue. ");
-                            Console.ReadLine();
-                            break;
-                    }
+                    Console.Write("\nInvalid input. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    return;
                 }
+
+
             }
             else
             {
-                Console.Write("\nInvalid Input. Press ENTER to go back to previous menu. ");
+                Console.Write("\nNo locations found in the selected region. Press ENTER to go back to previous menu. ");
                 Console.ReadLine();
                 return;
             }
