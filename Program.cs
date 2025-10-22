@@ -17,23 +17,16 @@ if (sys.users.Count <= 0)
   sys.users.Add(new User("testssn1", "test1", "Test Patient"));
   sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
   // Hard coding all the permission to admins permission list.
-  foreach (User user in sys.users)
+  foreach (Permission perm in sys.allPermissionList)
   {
-    if (user.SSN == "admin123")
-    {
-      int permIndex = 1;
-      {
-        foreach (Permission perm in Enum.GetValues(typeof(Permission)))
-        {
-          user.Permissions.Add(perm);
-          permIndex++;
-        }
-      }
-    }
-    break;
+    sys.users[0].Permissions.Add(perm);
   }
 }
 
+foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+{
+  sys.allPermissionList.Add(perm);
+}
 sys.SaveUsersToFile();
 
 
@@ -231,12 +224,12 @@ while (isRunning)
           sys.ViewEvents();
           break;
 
-        case "m": // Manage permessions
+        case "m": // Manage permissions
           sys.ManagePermissions(activeUser);
           break;
 
         case "v": // View permissions
-          sys.ViewPermissions(activeUser, currentMenu);
+          sys.ViewPermissions(activeUser);
           break;
 
         case "x":

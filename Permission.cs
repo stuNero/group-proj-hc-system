@@ -20,6 +20,5 @@ public enum Permission
   AssignRegion,
   ViewPermissionList,
   PermHandlePerm,
-  SysPermissions,
 }
 
