@@ -647,4 +647,41 @@ class HCSystem
             Console.ReadLine();
         }
     }
+    public void ViewEvent(Event.EventType eventType,User activeUser)
+    {
+        if (eventType == Event.EventType.Entry)
+        {
+            Console.WriteLine("Your Journal");
+        }
+        else
+        {
+            Console.WriteLine("Your Appointment");
+        }        
+        foreach (Event event1 in eventList)
+        {
+            if (event1.MyEventType == Event.EventType.Entry)
+            {
+                foreach (Participant participant in event1.Participants)
+                {
+                    if (activeUser == participant.User)
+                    {
+                        Console.WriteLine("Title:       " + event1.Title);
+                        Console.WriteLine("Description: " + event1.Description);
+                        Console.WriteLine("Start Date:  " + event1.StartDate);
+                        Console.WriteLine("End Date:    " + event1.EndDate);
+                        Console.WriteLine("Location:    " + event1.Location!.Name);
+                        Console.WriteLine("             " + event1.Location.Address);
+                        Console.WriteLine("             " + event1.Location.Region);
+                        Console.WriteLine("Participants: \n_________");
+                        foreach (Participant part1 in event1.Participants)
+                        {
+                            Console.WriteLine("Name: " + part1.User.Name);
+                            Console.WriteLine("Role: " + part1.ParticipantRole);
+                            Console.WriteLine("_________");
+                        }
+                    }
+                }
+            }
+        }
+    }
 }
