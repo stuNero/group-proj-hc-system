@@ -33,23 +33,14 @@ if (sys.users.Count <= 0)
   }
 
 }
-
 foreach (Permission perm in Enum.GetValues(typeof(Permission)))
 {
   sys.allPermissionList.Add(perm);
 }
-sys.SaveUsersToFile();
-
-
-
-
 if (sys.locations.Count <= 0)
 {
   sys.locations.Add(new("testVC", "Main Street 1"));
 }
-
-sys.SaveLocationsToFile();
-
 if (sys.eventList.Count <= 0)
 {
   Event myEvent = new("event", Event.EventType.Request);
@@ -195,6 +186,7 @@ while (isRunning)
 
       switch (Console.ReadLine())
       {
+
         // HandleAccount
         case "1":
           try { Console.Clear(); } catch { }
@@ -202,6 +194,7 @@ while (isRunning)
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.CreateAccount();
           break;
+
         // HandleRegistration
         case "2":
           try { Console.Clear(); } catch { }
@@ -209,6 +202,7 @@ while (isRunning)
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.ViewEvents(Event.EventType.Request);
           break;
+
         // HandleAppointment
         case "3":
           try { Console.Clear(); } catch { }
@@ -216,6 +210,7 @@ while (isRunning)
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.ViewEvents(Event.EventType.Appointment);
           break;
+
         // JournalEntries
         case "4":
           try { Console.Clear(); } catch { }
@@ -224,79 +219,29 @@ while (isRunning)
           Console.WriteLine("W I P");
           Console.ReadKey(true);
           break;
+
         // AddLocation
         case "5":
           if (!activeUser!.HasPermission(Permission.AddLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           try { Console.Clear(); } catch { }
 
-          Console.WriteLine("Name of Location?");
-          Console.Write(">");
-          string? locName = Console.ReadLine();
-          bool check = false;
-          foreach (Location location in sys.locations)
-          {
-            if (location.Name == locName) check = true; break;
-          }
-          if (!check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); break; }
-          try { Console.Clear(); } catch { }
-          Console.WriteLine("Address of Location?");
-          Console.Write(">");
-          string? locAddress = Console.ReadLine();
-          List<Region> regionList = new();
-          foreach (Region region in Enum.GetValues(typeof(Region)))
-          {
-            regionList.Add(region);
-          }
+          sys.AddLocation();
 
-          for (int i = 1; i < regionList.Count; i++)
-          {
-            Console.WriteLine($"[{i}] {regionList[i].ToString()}");
-          }
-          Console.Write("Choose region for location: ");
-          int.TryParse(Console.ReadLine(), out int nr);
-          Region locRegion = (Region)(nr);
-          Debug.Assert(locName != null && locAddress != null);
-          sys.locations.Add(new Location(locName, locAddress, locRegion));
-          sys.SaveLocationsToFile();
           Console.ReadKey(true);
           break;
+
         // ScheduleOfLocation
         case "6":
           if (!activeUser!.HasPermission(Permission.ScheduleOfLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           try { Console.Clear(); } catch { }
-          Console.WriteLine("Which location do you want to see schedule of?");
-          for (int i = 0; i < sys.locations.Count; i++)
-          {
-            Console.WriteLine($"[{i + 1}]\nName: {sys.locations[i].Name} \nAddress: {sys.locations[i].Name}");
-          }
-          Console.Write(">");
-          string? choice = Console.ReadLine();
+          
+          sys.ScheduleOfLocation();
 
-          if (!int.TryParse(choice, out nr))
-          {
-            Console.WriteLine("Invalid Location");
-            break;
-          }
-          try { Console.Clear(); } catch { }
-          foreach (Event scheduledEvent in sys.eventList)
-          {
-            if (scheduledEvent.Location == sys.locations[nr - 1])
-            {
-              Console.WriteLine("____________________________________________");
-              Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
-              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
-              Console.WriteLine("Participants: ");
-              foreach (Participant participant in scheduledEvent.Participants)
-              {
-                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
-              }
-              Console.WriteLine("____________________________________________");
-            }
-          }
           Console.ReadKey(true);
           break;
+
         // AssignRegion
         case "7":
           try { Console.Clear(); } catch { }
@@ -305,12 +250,14 @@ while (isRunning)
           Console.WriteLine("W I P");
           Console.ReadKey(true);
           break;
+
         case "8": // Permissions
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.PermHandlePerm))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.PermissionSystem(activeUser);
           break;
+
         // View My Journal
         case "g":
           try { Console.Clear(); } catch { }
@@ -318,6 +265,7 @@ while (isRunning)
           sys.ViewEvent(Event.EventType.Entry, activeUser);
           Console.ReadKey(true);
           break;
+
         // View My Schedule
         case "h":
           try { Console.Clear(); } catch { }
@@ -325,6 +273,7 @@ while (isRunning)
           sys.ViewEvent(Event.EventType.Appointment, activeUser);
           Console.ReadKey(true);
           break;
+
         // View All Users
         case "j":
           try { Console.Clear(); } catch { }
@@ -337,7 +286,7 @@ while (isRunning)
           Console.ReadKey(true);
           break;
         
-
+        // Log out
         case "x":
           activeUser = null;
           currentMenu = Menu.Default;

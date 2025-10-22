@@ -225,8 +225,6 @@ class HCSystem
 
         return true;
     }
-
-
     public void PermissionSystem(User? activeUser)
     {
         Debug.Assert(activeUser != null);
@@ -367,7 +365,7 @@ class HCSystem
             {
                 while (true)
                 {
-                    if (targetUser.Permissions.Contains(Permission.None))
+                    if (targetUser!.HasPermission(Permission.None))
                     {
                         try { Console.Clear(); } catch { }
                         Console.WriteLine($"\n{targetUser.Name} has no permissions.");
@@ -391,7 +389,7 @@ class HCSystem
                             bool targetUserPermBool = false;
 
                             Debug.Assert(targetUser != null);
-                            if (targetUser.Permissions.Contains(perm))
+                            if (targetUser.HasPermission(perm))
                             {
                                 targetUserPermBool = true;
                                 string index = $"[{permIndex}]".PadRight(4);
@@ -409,9 +407,6 @@ class HCSystem
             }
         }
     }
-
-
-
     public bool CreateAccount()
     {
         Console.Write("\nEnter SSN for new User: ");
@@ -514,24 +509,24 @@ class HCSystem
                     Console.WriteLine($"Description: {events.Description}");
                 }
 
-                if (events.StartDate != default)
-                {
-                    Console.WriteLine($"Start: {events.StartDate}");
-                }
+                // if (events.StartDate != default)
+                // {
+                //     Console.WriteLine($"Start: {events.StartDate}");
+                // }
 
-                if (events.EndDate != default)
-                {
-                    Console.WriteLine($"End: {events.EndDate}");
-                }
+                // if (events.EndDate != default)
+                // {
+                //     Console.WriteLine($"End: {events.EndDate}");
+                // }
 
-                if (events.Participants.Count != 0)
-                {
-                    Console.WriteLine("Participants:");
-                    foreach (Participant participant in events.Participants)
-                    {
-                        Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                    }
-                }
+                // if (events.Participants.Count != 0)
+                // {
+                //     Console.WriteLine("Participants:");
+                //     foreach (Participant participant in events.Participants)
+                //     {
+                //         Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
+                //     }
+                // }
 
                 Console.WriteLine("------------------------");
             }
@@ -585,8 +580,8 @@ class HCSystem
             if (requestChoice == "1")
             {
                 Console.Clear();
-        Console.WriteLine($"=== Accept Request ===");
-        Console.WriteLine($"\n Request: {SelectedRequest.Description}");
+                Console.WriteLine($"=== Accept Request ===");
+                Console.WriteLine($"\n Request: {SelectedRequest.Description}");
                 if (CreateAccount())
                 {
                     Console.WriteLine("\nThe request has been accepted and account created.");
@@ -621,7 +616,7 @@ class HCSystem
     public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
-        {
+        { 
             Console.WriteLine("Your Journal");
         }
         else
@@ -654,5 +649,72 @@ class HCSystem
                 }
             }
         }
+    }
+    public void AddLocation()
+    {
+        Console.WriteLine("Name of Location?");
+        Console.Write(">");
+        string? locName = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(locName)){ Console.WriteLine("Invalid Input");return;}
+        bool check = false;
+        foreach (Location location in locations)
+        {
+            if (location.Name == locName) check = true; break;
+        }
+        if (check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); return; }
+        try { Console.Clear(); } catch { }
+        Console.WriteLine("Address of Location?");
+        Console.Write(">");
+        string? locAddress = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(locAddress)){ Console.WriteLine("Invalid Input");return;}
+        List<Region> regionList = new();
+        foreach (Region region in Enum.GetValues(typeof(Region)))
+        {
+            regionList.Add(region);
+        }
+
+        for (int i = 1; i < regionList.Count; i++)
+        {
+            Console.WriteLine($"[{i}] {regionList[i].ToString()}");
+        }
+        Console.Write("Choose region for location: ");
+        int.TryParse(Console.ReadLine(), out int nr);
+        Region locRegion = (Region)(nr);
+        Debug.Assert(locName != null && locAddress != null);
+        locations.Add(new Location(locName, locAddress, locRegion));
+        Console.WriteLine($"Location added: \n{locName}\n{locAddress}\n{locRegion}");
+        SaveLocationsToFile();
+    }
+    public void ScheduleOfLocation()
+    {
+        Console.WriteLine("Which location do you want to see schedule of?");
+          for (int i = 0; i < locations.Count; i++)
+          {
+            Console.WriteLine($"[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
+          }
+          Console.Write(">");
+          string? choice = Console.ReadLine();
+
+          if (!int.TryParse(choice, out int nr))
+          {
+            Console.WriteLine("Invalid Location");
+            return;
+          }
+          try { Console.Clear(); } catch { }
+          foreach (Event scheduledEvent in eventList)
+          {
+            if (scheduledEvent.Location == locations[nr - 1])
+            {
+              Console.WriteLine("____________________________________________");
+              Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
+              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+              Console.WriteLine("Participants: ");
+              foreach (Participant participant in scheduledEvent.Participants)
+              {
+                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+              }
+              Console.WriteLine("____________________________________________");
+            }
+          }
     }
 }
