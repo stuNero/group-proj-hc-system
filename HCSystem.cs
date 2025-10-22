@@ -222,7 +222,6 @@ class HCSystem
         }
 
         // Create new personnel user
-
         return true;
     }
 
@@ -279,11 +278,9 @@ class HCSystem
                         targetUser = selectableUser[selectedUser - 1];
                         break;
                     }
-
                     try { Console.Clear(); } catch { }
                 }
                 try { Console.Clear(); } catch { }
-                List<Permission> permList = new();
                 bool isSelectingperm = true;
                 while (isSelectingperm)
                 {
@@ -313,8 +310,6 @@ class HCSystem
                             string permName = perm.ToString().PadRight(21);
                             Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
                         }
-
-                        permList.Add(perm);
                         permIndex++;
                     }
 
@@ -387,7 +382,7 @@ class HCSystem
 
         try { Console.Clear(); } catch { }
         Debug.Assert(activeUser != null);
-        if (activeUser.HasPermission(Permission.ViewPermissionList))
+        if (activeUser.HasPermission(Permission.ViewPermissionList) || activeUser.HasPermission(Permission.PermHandlePerm))
         {
             User? targetUser = null;
             bool isSelectingUser = true;
@@ -395,7 +390,7 @@ class HCSystem
             {
                 int userIndex = 1;
                 List<User> selectableUser = new();
-                // List of all users accept activeuser, just to view permissions.
+                // List of all users accept activeuser, to view permissions.
                 foreach (User user in users)
                 {
                     if (user != activeUser)
@@ -460,22 +455,13 @@ class HCSystem
                                 string permName = perm.ToString().PadRight(21);
                                 Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
                             }
-                            else // remove this if not needed
-                            {
-                                targetUserPermBool = false;
-                                string index = $"[{permIndex}]".PadRight(4);
-                                string permName = perm.ToString().PadRight(21);
-                                Console.WriteLine($"\n{index}   {permName}{targetUserPermBool}");
-                            }
                             permIndex++;
                         }
                         Console.WriteLine("==================================");
                         Console.WriteLine("\nPress enter to continue...");
                         Console.ReadLine();
-                        // break;
                     }
                 }
-
                 try { Console.Clear(); } catch { }
             }
         }
