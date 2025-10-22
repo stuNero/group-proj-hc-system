@@ -619,12 +619,12 @@ class HCSystem
         Console.Write("\nPress [b] to go back or select a number to select a request.");
 
         string? userInput = Console.ReadLine();
-        
+
         if (userInput == "b")
         {
             return;
         }
-        else if(int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= filteredEvents.Count)
+        else if (int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= filteredEvents.Count)
         {
             Event SelectedRequest = filteredEvents[selectedRequest - 1];
             Console.Clear();
@@ -634,17 +634,17 @@ class HCSystem
             if (!string.IsNullOrWhiteSpace(SelectedRequest.Description))
             {
                 Console.WriteLine($"Description: {SelectedRequest.Description}");
-                    }
+            }
 
-                    if (SelectedRequest.StartDate != default)
-                    {
-                        Console.WriteLine($"Start: {SelectedRequest.StartDate}");
-                    }
+            if (SelectedRequest.StartDate != default)
+            {
+                Console.WriteLine($"Start: {SelectedRequest.StartDate}");
+            }
 
-                    if (SelectedRequest.EndDate != default)
-                    {
-                        Console.WriteLine($"End: {SelectedRequest.EndDate}");
-                    }
+            if (SelectedRequest.EndDate != default)
+            {
+                Console.WriteLine($"End: {SelectedRequest.EndDate}");
+            }
 
             if (SelectedRequest.Participants.Count != 0)
             {
@@ -655,6 +655,11 @@ class HCSystem
                 }
             }
             Console.WriteLine("\n Press ENTER to go back.");
+            Console.ReadKey(true);
+        }
+        else
+        {
+            Console.WriteLine("\nWrong input, press ENTER to go back to menu.");
             Console.ReadKey(true);
         }
     }
