@@ -654,8 +654,12 @@ class HCSystem
                     Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
                 }
             }
-            Console.WriteLine("\n Press ENTER to go back.");
-            Console.ReadKey(true);
+            Console.WriteLine("\n === Request Options ===");
+            Console.WriteLine("[1] Accept Request");
+            Console.WriteLine("[2] Deny request");
+            Console.WriteLine("[b] Go back");
+            Console.Write("\n► ");
+            Console.ReadLine();
         }
         else
         {
