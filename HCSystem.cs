@@ -724,6 +724,7 @@ class HCSystem
                             Event? newEvent = new($"{activeUser.Name} Appointment", Event.EventType.Request);
                             newEvent.Description = $"{newReason}. Desired time: {(desiredTime == "" ? "no" : desiredTime)}";
                             newEvent.Location = selectedLocation;
+                            newEvent.Participants.Add(new(activeUser, Role.Patient));
                             SaveEventsToFile();
                             Console.WriteLine("\nYour appoinment request has been registered.");
                             Console.Write("\nPress ENTER to continue: ");
@@ -739,6 +740,43 @@ class HCSystem
                 Console.Write("\nInvalid Input. Press ENTER to go back to previous menu. ");
                 Console.ReadLine();
                 return;
+            }
+        }
+    }
+    public void ViewEvent(Event.EventType eventType, User activeUser)
+    {
+        if (eventType == Event.EventType.Entry)
+        {
+            Console.WriteLine("Your Journal");
+        }
+        else
+        {
+            Console.WriteLine("Your Appointment");
+        }
+        foreach (Event event1 in eventList)
+        {
+            if (event1.MyEventType == Event.EventType.Entry)
+            {
+                foreach (Participant participant in event1.Participants)
+                {
+                    if (activeUser == participant.User)
+                    {
+                        Console.WriteLine("Title:       " + event1.Title);
+                        Console.WriteLine("Description: " + event1.Description);
+                        Console.WriteLine("Start Date:  " + event1.StartDate);
+                        Console.WriteLine("End Date:    " + event1.EndDate);
+                        Console.WriteLine("Location:    " + event1.Location!.Name);
+                        Console.WriteLine("             " + event1.Location.Address);
+                        Console.WriteLine("             " + event1.Location.Region);
+                        Console.WriteLine("Participants: \n_________");
+                        foreach (Participant part1 in event1.Participants)
+                        {
+                            Console.WriteLine("Name: " + part1.User.Name);
+                            Console.WriteLine("Role: " + part1.ParticipantRole);
+                            Console.WriteLine("_________");
+                        }
+                    }
+                }
             }
         }
     }

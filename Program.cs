@@ -56,6 +56,16 @@ if (sys.eventList.Count <= 0)
   mySecondEvent.Participants.Add(new(sys.users[1], Role.Personnel));
   mySecondEvent.Participants.Add(new(sys.users[2], Role.Admin));
   sys.eventList.Add(mySecondEvent);
+
+  Event testEntry = new("My Entry", Event.EventType.Entry);
+  testEntry.Description = "User has too long fingers";
+  testEntry.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
+  testEntry.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
+  testEntry.Location = sys.locations[0];
+  testEntry.Participants.Add(new(sys.users[0], Role.Patient));
+  testEntry.Participants.Add(new(sys.users[1], Role.Personnel));
+  testEntry.Participants.Add(new(sys.users[2], Role.Admin));
+  sys.eventList.Add(testEntry);
 }
 
 sys.SaveLocationsToFile();
@@ -183,44 +193,54 @@ while (isRunning)
       {
         // HandleAccount
         case "1":
-          if (!activeUser.HasPermission(Permission.HandleAccount))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.HandleAccount))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.CreateAccount();
           break;
         // HandleRegistration
         case "2":
-          if (!activeUser.HasPermission(Permission.HandleRegistration))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.HandleRegistration))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          Console.WriteLine("W I P");
+          Console.ReadKey(true);
           break;
         // HandleAppointment
         case "3":
-          if (!activeUser.HasPermission(Permission.HandleAppointment))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.HandleAppointment))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          Console.WriteLine("W I P");
+          Console.ReadKey(true);
           break;
         // JournalEntries
         case "4":
-          if (!activeUser.HasPermission(Permission.JournalEntries))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.JournalEntries))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          Console.WriteLine("W I P");
+          Console.ReadKey(true);
           break;
         // AddLocation
         case "5":
-          if (!activeUser.HasPermission(Permission.AddLocation))
+          if (!activeUser!.HasPermission(Permission.AddLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           try { Console.Clear(); } catch { }
 
           Console.WriteLine("Name of Location?");
           Console.Write(">");
-          string locName = Console.ReadLine();
+          string? locName = Console.ReadLine();
           bool check = false;
           foreach (Location location in sys.locations)
           {
-            if (location.Name == locName) ; check = true; break;
+            if (location.Name == locName) check = true; break;
           }
           if (!check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); break; }
           try { Console.Clear(); } catch { }
           Console.WriteLine("Address of Location?");
           Console.Write(">");
-          string locAddress = Console.ReadLine();
+          string? locAddress = Console.ReadLine();
           List<Region> regionList = new();
           foreach (Region region in Enum.GetValues(typeof(Region)))
           {
@@ -234,13 +254,14 @@ while (isRunning)
           Console.Write("Choose region for location: ");
           int.TryParse(Console.ReadLine(), out int nr);
           Region locRegion = (Region)(nr);
+          Debug.Assert(locName != null && locAddress != null);
           sys.locations.Add(new Location(locName, locAddress, locRegion));
           sys.SaveLocationsToFile();
           Console.ReadKey(true);
           break;
         // ScheduleOfLocation
         case "6":
-          if (!activeUser.HasPermission(Permission.ScheduleOfLocation))
+          if (!activeUser!.HasPermission(Permission.ScheduleOfLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           try { Console.Clear(); } catch { }
           Console.WriteLine("Which location do you want to see schedule of?");
@@ -249,7 +270,7 @@ while (isRunning)
             Console.WriteLine($"[{i + 1}]\nName: {sys.locations[i].Name} \nAddress: {sys.locations[i].Name}");
           }
           Console.Write(">");
-          string choice = Console.ReadLine();
+          string? choice = Console.ReadLine();
 
           if (!int.TryParse(choice, out nr))
           {
@@ -276,21 +297,45 @@ while (isRunning)
           break;
         // AssignRegion
         case "7":
-          if (!activeUser.HasPermission(Permission.AssignRegion))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.AssignRegion))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          Console.WriteLine("W I P");
+          Console.ReadKey(true);
           break;
         // ViewPermissionList
         case "8":
-          if (!activeUser.HasPermission(Permission.ViewPermissionList))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.ViewPermissionList))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          Console.WriteLine("W I P");
+          Console.ReadKey(true);
           break;
         // PermHandlePerm
         case "9":
-          if (!activeUser.HasPermission(Permission.PermHandlePerm))
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.PermHandlePerm))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          Console.WriteLine("W I P");
+          Console.ReadKey(true);
           break;
+        // View My Journal
+        case "g":
+          try { Console.Clear(); } catch { }
+          Debug.Assert(activeUser != null);
+          sys.ViewEvent(Event.EventType.Entry, activeUser);
+          Console.ReadKey(true);
+          break;
+        // View My Schedule
+        case "h":
+          try { Console.Clear(); } catch { }
+          Debug.Assert(activeUser != null);
+          sys.ViewEvent(Event.EventType.Appointment, activeUser);
+          Console.ReadKey(true);
+          break;
+        // View All Users
         case "j":
-          // View All Users
+          try { Console.Clear(); } catch { }
           Console.WriteLine("\n=== ALL USERS ===");
           foreach (User user in sys.users)
           {
@@ -300,14 +345,17 @@ while (isRunning)
           Console.ReadKey(true);
           break;
         case "k":
+          try { Console.Clear(); } catch { }
           sys.ViewEvents();
           break;
 
         case "m": // Manage permissions
+          try { Console.Clear(); } catch { }
           sys.ManagePermissions(activeUser);
           break;
 
         case "v": // View permissions
+          try { Console.Clear(); } catch { }
           sys.ViewPermissions(activeUser, currentMenu);
           break;
 
