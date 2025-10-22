@@ -19,8 +19,30 @@ if (sys.users.Count <= 0)
   // Hard coding all the permission to admins permission list.
   foreach (Permission perm in sys.allPermissionList)
   {
-    sys.users[0].Permissions.Add(perm);
+    if (perm != Permission.None)
+    {
+      sys.users[0].Permissions.Add(perm);
+    }
   }
+
+
+
+  // foreach (User user in sys.users)
+  // {
+  //   if (user.SSN == "admin123")
+  //   {
+  //     {
+  //       foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+  //       {
+  //         if (perm != Permission.None)
+  //         {
+  //           user.Permissions.Add(perm);
+  //         }
+  //       }
+  //     }
+  //   }
+  //   break;
+  // }
 }
 
 foreach (Permission perm in Enum.GetValues(typeof(Permission)))
