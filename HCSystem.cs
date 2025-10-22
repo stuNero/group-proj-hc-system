@@ -222,8 +222,7 @@ class HCSystem
                 return false; // User already exists
             }
         }
-
-        // Create new personnel user
+        // Create new user
         return true;
     }
 
@@ -414,7 +413,7 @@ class HCSystem
 
     public void CreateAccount()
     {
-        Console.Write("\nEnter SSN for new personnel: ");
+        Console.Write("\nEnter SSN for new user: ");
         string? newSSN = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newSSN))
@@ -424,7 +423,7 @@ class HCSystem
             return;
         }
 
-        Console.Write("Enter password for new personnel: ");
+        Console.Write("Enter password for new user: ");
         string? newPassword = Console.ReadLine();
 
         if (newPassword == null)
@@ -434,7 +433,7 @@ class HCSystem
             return;
         }
 
-        Console.Write("Enter name for new personnel: ");
+        Console.Write("Enter name for new user: ");
         string? newName = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newName))
@@ -446,8 +445,9 @@ class HCSystem
 
         if (CheckUser(newSSN))
         {
-            User newPersonnel = new(newSSN, newPassword, newName);
-            users.Add(newPersonnel);
+            User newUser = new(newSSN, newPassword, newName);
+            newUser.Permissions.Add(Permission.None);
+            users.Add(newUser);
             SaveUsersToFile();
             Console.WriteLine($"\nAccount created successfully for {newName}!");
         }
