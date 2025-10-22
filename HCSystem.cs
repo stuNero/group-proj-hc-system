@@ -495,7 +495,7 @@ class HCSystem
 
 
 
-    public void CreateAccount()
+    public bool CreateAccount()
     {
         Console.Write("\nEnter SSN for new personnel: ");
         string? newSSN = Console.ReadLine();
@@ -504,7 +504,7 @@ class HCSystem
         {
             Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
             Console.ReadLine();
-            return;
+            return false;
         }
 
         Console.Write("Enter password for new personnel: ");
@@ -514,7 +514,7 @@ class HCSystem
         {
             Console.WriteLine("\nInvalid password. Press ENTER to continue.");
             Console.ReadLine();
-            return;
+            return false;
         }
 
         Console.Write("Enter name for new personnel: ");
@@ -524,7 +524,7 @@ class HCSystem
         {
             Console.WriteLine("\nInvalid name. Press ENTER to continue.");
             Console.ReadLine();
-            return;
+            return false;
         }
 
         if (CheckUser(newSSN))
@@ -533,14 +533,17 @@ class HCSystem
             users.Add(newPersonnel);
             SaveUsersToFile();
             Console.WriteLine($"\nPersonnel account created successfully for {newName}!");
+            return true;
         }
         else
         {
             Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
+            Console.Write("\nPress ENTER to continue.");
+            Console.ReadLine();
+            return false;
         }
 
-        Console.Write("\nPress ENTER to continue.");
-        Console.ReadLine();
+        
     }
     public void ViewEvents(Event.EventType? eventType)
     {
@@ -667,11 +670,24 @@ class HCSystem
                 Console.Clear();
         Console.WriteLine($"=== Accept Request ===");
         Console.WriteLine($"\n Request: {SelectedRequest.Description}");
-        CreateAccount();
+                if (CreateAccount())
+                {
+                    Console.WriteLine("\nThe request has been accepted and account created.");
+                    eventList.Remove(SelectedRequest);
+                    SaveEventsToFile();
+                }
+                else {
+                    Console.WriteLine("\nFailed to create account. The request has not been accepted.");
+                }
             }
             else if (requestChoice == "2")
             {
-                //DenyRequest metod här
+                Console.Clear();
+                Console.WriteLine("You have denied the request.");
+                Console.WriteLine("Press ENTER to continue");
+                eventList.Remove(SelectedRequest);
+                SaveEventsToFile();
+                Console.ReadLine();
             }
             else if (requestChoice == "b")
             {
