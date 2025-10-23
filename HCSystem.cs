@@ -123,7 +123,8 @@ class HCSystem
                 string[] participantSplitData = participants[i].Split("¤");
 
                 User? partUser = null;
-                Role partRole = Role.None;
+                Role partRole = Enum.Parse<Role>(participantSplitData[1]);
+
                 foreach (User user in users)
                 {
                     if (participantSplitData[0] == user.SSN)
@@ -131,13 +132,6 @@ class HCSystem
                         partUser = user;
                         break;
                     }
-                }
-
-                switch (participantSplitData[1])
-                {
-                    case "Admin": partRole = Role.Admin; break;
-                    case "Patient": partRole = Role.Patient; break;
-                    case "Personnel": partRole = Role.Personnel; break;
                 }
 
                 if (partUser != null)
@@ -222,9 +216,7 @@ class HCSystem
                 return false; // User already exists
             }
         }
-
         // Create new user
-
         return true;
     }
     public void PermissionSystem(User? activeUser)
@@ -417,7 +409,7 @@ class HCSystem
 
         if (string.IsNullOrWhiteSpace(newSSN))
         {
-            Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
+            Console.Write("\nInvalid SSN. Press ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -427,7 +419,7 @@ class HCSystem
 
         if (newPassword == null)
         {
-            Console.WriteLine("\nInvalid password. Press ENTER to continue.");
+            Console.Write("\nInvalid password. Press ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -437,7 +429,7 @@ class HCSystem
 
         if (string.IsNullOrWhiteSpace(newName))
         {
-            Console.WriteLine("\nInvalid name. Press ENTER to continue.");
+            Console.Write("\nInvalid name. Press ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -448,12 +440,14 @@ class HCSystem
             users.Add(newUser);
             SaveUsersToFile();
             Console.WriteLine($"\nUser account created successfully for {newName}!");
+            Console.Write("\nPress ENTER to go back to previous menu. ");
+            Console.ReadLine();
             return true;
         }
         else
         {
             Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
-            Console.Write("\nPress ENTER to continue.");
+            Console.Write("\nPress ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -502,7 +496,7 @@ class HCSystem
                 Console.WriteLine("------------------------");
             }
         }
-        Console.Write("\nPress [b] to go back or select a number to select a request.");
+        Console.Write("\nPress [b] to go back or select a number to select a request. ");
 
         string? userInput = Console.ReadLine();
 
@@ -527,7 +521,7 @@ class HCSystem
             Console.WriteLine("[2] Deny request");
             Console.WriteLine("[b] Go back");
             Console.Write("\n► ");
-            
+
 
             string? requestChoice = Console.ReadLine();
             if (requestChoice == "1")
@@ -541,7 +535,8 @@ class HCSystem
                     eventList.Remove(SelectedRequest);
                     SaveEventsToFile();
                 }
-                else {
+                else
+                {
                     Console.WriteLine("\nFailed to create account. The request has not been accepted.");
                 }
             }
@@ -582,7 +577,7 @@ class HCSystem
         string? selectedRegionIndex = Console.ReadLine();
 
 
-        if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 1 && selectedRegion < 21)
+        if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 0 && selectedRegion < 21)
         {
             Location? selectedLocation = null;
             bool foundLocation = false;
@@ -600,79 +595,83 @@ class HCSystem
             if (foundLocation)
             {
                 Console.Write("\nSelect location ID: ");
-                int selectedLocID = Convert.ToInt32(Console.ReadLine());
+                string? selectedLocString = Console.ReadLine();
 
-                if (selectedLocID < 0 || selectedLocID > locations.Count)
+                if (int.TryParse(selectedLocString, out int selectedLocID) && selectedLocID > 0 && selectedLocID <= locations.Count)
                 {
-                    Console.Write("\nInvalid input. Press ENTER to continue. ");
-                    Console.ReadLine();
-                    return;
-                }
+                    selectedLocation = locations[selectedLocID - 1];
+                    if ((int)selectedLocation.Region != selectedRegion)
+                    {
+                        Console.Write("\nInvalid input. Press ENTER to continue. ");
+                        Console.ReadLine();
+                        return;
+                    }
 
-                selectedLocation = locations[selectedLocID - 1];
-                if ((int)selectedLocation.Region != selectedRegion)
-                {
-                    Console.Write("\nInvalid input. Press ENTER to continue. ");
-                    Console.ReadLine();
-                    return;
-                }
+                    Console.WriteLine("\nDescribe the reason of the appointment:");
+                    Console.Write("► ");
+                    string? newReason = Console.ReadLine();
 
-                Console.WriteLine("\nDescribe the reason of the appointment:");
-                Console.Write("► ");
-                string? newReason = Console.ReadLine();
+                    if (string.IsNullOrWhiteSpace(newReason))
+                    {
+                        Console.WriteLine("\nReason can't be empty.");
+                        Console.Write("\nPress ENTER to go back to previous menu. ");
+                        Console.ReadLine();
+                        return;
+                    }
+                    else
+                    {
+                        Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
+                        Console.WriteLine("\nPlease use (DD/MM/YY - HH:mm) format.");
+                        Console.Write("► ");
 
-                if (string.IsNullOrWhiteSpace(newReason))
-                {
-                    Console.WriteLine("\nReason can't be empty.");
-                    Console.Write("\nPress ENTER to go back to previous menu. ");
-                    Console.ReadLine();
-                    return;
+                        string? desiredTime = Console.ReadLine();
+
+                        try { Console.Clear(); } catch { }
+                        Console.WriteLine("\nReview the appointment request before sending:");
+                        Console.WriteLine($"\nYour name: {activeUser.Name}\nYour SSN: {activeUser.SSN}");
+                        Console.WriteLine($"Reason of the appointment:\n"
+                        + $"'{newReason}'");
+                        Console.WriteLine($"\nDesired time: {(desiredTime == "" ? "None" : desiredTime)}");
+
+                        Console.WriteLine($"\nAt: {selectedLocation.Name} - Address: {selectedLocation.Address}");
+
+                        Console.WriteLine("\nIs the information correct?");
+                        Console.Write("Y/N? ('N' would take you back to previous menu): ");
+                        switch (Console.ReadLine()?.ToLower())
+                        {
+                            case "y":
+                                Event? newEvent = new($"AppointmentRequest", Event.EventType.Request);
+                                newEvent.Description = $"{newReason} | Desired time: {(desiredTime == "" ? "None" : desiredTime)}";
+                                newEvent.Location = selectedLocation;
+                                newEvent.Participants.Add(new(activeUser, Role.Patient));
+                                eventList.Add(newEvent);
+                                SaveEventsToFile();
+                                Console.WriteLine("\nYour appoinment request has been registered.");
+                                Console.Write("\nPress ENTER to continue. ");
+                                Console.ReadLine();
+                                break;
+
+                            case "n": return;
+
+                            default:
+                                Console.Write("\nInvalid input. Press ENTER to continue. ");
+                                Console.ReadLine();
+                                break;
+                        }
+                    }
                 }
                 else
                 {
-                    Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
-                    Console.WriteLine("\nPlease use (DD/MM/YY - HH:mm) format.");
-                    Console.Write("► ");
-
-                    string? desiredTime = Console.ReadLine();
-
-                    try { Console.Clear(); } catch { }
-                    Console.WriteLine("\nReview the appointment request before sending:");
-                    Console.WriteLine($"\nYour name: {activeUser.Name}\nYour SSN: {activeUser.SSN}");
-                    Console.WriteLine($"Reason of the appointment:\n"
-                    + $"'{newReason}'");
-                    Console.WriteLine($"\nDesired time: {(desiredTime == "" ? "None" : desiredTime)}");
-
-                    Console.WriteLine($"\nAt: {selectedLocation.Name} - Address: {selectedLocation.Address}");
-
-                    Console.WriteLine("\nIs the information correct?");
-                    Console.Write("Y/N? ('N' would take you back to previous menu): ");
-                    switch (Console.ReadLine()?.ToLower())
-                    {
-                        case "y":
-                            Event? newEvent = new($"AppointmentRequest", Event.EventType.Request);
-                            newEvent.Description = $"{newReason} | Desired time: {(desiredTime == "" ? "None" : desiredTime)}";
-                            newEvent.Location = selectedLocation;
-                            newEvent.Participants.Add(new(activeUser, Role.Patient));
-                            eventList.Add(newEvent);
-                            SaveEventsToFile();
-                            Console.WriteLine("\nYour appoinment request has been registered.");
-                            Console.Write("\nPress ENTER to continue. ");
-                            Console.ReadLine();
-                            break;
-
-                        case "n": return;
-
-                        default:
-                            Console.Write("\nInvalid input. Press ENTER to continue. ");
-                            Console.ReadLine();
-                            break;
-                    }
+                    Console.Write("\nInvalid input. Press ENTER to continue. ");
+                    Console.ReadLine();
+                    return;
                 }
+
+
             }
             else
             {
-                Console.Write("\nInvalid Input. Press ENTER to go back to previous menu. ");
+                Console.Write("\nNo locations found in the selected region. Press ENTER to go back to previous menu. ");
                 Console.ReadLine();
                 return;
             }
@@ -706,15 +705,10 @@ class HCSystem
         if (foundAppointment)
         {
             Console.Write("\nSelect ID the the request you want to handle: ");
-            int requestID = Convert.ToInt32(Console.ReadLine());
+            string? requestIDstring = Console.ReadLine();
+            if (int.TryParse(requestIDstring, out int requestID) && requestID > 0 && requestID <= eventList.Count)
+            {
 
-            if (requestID < eventList.Count || requestID > eventList.Count)
-            {
-                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-                return;
-            }
-            else
-            {
                 Event? newEvent = null;
                 foreach (Event events in eventList)
                 {
@@ -738,12 +732,12 @@ class HCSystem
                             DateTime newDateTime;
                             if (DateTime.TryParse(dateInput, out newDateTime))
                             {
-
                                 Debug.Assert(newEvent != null);
+                                Debug.Assert(newEvent.Location != null);
                                 Console.WriteLine("\nSelect personnel: ");
                                 foreach (User user in users)
                                 {
-                                    if (user != newEvent.Participants[0].User)
+                                    if (user != newEvent.Participants[0].User && user.UserRegion == newEvent.Location.Region)
                                     {
                                         Console.WriteLine($"\nID: [{users.IndexOf(user) + 1}] {user.Name}");
                                     }
@@ -787,14 +781,18 @@ class HCSystem
                         Debug.Assert(newEvent != null);
                         newEvent.MyEventType = Event.EventType.None;
                         SaveEventsToFile();
-                        Console.WriteLine("\nAppointment rejected. Press ENTER to go back to previous menu. ");
+                        Console.Write("\nAppointment rejected. Press ENTER to go back to previous menu. ");
                         return;
 
                     default:
                         Console.Write("\nInvalid input. Press ENTER to continue. ");
-                        Console.ReadLine();
                         break;
                 }
+            }
+            else
+            {
+                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+                return;
             }
         }
         else
@@ -808,22 +806,22 @@ class HCSystem
     public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
-        { 
-            Console.WriteLine("Your Journal");
+        {
+            Console.WriteLine("\nYour Journal");
         }
         else
         {
-            Console.WriteLine("Your Appointment");
+            Console.WriteLine("\nYour Schedule");
         }
         foreach (Event event1 in eventList)
         {
-            if (event1.MyEventType == Event.EventType.Entry)
+            if (event1.MyEventType == eventType)
             {
                 foreach (Participant participant in event1.Participants)
                 {
                     if (activeUser == participant.User)
                     {
-                        Console.WriteLine("Title:       " + event1.Title);
+                        Console.WriteLine("\nTitle:       " + event1.Title);
                         Console.WriteLine("Description: " + event1.Description);
                         Console.WriteLine("Start Date:  " + event1.StartDate);
                         Console.WriteLine("End Date:    " + event1.EndDate);
@@ -837,17 +835,20 @@ class HCSystem
                             Console.WriteLine("Role: " + part1.ParticipantRole);
                             Console.WriteLine("_________");
                         }
+                        Console.WriteLine("------------------------");
                     }
                 }
             }
+
         }
+        Console.Write("\nPress ENTER to go back to previous menu. ");
     }
     public void AddLocation()
     {
         Console.WriteLine("Name of Location?");
-        Console.Write(">");
+        Console.Write("> ");
         string? locName = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(locName)){ Console.WriteLine("Invalid Input");return;}
+        if (string.IsNullOrWhiteSpace(locName)) { Console.WriteLine("Invalid Input"); return; }
         bool check = false;
         foreach (Location location in locations)
         {
@@ -856,57 +857,59 @@ class HCSystem
         if (check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); return; }
         try { Console.Clear(); } catch { }
         Console.WriteLine("Address of Location?");
-        Console.Write(">");
+        Console.Write("> ");
         string? locAddress = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(locAddress)){ Console.WriteLine("Invalid Input");return;}
+        if (string.IsNullOrWhiteSpace(locAddress)) { Console.WriteLine("Invalid Input"); return; }
         List<Region> regionList = new();
         foreach (Region region in Enum.GetValues(typeof(Region)))
         {
             regionList.Add(region);
         }
-
+        Console.WriteLine("");
         for (int i = 1; i < regionList.Count; i++)
         {
             Console.WriteLine($"[{i}] {regionList[i].ToString()}");
         }
-        Console.Write("Choose region for location: ");
+        Console.Write("\nChoose region for location: ");
         int.TryParse(Console.ReadLine(), out int nr);
         Region locRegion = (Region)(nr);
         Debug.Assert(locName != null && locAddress != null);
         locations.Add(new Location(locName, locAddress, locRegion));
         Console.WriteLine($"Location added: \n{locName}\n{locAddress}\n{locRegion}");
         SaveLocationsToFile();
+        Console.Write("\nPress ENTER to go back to previoud menu. ");
     }
     public void ScheduleOfLocation()
     {
-        Console.WriteLine("Which location do you want to see schedule of?");
-          for (int i = 0; i < locations.Count; i++)
-          {
-            Console.WriteLine($"[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
-          }
-          Console.Write(">");
-          string? choice = Console.ReadLine();
+        Console.WriteLine("\nWhich location do you want to see schedule of?");
+        for (int i = 0; i < locations.Count; i++)
+        {
+            Console.WriteLine($"\n[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
+        }
+        Console.Write("\n> ");
+        string? choice = Console.ReadLine();
 
-          if (!int.TryParse(choice, out int nr))
-          {
-            Console.WriteLine("Invalid Location");
+        if (!int.TryParse(choice, out int nr))
+        {
+            Console.Write("\nInvalid Location. Press ENTER to go back to previous menu. ");
             return;
-          }
-          try { Console.Clear(); } catch { }
-          foreach (Event scheduledEvent in eventList)
-          {
+        }
+        try { Console.Clear(); } catch { }
+        foreach (Event scheduledEvent in eventList)
+        {
             if (scheduledEvent.Location == locations[nr - 1])
             {
-              Console.WriteLine("____________________________________________");
-              Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
-              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
-              Console.WriteLine("Participants: ");
-              foreach (Participant participant in scheduledEvent.Participants)
-              {
-                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
-              }
-              Console.WriteLine("____________________________________________");
+                Console.WriteLine("____________________________________________");
+                Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
+                $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+                Console.WriteLine("Participants: ");
+                foreach (Participant participant in scheduledEvent.Participants)
+                {
+                    Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+                }
+                Console.WriteLine("____________________________________________");
             }
-          }
+        }
+        Console.Write("\nPress ENTER to go back to previous menu. ");
     }
 }

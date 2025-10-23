@@ -16,6 +16,7 @@ class User
         _password = password;
         Name = name;
         UserRegion = userRegion;
+        Permissions.Add(Permission.None);
     }
     public bool TryLogin(string ssn, string password)
     {
