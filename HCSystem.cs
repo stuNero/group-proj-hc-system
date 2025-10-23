@@ -443,7 +443,7 @@ class HCSystem
         {
             Event SelectedRequest = userRequestList[selectedRequest - 1];
             Console.Clear();
-            Console.WriteLine($"\n === Selected Events ===");
+            Console.WriteLine($"\n=== Selected Events ===");
             Console.WriteLine($"\nSSN: {SelectedRequest.Title}");
             Console.WriteLine($"Type: {SelectedRequest.MyEventType}");
             if (!string.IsNullOrWhiteSpace(SelectedRequest.Description))
@@ -451,8 +451,8 @@ class HCSystem
                 Console.WriteLine($"Description: {SelectedRequest.Description}");
             }
 
-            Console.WriteLine("\n === Request Options ===");
-            Console.WriteLine("[1] Accept Request");
+            Console.WriteLine("\n=== Request Options ===");
+            Console.WriteLine("\n[1] Accept Request");
             Console.WriteLine("[2] Deny request");
             Console.WriteLine("[b] Go back");
             Console.Write("\n► ");
@@ -462,21 +462,26 @@ class HCSystem
             if (requestChoice == "1")
             {
                 Console.Clear();
-                Console.WriteLine($"=== Accept Request ===");
-                Console.WriteLine($"\n Request: {SelectedRequest.Description}");
+                Console.WriteLine($"\n=== Accept Request ===");
+                Console.WriteLine($"\nRequest: {SelectedRequest.Description}");
                 if (CreateAccount())
                 {
                     Console.WriteLine("\nThe request has been accepted and account created.");
                     eventList.Remove(SelectedRequest);
                     SaveEventsToFile();
                 }
-                else { Console.WriteLine("\nFailed to create account. The request has not been accepted."); }
+                else
+                {
+                    Console.WriteLine("\n\nFailed to create account. The request has not been accepted.");
+                    Console.Write("\nPress ENTER to continue. ");
+                    Console.ReadLine();
+                }
             }
             else if (requestChoice == "2")
             {
                 Console.Clear();
-                Console.WriteLine("You have denied the request.");
-                Console.WriteLine("Press ENTER to continue");
+                Console.WriteLine("\nYou have denied the request.");
+                Console.Write("\nPress ENTER to continue. ");
                 eventList.Remove(SelectedRequest);
                 SaveEventsToFile();
                 Console.ReadLine();
@@ -766,7 +771,7 @@ class HCSystem
         locations.Add(new Location(locName, locAddress, locRegion));
         Console.WriteLine($"Location added: \n{locName}\n{locAddress}\n{locRegion}");
         SaveLocationsToFile();
-        Console.Write("\nPress ENTER to go back to previoud menu. ");
+        Console.Write("\nPress ENTER to go back to previous menu. ");
     }
     public void ScheduleOfLocation()
     {
