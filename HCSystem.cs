@@ -409,7 +409,7 @@ class HCSystem
 
         if (string.IsNullOrWhiteSpace(newSSN))
         {
-            Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
+            Console.Write("\nInvalid SSN. Press ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -419,7 +419,7 @@ class HCSystem
 
         if (newPassword == null)
         {
-            Console.WriteLine("\nInvalid password. Press ENTER to continue.");
+            Console.Write("\nInvalid password. Press ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -429,7 +429,7 @@ class HCSystem
 
         if (string.IsNullOrWhiteSpace(newName))
         {
-            Console.WriteLine("\nInvalid name. Press ENTER to continue.");
+            Console.Write("\nInvalid name. Press ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -440,12 +440,14 @@ class HCSystem
             users.Add(newUser);
             SaveUsersToFile();
             Console.WriteLine($"\nUser account created successfully for {newName}!");
+            Console.Write("\nPress ENTER to go back to previous menu. ");
+            Console.ReadLine();
             return true;
         }
         else
         {
             Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
-            Console.Write("\nPress ENTER to continue.");
+            Console.Write("\nPress ENTER to go back to previous menu. ");
             Console.ReadLine();
             return false;
         }
@@ -494,7 +496,7 @@ class HCSystem
                 Console.WriteLine("------------------------");
             }
         }
-        Console.Write("\nPress [b] to go back or select a number to select a request.");
+        Console.Write("\nPress [b] to go back or select a number to select a request. ");
 
         string? userInput = Console.ReadLine();
 
@@ -805,11 +807,11 @@ class HCSystem
     {
         if (eventType == Event.EventType.Entry)
         {
-            Console.WriteLine("Your Journal");
+            Console.WriteLine("\nYour Journal");
         }
         else
         {
-            Console.WriteLine("Your Appointment");
+            Console.WriteLine("\nYour Schedule");
         }
         foreach (Event event1 in eventList)
         {
@@ -819,7 +821,7 @@ class HCSystem
                 {
                     if (activeUser == participant.User)
                     {
-                        Console.WriteLine("Title:       " + event1.Title);
+                        Console.WriteLine("\nTitle:       " + event1.Title);
                         Console.WriteLine("Description: " + event1.Description);
                         Console.WriteLine("Start Date:  " + event1.StartDate);
                         Console.WriteLine("End Date:    " + event1.EndDate);
@@ -833,15 +835,18 @@ class HCSystem
                             Console.WriteLine("Role: " + part1.ParticipantRole);
                             Console.WriteLine("_________");
                         }
+                        Console.WriteLine("------------------------");
                     }
                 }
             }
+
         }
+        Console.Write("\nPress ENTER to go back to previous menu. ");
     }
     public void AddLocation()
     {
         Console.WriteLine("Name of Location?");
-        Console.Write(">");
+        Console.Write("> ");
         string? locName = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(locName)) { Console.WriteLine("Invalid Input"); return; }
         bool check = false;
@@ -852,7 +857,7 @@ class HCSystem
         if (check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); return; }
         try { Console.Clear(); } catch { }
         Console.WriteLine("Address of Location?");
-        Console.Write(">");
+        Console.Write("> ");
         string? locAddress = Console.ReadLine();
         if (string.IsNullOrWhiteSpace(locAddress)) { Console.WriteLine("Invalid Input"); return; }
         List<Region> regionList = new();
@@ -860,32 +865,33 @@ class HCSystem
         {
             regionList.Add(region);
         }
-
+        Console.WriteLine("");
         for (int i = 1; i < regionList.Count; i++)
         {
             Console.WriteLine($"[{i}] {regionList[i].ToString()}");
         }
-        Console.Write("Choose region for location: ");
+        Console.Write("\nChoose region for location: ");
         int.TryParse(Console.ReadLine(), out int nr);
         Region locRegion = (Region)(nr);
         Debug.Assert(locName != null && locAddress != null);
         locations.Add(new Location(locName, locAddress, locRegion));
         Console.WriteLine($"Location added: \n{locName}\n{locAddress}\n{locRegion}");
         SaveLocationsToFile();
+        Console.Write("\nPress ENTER to go back to previoud menu. ");
     }
     public void ScheduleOfLocation()
     {
-        Console.WriteLine("Which location do you want to see schedule of?");
+        Console.WriteLine("\nWhich location do you want to see schedule of?");
         for (int i = 0; i < locations.Count; i++)
         {
-            Console.WriteLine($"[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
+            Console.WriteLine($"\n[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
         }
-        Console.Write(">");
+        Console.Write("\n> ");
         string? choice = Console.ReadLine();
 
         if (!int.TryParse(choice, out int nr))
         {
-            Console.WriteLine("Invalid Location");
+            Console.Write("\nInvalid Location. Press ENTER to go back to previous menu. ");
             return;
         }
         try { Console.Clear(); } catch { }
@@ -904,5 +910,6 @@ class HCSystem
                 Console.WriteLine("____________________________________________");
             }
         }
+        Console.Write("\nPress ENTER to go back to previous menu. ");
     }
 }
