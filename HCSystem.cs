@@ -412,7 +412,7 @@ class HCSystem
     public bool CreateAccount()
     {
         Console.Write("\nEnter SSN for new User: ");
-        string? newSSN = Console.ReadLine();
+        string? newSSN = Console.ReadLine().Trim();
 
         if (string.IsNullOrWhiteSpace(newSSN))
         {
