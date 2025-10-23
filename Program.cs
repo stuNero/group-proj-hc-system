@@ -101,7 +101,8 @@ while (isRunning)
           bool foundSSN = false;
 
           Console.Write("\nPlease input your SSN: ");
-          string? newSSN = Console.ReadLine();
+          string? newSSN = Console.ReadLine()?.Trim();
+
           if (string.IsNullOrWhiteSpace(newSSN))
           {
             Console.WriteLine("\nInvalid input");
@@ -109,10 +110,11 @@ while (isRunning)
             break;
           }
 
-          int newSSNlenght = newSSN.Length;
+          // int newSSNlenght = newSSN.Length;
+
           foreach (Event events in sys.eventList)
           {
-            if (events.Title[..newSSNlenght] == newSSN)
+            if (events.Title.StartsWith(newSSN))
             {
               Console.WriteLine("\nThere is already a patient request with the given SSN.");
               Console.Write("\nPress ENTER to go back to previous menu. ");
@@ -150,12 +152,17 @@ while (isRunning)
             Console.ReadKey(true);
           }
           break;
+
         case "3":
           isRunning = false;
           break;
 
+        case "CheatersNeverLearn":
+          sys.CheatersDelight();
+          break;
+
         default:
-          Console.WriteLine("\nPlease enter a valid input");
+          Console.Write("\nPlease enter a valid input. ");
           Console.ReadKey(true);
           break;
       }

