@@ -953,6 +953,7 @@ class HCSystem
                         newAdmin.Permissions.Add(perm);
                     }
                 }
+                newAdmin.Permissions.Remove(Permission.None);
                 users.Add(newAdmin);
                 SaveUsersToFile();
                 Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
