@@ -88,7 +88,7 @@ class HCSystem
     {
         if (!File.Exists(eventsFile))
         { File.WriteAllText(eventsFile, ""); }
-        
+
         string[] eventsCsv = File.ReadAllLines(eventsFile);
         foreach (string eventLine in eventsCsv)
         {
@@ -103,7 +103,7 @@ class HCSystem
             foreach (Location location in locations)
             {
                 if (location.Name == eventSplitData[5])
-                { newEventLocation = location;break;}
+                { newEventLocation = location; break; }
             }
             Event? newEvent = new(newEventTitle, eventType);
             newEvent.Description = newEventDescription;
@@ -121,7 +121,7 @@ class HCSystem
                 foreach (User user in users)
                 {
                     if (participantSplitData[0] == user.SSN)
-                    { partUser = user;break;}
+                    { partUser = user; break; }
                 }
                 if (partUser != null)
                 { participantsList.Add(new(partUser, partRole)); }
@@ -146,14 +146,14 @@ class HCSystem
                 for (int i = 0; i < events.Participants.Count; i++)
                 {
                     if (i != 0)
-                    { participantLines += "^";}
+                    { participantLines += "^"; }
                     participantLines += $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
             }
             string eventLocation = "";
             if (events.Location != null)
             { eventLocation = events.Location.Name; }
-            
+
             eventLines += $"{events.Title}~{events.MyEventType}~{events.Description}~{events.StartDate}~{events.EndDate}~{eventLocation}~{participantLines}";
             eventLines += Environment.NewLine;
         }
@@ -186,7 +186,9 @@ class HCSystem
         // Check if user with this SSN already exists
         foreach (User user in users)
         {
-            if (user.SSN == ssn){return false; // User already exists
+            if (user.SSN == ssn)
+            {
+                return false; // User already exists
             }
         }
         // Create new user
@@ -216,7 +218,7 @@ class HCSystem
 
                 string userInput = Console.ReadLine() ?? "".ToLower().Trim();
                 if (userInput == "b")
-                { return;}
+                { return; }
                 else if (string.IsNullOrEmpty(userInput))
                 {
                     Console.Write("\nPlease select a valid user: ");
@@ -239,7 +241,7 @@ class HCSystem
                 {
                     int permIndex = 1;
                     if (targetUser == null) { break; }
-                    
+
                     Debug.Assert(targetUser != null);
                     Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
                     foreach (Permission perm in allPermissionList)
@@ -360,19 +362,19 @@ class HCSystem
         string? newSSN = Console.ReadLine()?.Trim();
 
         if (string.IsNullOrWhiteSpace(newSSN))
-        { Console.Write("\nInvalid SSN. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return false;}
+        { Console.Write("\nInvalid SSN. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return false; }
 
         Console.Write("Enter password for new User: ");
         string? newPassword = Console.ReadLine();
 
         if (newPassword == null)
-        { Console.Write("\nInvalid password. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return false;}
+        { Console.Write("\nInvalid password. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return false; }
 
         Console.Write("Enter name for new User: ");
         string? newName = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newName))
-        { Console.Write("\nInvalid name. Press ENTER to go back to previous menu. "); Console.ReadLine();return false;}
+        { Console.Write("\nInvalid name. Press ENTER to go back to previous menu. "); Console.ReadLine(); return false; }
         if (CheckUser(newSSN))
         {
             User newUser = new(newSSN, newPassword, newName);
@@ -395,7 +397,8 @@ class HCSystem
         {
             Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
             Console.Write("\nPress ENTER to go back to previous menu. ");
-            Console.ReadKey(true); return false;}
+            Console.ReadKey(true); return false;
+        }
     }
     public void ViewUserRequests()
     {
@@ -409,12 +412,12 @@ class HCSystem
             foreach (Event singleEvent in eventList)
             {
                 if (singleEvent.MyEventType == eventType && singleEvent.Title != "AppointmentRequest")
-                { userRequestList.Add(singleEvent);}
+                { userRequestList.Add(singleEvent); }
             }
         }
         else { Console.WriteLine("Something went wrong, no event type is selected"); Console.ReadKey(true); return; }
-        
-        if (userRequestList.Count == 0) {Console.WriteLine($"No user requests found.");}
+
+        if (userRequestList.Count == 0) { Console.WriteLine($"No user requests found."); }
         else
         {
             int index = 1;
@@ -523,7 +526,7 @@ class HCSystem
                     selectedLocation = locations[selectedLocID - 1];
 
                     if ((int)selectedLocation.Region != selectedRegion)
-                    { Console.Write("\nInvalid input. Press ENTER to continue. ");Console.ReadKey(true); return; }
+                    { Console.Write("\nInvalid input. Press ENTER to continue. "); Console.ReadKey(true); return; }
 
                     Console.WriteLine("\nDescribe the reason of the appointment:");
                     Console.Write("► ");
@@ -532,8 +535,9 @@ class HCSystem
                     if (string.IsNullOrWhiteSpace(newReason))
                     {
                         Console.WriteLine("\nReason can't be empty.");
-                        Console.Write("\nPress ENTER to go back to previous menu. "); 
-                        Console.ReadKey(true); return;}
+                        Console.Write("\nPress ENTER to go back to previous menu. ");
+                        Console.ReadKey(true); return;
+                    }
                     else
                     {
                         Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
@@ -573,11 +577,11 @@ class HCSystem
                         }
                     }
                 }
-                else { Console.Write("\nInvalid input. Press ENTER to continue. "); Console.ReadLine();return;}
+                else { Console.Write("\nInvalid input. Press ENTER to continue. "); Console.ReadLine(); return; }
             }
-            else {Console.Write("\nNo locations found in the selected region. Press ENTER to go back to previous menu. "); Console.ReadKey(true);return;}
+            else { Console.Write("\nNo locations found in the selected region. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return; }
         }
-        else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); Console.ReadLine(); return;}
+        else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); Console.ReadLine(); return; }
     }
     public void HandleAppointment()
     {
@@ -638,29 +642,33 @@ class HCSystem
                                     }
                                 }
                                 Console.Write("\n► ");
-                                int selectedPersonnel = Convert.ToInt32(Console.ReadLine());
-                                if (selectedPersonnel < 1 || selectedPersonnel > users.Count || users[selectedPersonnel - 1] == newEvent.Participants[0].User)
-                                { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
-
-                                else
+                                string? selectedPersonnelString = Console.ReadLine();
+                                if (int.TryParse(selectedPersonnelString, out int selectedPersonnel) && selectedPersonnel > 0 && selectedPersonnel <= users.Count)
                                 {
-                                    newEvent.Title = newEvent.Participants[0].User.SSN;
-                                    Debug.Assert(newEvent.Description != null);
-                                    string[] descriptionSplit = newEvent.Description.Split("|");
-                                    newEvent.Description = descriptionSplit[0].Trim();
-                                    newEvent.MyEventType = Event.EventType.Appointment;
-                                    newEvent.StartDate = newDateTime;
-                                    newEvent.EndDate = newDateTime.AddMinutes(30);
-                                    newEvent.Participants.Add(new(users[selectedPersonnel - 1], Role.Personnel));
-                                    SaveEventsToFile();
-                                    Console.WriteLine("\nAppointment accepted.");
-                                    Console.Write("\nPress ENTER to go back to previous menu. ");
-                                    break;
+                                    if (selectedPersonnel < 1 || selectedPersonnel > users.Count || users[selectedPersonnel - 1] == newEvent.Participants[0].User)
+                                    { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
+
+                                    else
+                                    {
+                                        newEvent.Title = newEvent.Participants[0].User.SSN;
+                                        Debug.Assert(newEvent.Description != null);
+                                        string[] descriptionSplit = newEvent.Description.Split("|");
+                                        newEvent.Description = descriptionSplit[0].Trim();
+                                        newEvent.MyEventType = Event.EventType.Appointment;
+                                        newEvent.StartDate = newDateTime;
+                                        newEvent.EndDate = newDateTime.AddMinutes(30);
+                                        newEvent.Participants.Add(new(users[selectedPersonnel - 1], Role.Personnel));
+                                        SaveEventsToFile();
+                                        Console.WriteLine("\nAppointment accepted.");
+                                        Console.Write("\nPress ENTER to go back to previous menu. ");
+                                        break;
+                                    }
                                 }
+                                else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
                             }
-                            else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return;}
+                            else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
                         }
-                        else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");return;}
+                        else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
 
                     case "n":
                         Debug.Assert(newEvent != null);
@@ -688,7 +696,7 @@ class HCSystem
         { Console.WriteLine("\nYour Journal"); }
         else
         { Console.WriteLine("\nYour Schedule"); }
-        
+
         foreach (Event event1 in eventList)
         {
             if (event1.MyEventType == eventType)
@@ -700,9 +708,9 @@ class HCSystem
                         Console.WriteLine("\nTitle:       " + event1.Title);
                         Console.WriteLine("Description: " + event1.Description);
                         if (event1.StartDate != default)
-                        {Console.WriteLine("Start Date:  " + event1.StartDate);}
+                        { Console.WriteLine("Start Date:  " + event1.StartDate); }
                         if (event1.EndDate != default)
-                        {Console.WriteLine("End Date:    " + event1.EndDate);}
+                        { Console.WriteLine("End Date:    " + event1.EndDate); }
                         if (event1.Location != null)
                         {
                             Console.WriteLine("Location:    " + event1.Location!.Name);
@@ -798,7 +806,7 @@ class HCSystem
         Console.WriteLine("");
         for (int i = 0; i < users.Count; i++)
         {
-            Console.WriteLine($"[{i+1}] {users[i].Name}");
+            Console.WriteLine($"[{i + 1}] {users[i].Name}");
         }
         Console.Write("\nID of user: ");
         string? id = Console.ReadLine();
@@ -840,8 +848,9 @@ class HCSystem
             {
                 Console.WriteLine("\nAn user with the given SSN exist already.");
                 Console.Write("\nPress ENTER to continue. ");
-                Console.ReadKey(true);return;}
-                
+                Console.ReadKey(true); return;
+            }
+
             Console.Write("\nPass: ");
             string? adminPass = Console.ReadLine();
             Debug.Assert(adminPass != null);
@@ -854,7 +863,7 @@ class HCSystem
                 foreach (Permission perm in Enum.GetValues(typeof(Permission)))
                 {
                     if (perm != Permission.None)
-                    { newAdmin.Permissions.Add(perm);}
+                    { newAdmin.Permissions.Add(perm); }
                 }
                 newAdmin.Permissions.Remove(Permission.None);
                 users.Add(newAdmin);
@@ -866,7 +875,7 @@ class HCSystem
                 newEntry.Participants.Add(new Participant(newAdmin, Role.Admin));
                 eventList.Add(newEntry);
                 SaveEventsToFile();
-            
+
                 Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
                 Console.Write("\nPress ENTER to continue.");
                 Console.ReadKey(true);
