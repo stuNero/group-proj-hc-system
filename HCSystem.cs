@@ -469,7 +469,7 @@ class HCSystem
         {
             foreach (Event singleEvent in eventList)
             {
-                if (singleEvent.MyEventType == eventType)
+                if (singleEvent.MyEventType == eventType && singleEvent.Title != "AppointmentRequest")
                 {
                     userRequestList.Add(singleEvent);
                 }
