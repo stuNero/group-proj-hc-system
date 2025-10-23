@@ -522,24 +522,6 @@ class HCSystem
                 Console.WriteLine($"Description: {SelectedRequest.Description}");
             }
 
-            if (SelectedRequest.StartDate != default)
-            {
-                Console.WriteLine($"Start: {SelectedRequest.StartDate}");
-            }
-
-            if (SelectedRequest.EndDate != default)
-            {
-                Console.WriteLine($"End: {SelectedRequest.EndDate}");
-            }
-
-            if (SelectedRequest.Participants.Count != 0)
-            {
-                Console.WriteLine("Participants:");
-                foreach (Participant participant in SelectedRequest.Participants)
-                {
-                    Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                }
-            }
             Console.WriteLine("\n === Request Options ===");
             Console.WriteLine("[1] Accept Request");
             Console.WriteLine("[2] Deny request");
