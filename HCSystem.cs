@@ -919,6 +919,42 @@ class HCSystem
         }
         Console.Write("\nPress ENTER to go back to previous menu. ");
     }
+    public void AssignToRegion()
+    {
+        Console.WriteLine("");
+        for (int i = 0; i < users.Count; i++)
+        {
+            Console.WriteLine($"[{i+1}] {users[i].Name}");
+        }
+        Console.Write("\nID of user: ");
+        string? id = Console.ReadLine();
+
+        if (string.IsNullOrWhiteSpace(id))
+        { Console.WriteLine("\nInvalid input"); return; }
+        if (int.TryParse(id, out int index) && index > 0 && index <= users.Count)
+        {
+            Console.WriteLine("\nSelect region\n");
+
+            foreach (Region region in Region.GetValues(typeof(Region)))
+            {
+                int regionIndex = (int)region;
+                if (region != Region.None)
+                { Console.WriteLine($"[{regionIndex}] {region}"); }
+            }
+            Console.Write("\nRegion [1-21]: ");
+            string? selectedRegionIndex = Console.ReadLine();
+            if (int.TryParse(selectedRegionIndex, out int selectedRegion) && selectedRegion > 0 && selectedRegion < 21)
+            {
+                users[index - 1].UserRegion = (Region)selectedRegion;
+            }
+            Console.WriteLine(users[index - 1].Name + " was assigned to " + users[index - 1].UserRegion);
+            Console.Write("\nPress ENTER to go back to previous menu..");
+        }
+        else { Console.WriteLine("\nInvalid input"); return; }
+
+
+
+    }
     public void CheatersDelight()
     {
         Console.Write("\nPlease enter a valid input. ");
