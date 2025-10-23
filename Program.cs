@@ -204,7 +204,16 @@ while (isRunning)
         case "9":
           try { Console.Clear(); } catch { }
           if (!activeUser!.HasPermission(Permission.PermHandlePerm) && !activeUser!.HasPermission(Permission.ViewPermissionList))
-          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          {
+            Console.WriteLine("\nYou do not have permission to view others permissions.");
+            Console.WriteLine("\nYour permissions are:");
+            foreach (Permission perm in activeUser.Permissions)
+            {
+              Console.WriteLine($"\n[{activeUser.Permissions.IndexOf(perm) + 1}] {perm}");
+            }
+            Console.Write("\nPress ENTER to go back to previos menu. ");
+            Console.ReadKey(true); break;
+          }
           sys.PermissionSystem(activeUser);
           break;
         case "10":
