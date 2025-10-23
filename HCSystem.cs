@@ -37,6 +37,10 @@ class HCSystem
         LoadLocationsFromFile();
         LoadEventsFromFile();
 
+        foreach (Permission perm in Enum.GetValues(typeof(Permission)))
+        {
+            allPermissionList.Add(perm);
+        }
     }
     public void LoadUsersFromFile()
     {
@@ -231,16 +235,12 @@ class HCSystem
             while (isSelectingUser)
             {
                 int userIndex = 1;
-                List<User> selectableUser = new();
                 // List of all users except activeuser
                 foreach (User user in users)
                 {
-                    if (user != activeUser)
-                    {
-                        Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
-                        selectableUser.Add(user);
-                        userIndex++;
-                    }
+
+                    Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
+                    userIndex++;
                 }
                 Console.WriteLine("========================================");
                 Console.WriteLine("\nPress [b] if you want to go back.");
@@ -259,14 +259,14 @@ class HCSystem
                     continue;
                 }
 
-                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > selectableUser.Count)
+                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > users.Count)
                 {
                     Console.Write("\nPlease select a valid user: ");
                 }
 
                 else
                 {
-                    targetUser = selectableUser[selectedUser - 1];
+                    targetUser = users[selectedUser - 1];
                     break;
                 }
                 try { Console.Clear(); } catch { }
@@ -275,6 +275,7 @@ class HCSystem
             if (activeUser.HasPermission(Permission.PermHandlePerm))
             {
                 try { Console.Clear(); } catch { }
+
                 bool isSelectingperm = true;
                 while (isSelectingperm)
                 {
@@ -307,6 +308,7 @@ class HCSystem
                         permIndex++;
                     }
 
+
                     Console.WriteLine("==================================");
                     Console.WriteLine("\nWrite 'done' when you are satisfied.");
                     Console.WriteLine($"\nSelect permission to give to: [{targetUser.Name}]");
@@ -317,7 +319,11 @@ class HCSystem
                     {
                         Console.WriteLine("\nPlease select a valid permission:");
                     }
-                    else if (userInput == "done") { break; }
+                    else if (userInput == "done")
+                    {
+                        SaveUsersToFile();
+                        break;
+                    }
                     else
                     {
                         if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > allPermissionList.Count)
@@ -348,7 +354,6 @@ class HCSystem
                                 targetUser.Permissions.Clear();
                                 targetUser.Permissions.Add(Permission.None);
                             }
-                            SaveUsersToFile();
                         }
                     }
                     try { Console.Clear(); } catch { }
@@ -359,6 +364,7 @@ class HCSystem
             {
                 while (true)
                 {
+                    try { Console.Clear(); } catch { }
                     Debug.Assert(targetUser != null);
                     if (targetUser!.HasPermission(Permission.None))
                     {
@@ -366,6 +372,7 @@ class HCSystem
                         Console.WriteLine($"\n{targetUser.Name} has no permissions.");
                         Console.WriteLine($"\nPress enter to continue...");
                         Console.ReadLine();
+                        break;
                     }
                     else
                     {
