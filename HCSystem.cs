@@ -403,7 +403,7 @@ class HCSystem
     public void ViewUserRequests()
     {
         Event.EventType? eventType = Event.EventType.Request;
-        Console.Clear();
+        try { Console.Clear(); } catch { }
         Console.WriteLine($"\n=== User Requests ===");
 
         List<Event> userRequestList = new List<Event>();
@@ -442,7 +442,7 @@ class HCSystem
         else if (int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= userRequestList.Count)
         {
             Event SelectedRequest = userRequestList[selectedRequest - 1];
-            Console.Clear();
+            try { Console.Clear(); } catch { }
             Console.WriteLine($"\n=== Selected Events ===");
             Console.WriteLine($"\nSSN: {SelectedRequest.Title}");
             Console.WriteLine($"Type: {SelectedRequest.MyEventType}");
@@ -461,7 +461,7 @@ class HCSystem
             string? requestChoice = Console.ReadLine();
             if (requestChoice == "1")
             {
-                Console.Clear();
+                try { Console.Clear(); } catch { }
                 Console.WriteLine($"\n=== Accept Request ===");
                 Console.WriteLine($"\nRequest: {SelectedRequest.Description}");
                 if (CreateAccount())
@@ -479,7 +479,7 @@ class HCSystem
             }
             else if (requestChoice == "2")
             {
-                Console.Clear();
+                try { Console.Clear(); } catch { }
                 Console.WriteLine("\nYou have denied the request.");
                 Console.Write("\nPress ENTER to continue. ");
                 eventList.Remove(SelectedRequest);
