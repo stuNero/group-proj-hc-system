@@ -101,7 +101,7 @@ while (isRunning)
           bool foundSSN = false;
 
           Console.Write("\nPlease input your SSN: ");
-          string? newSSN = Console.ReadLine().Trim();
+          string? newSSN = Console.ReadLine()?.Trim();
 
           if (string.IsNullOrWhiteSpace(newSSN))
           {
