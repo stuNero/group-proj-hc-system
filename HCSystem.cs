@@ -734,12 +734,12 @@ class HCSystem
                             DateTime newDateTime;
                             if (DateTime.TryParse(dateInput, out newDateTime))
                             {
-
                                 Debug.Assert(newEvent != null);
+                                Debug.Assert(newEvent.Location != null);
                                 Console.WriteLine("\nSelect personnel: ");
                                 foreach (User user in users)
                                 {
-                                    if (user != newEvent.Participants[0].User)
+                                    if (user != newEvent.Participants[0].User && user.UserRegion == newEvent.Location.Region)
                                     {
                                         Console.WriteLine($"\nID: [{users.IndexOf(user) + 1}] {user.Name}");
                                     }
