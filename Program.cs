@@ -44,7 +44,7 @@ while (isRunning)
           {
             Console.WriteLine("\nNo user was found with those credentials.");
             Console.Write("\nPress ENTER to continue. ");
-            Console.ReadLine();
+            Console.ReadKey(true);
           }
           break;
         case "2":
