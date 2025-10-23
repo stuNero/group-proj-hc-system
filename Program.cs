@@ -243,14 +243,14 @@ while (isRunning)
           if (!activeUser!.HasPermission(Permission.ScheduleOfLocation))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           try { Console.Clear(); } catch { }
-          
+
           sys.ScheduleOfLocation();
           Console.ReadKey(true);
           break;
 
         case "7": // Permissions
           try { Console.Clear(); } catch { }
-          if (!activeUser!.HasPermission(Permission.PermHandlePerm))
+          if (!activeUser!.HasPermission(Permission.PermHandlePerm) && !activeUser!.HasPermission(Permission.ViewPermissionList))
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.PermissionSystem(activeUser);
           break;

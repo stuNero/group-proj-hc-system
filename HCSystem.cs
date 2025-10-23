@@ -239,16 +239,12 @@ class HCSystem
             while (isSelectingUser)
             {
                 int userIndex = 1;
-                List<User> selectableUser = new();
                 // List of all users except activeuser
                 foreach (User user in users)
                 {
-                    if (user != activeUser)
-                    {
-                        Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
-                        selectableUser.Add(user);
-                        userIndex++;
-                    }
+
+                    Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
+                    userIndex++;
                 }
                 Console.WriteLine("========================================");
                 Console.WriteLine("\nPress [b] if you want to go back.");
@@ -267,14 +263,14 @@ class HCSystem
                     continue;
                 }
 
-                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > selectableUser.Count)
+                if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > users.Count)
                 {
                     Console.Write("\nPlease select a valid user: ");
                 }
 
                 else
                 {
-                    targetUser = selectableUser[selectedUser - 1];
+                    targetUser = users[selectedUser - 1];
                     break;
                 }
                 try { Console.Clear(); } catch { }
@@ -283,6 +279,7 @@ class HCSystem
             if (activeUser.HasPermission(Permission.PermHandlePerm))
             {
                 try { Console.Clear(); } catch { }
+
                 bool isSelectingperm = true;
                 while (isSelectingperm)
                 {
@@ -315,6 +312,7 @@ class HCSystem
                         permIndex++;
                     }
 
+
                     Console.WriteLine("==================================");
                     Console.WriteLine("\nWrite 'done' when you are satisfied.");
                     Console.WriteLine($"\nSelect permission to give to: [{targetUser.Name}]");
@@ -325,7 +323,11 @@ class HCSystem
                     {
                         Console.WriteLine("\nPlease select a valid permission:");
                     }
-                    else if (userInput == "done") { break; }
+                    else if (userInput == "done")
+                    {
+                        SaveUsersToFile();
+                        break;
+                    }
                     else
                     {
                         if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > allPermissionList.Count)
@@ -356,7 +358,6 @@ class HCSystem
                                 targetUser.Permissions.Clear();
                                 targetUser.Permissions.Add(Permission.None);
                             }
-                            SaveUsersToFile();
                         }
                     }
                     try { Console.Clear(); } catch { }
@@ -367,6 +368,7 @@ class HCSystem
             {
                 while (true)
                 {
+                    try { Console.Clear(); } catch { }
                     Debug.Assert(targetUser != null);
                     if (targetUser!.HasPermission(Permission.None))
                     {
@@ -374,6 +376,7 @@ class HCSystem
                         Console.WriteLine($"\n{targetUser.Name} has no permissions.");
                         Console.WriteLine($"\nPress enter to continue...");
                         Console.ReadLine();
+                        break;
                     }
                     else
                     {
@@ -527,7 +530,7 @@ class HCSystem
             Console.WriteLine("[2] Deny request");
             Console.WriteLine("[b] Go back");
             Console.Write("\n► ");
-            
+
 
             string? requestChoice = Console.ReadLine();
             if (requestChoice == "1")
@@ -541,7 +544,8 @@ class HCSystem
                     eventList.Remove(SelectedRequest);
                     SaveEventsToFile();
                 }
-                else {
+                else
+                {
                     Console.WriteLine("\nFailed to create account. The request has not been accepted.");
                 }
             }
@@ -808,7 +812,7 @@ class HCSystem
     public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
-        { 
+        {
             Console.WriteLine("Your Journal");
         }
         else
@@ -847,7 +851,7 @@ class HCSystem
         Console.WriteLine("Name of Location?");
         Console.Write(">");
         string? locName = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(locName)){ Console.WriteLine("Invalid Input");return;}
+        if (string.IsNullOrWhiteSpace(locName)) { Console.WriteLine("Invalid Input"); return; }
         bool check = false;
         foreach (Location location in locations)
         {
@@ -858,7 +862,7 @@ class HCSystem
         Console.WriteLine("Address of Location?");
         Console.Write(">");
         string? locAddress = Console.ReadLine();
-        if (string.IsNullOrWhiteSpace(locAddress)){ Console.WriteLine("Invalid Input");return;}
+        if (string.IsNullOrWhiteSpace(locAddress)) { Console.WriteLine("Invalid Input"); return; }
         List<Region> regionList = new();
         foreach (Region region in Enum.GetValues(typeof(Region)))
         {
@@ -880,33 +884,33 @@ class HCSystem
     public void ScheduleOfLocation()
     {
         Console.WriteLine("Which location do you want to see schedule of?");
-          for (int i = 0; i < locations.Count; i++)
-          {
+        for (int i = 0; i < locations.Count; i++)
+        {
             Console.WriteLine($"[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
-          }
-          Console.Write(">");
-          string? choice = Console.ReadLine();
+        }
+        Console.Write(">");
+        string? choice = Console.ReadLine();
 
-          if (!int.TryParse(choice, out int nr))
-          {
+        if (!int.TryParse(choice, out int nr))
+        {
             Console.WriteLine("Invalid Location");
             return;
-          }
-          try { Console.Clear(); } catch { }
-          foreach (Event scheduledEvent in eventList)
-          {
+        }
+        try { Console.Clear(); } catch { }
+        foreach (Event scheduledEvent in eventList)
+        {
             if (scheduledEvent.Location == locations[nr - 1])
             {
-              Console.WriteLine("____________________________________________");
-              Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
-              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
-              Console.WriteLine("Participants: ");
-              foreach (Participant participant in scheduledEvent.Participants)
-              {
-                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
-              }
-              Console.WriteLine("____________________________________________");
+                Console.WriteLine("____________________________________________");
+                Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
+                $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+                Console.WriteLine("Participants: ");
+                foreach (Participant participant in scheduledEvent.Participants)
+                {
+                    Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+                }
+                Console.WriteLine("____________________________________________");
             }
-          }
+        }
     }
 }
