@@ -19,8 +19,11 @@ if (sys.users.Count <= 0)
   sys.users.Add(new User("admin123", "admin", "admin User"));
   sys.users.Add(new User("testssn1", "test1", "Test Patient"));
   sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
+  sys.users.Add(new User("nursessn1", "nurse1", "Test Nurse"));
   sys.users[1].Permissions.Add(Permission.None);
   sys.users[2].Permissions.Add(Permission.None);
+  sys.users[3].Permissions.Add(Permission.HandleAppointment);
+  sys.users[3].UserRegion = Region.Halland;
   // Hard coding all the permission to admins permission list.
   foreach (Permission perm in sys.allPermissionList)
   {
