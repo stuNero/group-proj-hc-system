@@ -829,8 +829,9 @@ class HCSystem
             {
                 users[index - 1].UserRegion = (Region)selectedRegion;
             }
-            Console.WriteLine(users[index - 1].Name + " was assigned to " + users[index - 1].UserRegion);
-            Console.Write("\nPress ENTER to go back to previous menu..");
+            Console.WriteLine($"\n{users[index - 1].Name} was assigned to Region {users[index - 1].UserRegion}.");
+            Console.Write("\nPress ENTER to go back to previous menu. ");
+            SaveUsersToFile();
         }
         else { Console.WriteLine("\nInvalid input"); return; }
     }
