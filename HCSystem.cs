@@ -813,7 +813,7 @@ class HCSystem
         }
         foreach (Event event1 in eventList)
         {
-            if (event1.MyEventType == Event.EventType.Entry)
+            if (event1.MyEventType == eventType)
             {
                 foreach (Participant participant in event1.Participants)
                 {
