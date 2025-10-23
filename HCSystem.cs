@@ -703,15 +703,10 @@ class HCSystem
         if (foundAppointment)
         {
             Console.Write("\nSelect ID the the request you want to handle: ");
-            int requestID = Convert.ToInt32(Console.ReadLine());
+            string? requestIDstring = Console.ReadLine();
+            if (int.TryParse(requestIDstring, out int requestID) && requestID > 0 && requestID <= eventList.Count)
+            {
 
-            if (requestID < eventList.Count || requestID > eventList.Count)
-            {
-                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-                return;
-            }
-            else
-            {
                 Event? newEvent = null;
                 foreach (Event events in eventList)
                 {
@@ -784,14 +779,18 @@ class HCSystem
                         Debug.Assert(newEvent != null);
                         newEvent.MyEventType = Event.EventType.None;
                         SaveEventsToFile();
-                        Console.WriteLine("\nAppointment rejected. Press ENTER to go back to previous menu. ");
+                        Console.Write("\nAppointment rejected. Press ENTER to go back to previous menu. ");
                         return;
 
                     default:
                         Console.Write("\nInvalid input. Press ENTER to continue. ");
-                        Console.ReadLine();
                         break;
                 }
+            }
+            else
+            {
+                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
+                return;
             }
         }
         else
