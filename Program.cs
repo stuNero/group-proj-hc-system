@@ -26,7 +26,7 @@ while (isRunning)
           string? ssn = Console.ReadLine();
           Console.Write("\nPlease input a password: ");
           string? password = Console.ReadLine();
-
+          bool foundUser = false;
           Debug.Assert(ssn != null);
           Debug.Assert(password != null);
 
@@ -36,8 +36,15 @@ while (isRunning)
             {
               activeUser = user;
               currentMenu = Menu.Main;
+              foundUser = true;
               break;
             }
+          }
+          if (!foundUser)
+          {
+            Console.WriteLine("\nNo user was found with those credentials.");
+            Console.Write("\nPress ENTER to continue. ");
+            Console.ReadLine();
           }
           break;
         case "2":
@@ -53,8 +60,6 @@ while (isRunning)
             Console.ReadKey(true);
             break;
           }
-
-          // int newSSNlenght = newSSN.Length;
 
           foreach (Event events in sys.eventList)
           {
