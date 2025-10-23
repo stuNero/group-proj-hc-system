@@ -8,62 +8,6 @@ HCSystem sys = new();
 User? activeUser = null;
 Menu currentMenu = Menu.Default;
 
-if (sys.users.Count <= 0)
-{
-  sys.users.Add(new User("admin123", "admin", "admin User"));
-  sys.users.Add(new User("testssn1", "test1", "Test Patient"));
-  sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
-  sys.users.Add(new User("nursessn1", "nurse1", "Test Nurse"));
-  sys.users[0].Permissions.Remove(Permission.None);
-  sys.users[3].Permissions.Add(Permission.HandleAppointment);
-  sys.users[3].UserRegion = Region.Halland;
-  // Hard coding all the permission to admins permission list.
-  foreach (Permission perm in sys.allPermissionList)
-  {
-    if (perm != Permission.None)
-    {
-      sys.users[0].Permissions.Add(perm);
-    }
-  }
-}
-
-if (sys.locations.Count <= 0)
-{
-  sys.locations.Add(new("testVC", "Main Street 1"));
-  sys.locations.Add(new("Halmstad Sjukhus", "Lasarettvägen"));
-  sys.locations[1].Region = Region.Halland;
-}
-if (sys.eventList.Count <= 0)
-{
-  Event myEvent = new("event", Event.EventType.Request);
-  myEvent.Participants.Add(new Participant(sys.users[0], Role.Patient));
-  sys.eventList.Add(myEvent);
-
-  Event mySecondEvent = new("My Appointment", Event.EventType.Appointment);
-  mySecondEvent.Description = "I have a cold.";
-  mySecondEvent.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
-  mySecondEvent.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
-  mySecondEvent.Location = sys.locations[0];
-  mySecondEvent.Participants.Add(new(sys.users[0], Role.Patient));
-  mySecondEvent.Participants.Add(new(sys.users[1], Role.Personnel));
-  mySecondEvent.Participants.Add(new(sys.users[2], Role.Admin));
-  sys.eventList.Add(mySecondEvent);
-
-  Event testEntry = new("My Entry", Event.EventType.Entry);
-  testEntry.Description = "User has too long fingers";
-  testEntry.StartDate = new DateTime(2025, 10, 20, 11, 0, 0);
-  testEntry.EndDate = new DateTime(2025, 10, 20, 11, 30, 0);
-  testEntry.Location = sys.locations[0];
-  testEntry.Participants.Add(new(sys.users[0], Role.Patient));
-  testEntry.Participants.Add(new(sys.users[1], Role.Personnel));
-  testEntry.Participants.Add(new(sys.users[2], Role.Admin));
-  sys.eventList.Add(testEntry);
-}
-
-sys.SaveLocationsToFile();
-sys.SaveUsersToFile();
-sys.SaveEventsToFile();
-
 bool isRunning = true;
 while (isRunning)
 {
