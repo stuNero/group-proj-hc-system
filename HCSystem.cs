@@ -223,11 +223,10 @@ class HCSystem
             }
         }
 
-        // Create new personnel user
+        // Create new user
+
         return true;
     }
-
-
     public void PermissionSystem(User? activeUser)
     {
         Debug.Assert(activeUser != null);
@@ -369,7 +368,7 @@ class HCSystem
                 while (true)
                 {
                     Debug.Assert(targetUser != null);
-                    if (targetUser.Permissions.Contains(Permission.None))
+                    if (targetUser!.HasPermission(Permission.None))
                     {
                         try { Console.Clear(); } catch { }
                         Console.WriteLine($"\n{targetUser.Name} has no permissions.");
@@ -393,7 +392,7 @@ class HCSystem
                             bool targetUserPermBool = false;
 
                             Debug.Assert(targetUser != null);
-                            if (targetUser.Permissions.Contains(perm))
+                            if (targetUser.HasPermission(perm))
                             {
                                 targetUserPermBool = true;
                                 string index = $"[{permIndex}]".PadRight(4);
@@ -411,157 +410,160 @@ class HCSystem
             }
         }
     }
-
-    public void CreateAccount()
+    public bool CreateAccount()
     {
-        Console.Write("\nEnter SSN for new personnel: ");
+        Console.Write("\nEnter SSN for new User: ");
         string? newSSN = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newSSN))
         {
             Console.WriteLine("\nInvalid SSN. Press ENTER to continue.");
             Console.ReadLine();
-            return;
+            return false;
         }
 
-        Console.Write("Enter password for new personnel: ");
+        Console.Write("Enter password for new User: ");
         string? newPassword = Console.ReadLine();
 
         if (newPassword == null)
         {
             Console.WriteLine("\nInvalid password. Press ENTER to continue.");
             Console.ReadLine();
-            return;
+            return false;
         }
 
-        Console.Write("Enter name for new personnel: ");
+        Console.Write("Enter name for new User: ");
         string? newName = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newName))
         {
             Console.WriteLine("\nInvalid name. Press ENTER to continue.");
             Console.ReadLine();
-            return;
+            return false;
         }
 
         if (CheckUser(newSSN))
         {
-            User newPersonnel = new(newSSN, newPassword, newName);
-            users.Add(newPersonnel);
+            User newUser = new(newSSN, newPassword, newName);
+            users.Add(newUser);
             SaveUsersToFile();
-            Console.WriteLine($"\nAccount created successfully for {newName}!");
+            Console.WriteLine($"\nUser account created successfully for {newName}!");
+            return true;
         }
         else
         {
             Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
-        }
-
-        Console.Write("\nPress ENTER to continue.");
-        Console.ReadLine();
-    }
-    public void ViewEvents()
-    {
-        Console.WriteLine("\n=== VIEW EVENTS BY TYPE ===");
-        Console.WriteLine("[1] Request Events");
-        Console.WriteLine("[2] Appointment Events");
-        Console.WriteLine("[3] Entry Events");
-        Console.WriteLine("[4] All Events");
-        Console.WriteLine("\n[b] Back to Admin Menu");
-        Console.Write("\n► ");
-
-        string? eventTypeChoice = Console.ReadLine();
-        Event.EventType? selectedType = null;
-        string typeTitle = "";
-
-        switch (eventTypeChoice)
-        {
-            case "1":
-                selectedType = Event.EventType.Request;
-                typeTitle = "REQUEST EVENTS";
-                break;
-            case "2":
-                selectedType = Event.EventType.Appointment;
-                typeTitle = "APPOINTMENT EVENTS";
-                break;
-            case "3":
-                selectedType = Event.EventType.Entry;
-                typeTitle = "ENTRY EVENTS";
-                break;
-            case "4":
-                selectedType = null;
-                typeTitle = "ALL EVENTS";
-                break;
-            case "b":
-                break;
-            default:
-                Console.Write("\nInvalid input. Press ENTER to continue.");
-                Console.ReadLine();
-                break;
-        }
-
-        if (eventTypeChoice != "b" && eventTypeChoice != null && (eventTypeChoice == "1" || eventTypeChoice == "2" || eventTypeChoice == "3" || eventTypeChoice == "4"))
-        {
-            Console.WriteLine($"\n=== {typeTitle} ===");
-
-            List<Event> filteredEvents = new List<Event>();
-            if (selectedType.HasValue)
-            {
-                foreach (Event singleEvent in eventList)
-                {
-                    if (singleEvent.MyEventType == selectedType.Value)
-                    {
-                        filteredEvents.Add(singleEvent);
-                    }
-                }
-            }
-            else
-            {
-                foreach (Event singleEvent in eventList)
-                {
-                    filteredEvents.Add(singleEvent);
-                }
-            }
-
-            if (filteredEvents.Count == 0)
-            {
-                Console.WriteLine($"No {typeTitle.ToLower()} found.");
-            }
-            else
-            {
-                foreach (Event events in filteredEvents)
-                {
-                    Console.WriteLine($"\nTitle: {events.Title}");
-                    Console.WriteLine($"Type: {events.MyEventType}");
-                    if (string.IsNullOrWhiteSpace(events.Description))
-                    { }
-                    else
-                    {
-                        Console.WriteLine($"Description: {events.Description}");
-                    }
-                    if (events.StartDate == default(DateTime)) { }
-                    else
-                    {
-                        Console.WriteLine($"Start: {events.StartDate}");
-                    }
-
-                    if (events.EndDate == default(DateTime))
-                    {
-
-                    }
-                    else
-                    {
-                        Console.WriteLine($"End: {events.EndDate}");
-                    }
-                    Console.WriteLine("Participants:");
-                    foreach (Participant participant in events.Participants)
-                    {
-                        Console.WriteLine($"  - {participant.User.Name} ({participant.ParticipantRole})");
-                    }
-                    Console.WriteLine("------------------------");
-                }
-            }
             Console.Write("\nPress ENTER to continue.");
             Console.ReadLine();
+            return false;
+        }
+    }
+    public void ViewUserRequests()
+    {
+        Event.EventType? eventType = Event.EventType.Request;
+        Console.Clear();
+        Console.WriteLine($"\n=== User Requests ===");
+
+        List<Event> userRequestList = new List<Event>();
+        if (eventType != null)
+        {
+            foreach (Event singleEvent in eventList)
+            {
+                if (singleEvent.MyEventType == eventType && singleEvent.Title != "AppointmentRequest")
+                {
+                    userRequestList.Add(singleEvent);
+                }
+            }
+        }
+        else
+        {
+            Console.WriteLine("Something went wrong, no event type is selected");
+            Console.ReadKey(true);
+            return;
+        }
+
+        if (userRequestList.Count == 0)
+        {
+            Console.WriteLine($"No user requests found.");
+        }
+        else
+        {
+            int index = 1;
+            foreach (Event events in userRequestList)
+            {
+                Console.WriteLine($"\n --- {index++} ---");
+                Console.WriteLine($"\nTitle: {events.Title}");
+                Console.WriteLine($"Type: {events.MyEventType}");
+                if (!string.IsNullOrWhiteSpace(events.Description))
+                {
+                    Console.WriteLine($"Description: {events.Description}");
+                }
+
+                Console.WriteLine("------------------------");
+            }
+        }
+        Console.Write("\nPress [b] to go back or select a number to select a request.");
+
+        string? userInput = Console.ReadLine();
+
+        if (userInput == "b")
+        {
+            return;
+        }
+        else if (int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= userRequestList.Count)
+        {
+            Event SelectedRequest = userRequestList[selectedRequest - 1];
+            Console.Clear();
+            Console.WriteLine($"\n === Selected Events ===");
+            Console.WriteLine($"\nSSN: {SelectedRequest.Title}");
+            Console.WriteLine($"Type: {SelectedRequest.MyEventType}");
+            if (!string.IsNullOrWhiteSpace(SelectedRequest.Description))
+            {
+                Console.WriteLine($"Description: {SelectedRequest.Description}");
+            }
+
+            Console.WriteLine("\n === Request Options ===");
+            Console.WriteLine("[1] Accept Request");
+            Console.WriteLine("[2] Deny request");
+            Console.WriteLine("[b] Go back");
+            Console.Write("\n► ");
+            
+
+            string? requestChoice = Console.ReadLine();
+            if (requestChoice == "1")
+            {
+                Console.Clear();
+                Console.WriteLine($"=== Accept Request ===");
+                Console.WriteLine($"\n Request: {SelectedRequest.Description}");
+                if (CreateAccount())
+                {
+                    Console.WriteLine("\nThe request has been accepted and account created.");
+                    eventList.Remove(SelectedRequest);
+                    SaveEventsToFile();
+                }
+                else {
+                    Console.WriteLine("\nFailed to create account. The request has not been accepted.");
+                }
+            }
+            else if (requestChoice == "2")
+            {
+                Console.Clear();
+                Console.WriteLine("You have denied the request.");
+                Console.WriteLine("Press ENTER to continue");
+                eventList.Remove(SelectedRequest);
+                SaveEventsToFile();
+                Console.ReadLine();
+            }
+            else if (requestChoice == "b")
+            {
+                return;
+            }
+
+        }
+        else
+        {
+            Console.WriteLine("\nWrong input, press ENTER to go back to menu.");
+            Console.ReadKey(true);
         }
     }
     public void RequestAppointment(User activeUser)
@@ -806,7 +808,7 @@ class HCSystem
     public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
-        {
+        { 
             Console.WriteLine("Your Journal");
         }
         else
@@ -839,5 +841,72 @@ class HCSystem
                 }
             }
         }
+    }
+    public void AddLocation()
+    {
+        Console.WriteLine("Name of Location?");
+        Console.Write(">");
+        string? locName = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(locName)){ Console.WriteLine("Invalid Input");return;}
+        bool check = false;
+        foreach (Location location in locations)
+        {
+            if (location.Name == locName) check = true; break;
+        }
+        if (check) { Console.WriteLine("Location already exists"); Console.ReadKey(true); return; }
+        try { Console.Clear(); } catch { }
+        Console.WriteLine("Address of Location?");
+        Console.Write(">");
+        string? locAddress = Console.ReadLine();
+        if (string.IsNullOrWhiteSpace(locAddress)){ Console.WriteLine("Invalid Input");return;}
+        List<Region> regionList = new();
+        foreach (Region region in Enum.GetValues(typeof(Region)))
+        {
+            regionList.Add(region);
+        }
+
+        for (int i = 1; i < regionList.Count; i++)
+        {
+            Console.WriteLine($"[{i}] {regionList[i].ToString()}");
+        }
+        Console.Write("Choose region for location: ");
+        int.TryParse(Console.ReadLine(), out int nr);
+        Region locRegion = (Region)(nr);
+        Debug.Assert(locName != null && locAddress != null);
+        locations.Add(new Location(locName, locAddress, locRegion));
+        Console.WriteLine($"Location added: \n{locName}\n{locAddress}\n{locRegion}");
+        SaveLocationsToFile();
+    }
+    public void ScheduleOfLocation()
+    {
+        Console.WriteLine("Which location do you want to see schedule of?");
+          for (int i = 0; i < locations.Count; i++)
+          {
+            Console.WriteLine($"[{i + 1}]\nName: {locations[i].Name} \nAddress: {locations[i].Name}\nRegion: {locations[i].Region}");
+          }
+          Console.Write(">");
+          string? choice = Console.ReadLine();
+
+          if (!int.TryParse(choice, out int nr))
+          {
+            Console.WriteLine("Invalid Location");
+            return;
+          }
+          try { Console.Clear(); } catch { }
+          foreach (Event scheduledEvent in eventList)
+          {
+            if (scheduledEvent.Location == locations[nr - 1])
+            {
+              Console.WriteLine("____________________________________________");
+              Console.WriteLine($"Title: {scheduledEvent.Title}\nDescription: {scheduledEvent.Description}" +
+              $"\nStart Date: {scheduledEvent.StartDate}\nEnd Date: {scheduledEvent.EndDate}\nType:{scheduledEvent.MyEventType}");
+              Console.WriteLine("Participants: ");
+              foreach (Participant participant in scheduledEvent.Participants)
+              {
+                Console.WriteLine($"Name: {participant.User.Name}:\nSSN:{participant.User.SSN}\nRole: {participant.ParticipantRole}");
+              }
+              Console.WriteLine("____________________________________________");
+            }
+          }
     }
 }
