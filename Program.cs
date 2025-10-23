@@ -127,6 +127,7 @@ while (isRunning)
         Console.WriteLine("\n[7] Add a Location");
         Console.WriteLine("\n[8] Schedule of a Location");
         Console.WriteLine("\n[9] View Permissions");
+        Console.WriteLine("\n[10] Assign User To Region");
       }
       Console.WriteLine("\n[x] Logout");
       Console.Write("\n► ");
@@ -206,7 +207,13 @@ while (isRunning)
           { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
           sys.PermissionSystem(activeUser);
           break;
-
+        case "10":
+          try { Console.Clear(); } catch { }
+          if (!activeUser!.HasPermission(Permission.AssignRegion))
+          { Console.WriteLine("You do not have permission for this."); Console.ReadKey(true); break; }
+          sys.AssignToRegion();
+          Console.ReadKey(true);
+          break;
         // Log out
         case "x":
           activeUser = null;
