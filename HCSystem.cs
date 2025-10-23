@@ -378,6 +378,14 @@ class HCSystem
             User newUser = new(newSSN, newPassword, newName);
             users.Add(newUser);
             SaveUsersToFile();
+            Event? newEntry = new($"{newSSN} First Entry", Event.EventType.Entry);
+
+            newEntry.Description = $"{newName}'s account was created";
+            newEntry.StartDate = DateTime.Now;
+            newEntry.Participants.Add(new Participant(newUser, Role.None));
+            eventList.Add(newEntry);
+            SaveEventsToFile();
+
             Console.WriteLine($"\nUser account created successfully for {newName}!");
             Console.Write("\nPress ENTER to go back to previous menu. ");
             Console.ReadLine();
@@ -691,11 +699,16 @@ class HCSystem
                     {
                         Console.WriteLine("\nTitle:       " + event1.Title);
                         Console.WriteLine("Description: " + event1.Description);
-                        Console.WriteLine("Start Date:  " + event1.StartDate);
-                        Console.WriteLine("End Date:    " + event1.EndDate);
-                        Console.WriteLine("Location:    " + event1.Location!.Name);
-                        Console.WriteLine("             " + event1.Location.Address);
-                        Console.WriteLine("             " + event1.Location.Region);
+                        if (event1.StartDate != default)
+                        {Console.WriteLine("Start Date:  " + event1.StartDate);}
+                        if (event1.EndDate != default)
+                        {Console.WriteLine("End Date:    " + event1.EndDate);}
+                        if (event1.Location != null)
+                        {
+                            Console.WriteLine("Location:    " + event1.Location!.Name);
+                            Console.WriteLine("             " + event1.Location.Address);
+                            Console.WriteLine("             " + event1.Location.Region);
+                        }
                         Console.WriteLine("Participants: \n_________");
                         foreach (Participant part1 in event1.Participants)
                         {
@@ -846,6 +859,14 @@ class HCSystem
                 newAdmin.Permissions.Remove(Permission.None);
                 users.Add(newAdmin);
                 SaveUsersToFile();
+                Event? newEntry = new($"{newAdmin.SSN} First Entry", Event.EventType.Entry);
+
+                newEntry.Description = $"The Master Admin was born";
+                newEntry.StartDate = DateTime.Now;
+                newEntry.Participants.Add(new Participant(newAdmin, Role.Admin));
+                eventList.Add(newEntry);
+                SaveEventsToFile();
+            
                 Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
                 Console.Write("\nPress ENTER to continue.");
                 Console.ReadKey(true);
