@@ -20,6 +20,7 @@ if (sys.users.Count <= 0)
   sys.users.Add(new User("testssn1", "test1", "Test Patient"));
   sys.users.Add(new User("testssn2", "test2", "Test Personnel"));
   sys.users.Add(new User("nursessn1", "nurse1", "Test Nurse"));
+  sys.users[0].Permissions.Remove(Permission.None);
   sys.users[3].Permissions.Add(Permission.HandleAppointment);
   sys.users[3].UserRegion = Region.Halland;
   // Hard coding all the permission to admins permission list.
@@ -118,9 +119,10 @@ while (isRunning)
             break;
           }
 
+          int newSSNlenght = newSSN.Length;
           foreach (Event events in sys.eventList)
           {
-            if (events.Title == newSSN)
+            if (events.Title[..newSSNlenght] == newSSN)
             {
               Console.WriteLine("\nThere is already a patient request with the given SSN.");
               Console.Write("\nPress ENTER to go back to previous menu. ");
