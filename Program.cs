@@ -102,6 +102,7 @@ while (isRunning)
 
           Console.Write("\nPlease input your SSN: ");
           string? newSSN = Console.ReadLine();
+
           if (string.IsNullOrWhiteSpace(newSSN))
           {
             Console.WriteLine("\nInvalid input");
@@ -109,10 +110,11 @@ while (isRunning)
             break;
           }
 
-          int newSSNlenght = newSSN.Length;
+          // int newSSNlenght = newSSN.Length;
+
           foreach (Event events in sys.eventList)
           {
-            if (events.Title[..newSSNlenght] == newSSN)
+            if (events.Title.StartsWith(newSSN))
             {
               Console.WriteLine("\nThere is already a patient request with the given SSN.");
               Console.Write("\nPress ENTER to go back to previous menu. ");
