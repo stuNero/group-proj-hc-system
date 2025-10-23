@@ -68,17 +68,14 @@ class HCSystem
         {
             string userPermissionLine = "";
             if (user.Permissions.Count == 0)
-            {
-                userPermissionLine = "None";
-            }
+            { userPermissionLine = "None"; }
+
             else
             {
                 for (int i = 0; i < user.Permissions.Count; i++)
                 {
                     if (i != 0)
-                    {
-                        userPermissionLine += "^";
-                    }
+                    { userPermissionLine += "^"; }
                     userPermissionLine += $"{user.Permissions[i]}";
                 }
             }
@@ -89,12 +86,10 @@ class HCSystem
     }
     public void LoadEventsFromFile()
     {
-        string eventFile = @"csv-files\events-list.csv";
-        if (!File.Exists(eventFile))
-        {
-            File.WriteAllText(eventFile, "");
-        }
-        string[] eventsCsv = File.ReadAllLines(eventFile);
+        if (!File.Exists(eventsFile))
+        { File.WriteAllText(eventsFile, ""); }
+        
+        string[] eventsCsv = File.ReadAllLines(eventsFile);
         foreach (string eventLine in eventsCsv)
         {
             string[] eventSplitData = eventLine.Split("~");
@@ -108,12 +103,8 @@ class HCSystem
             foreach (Location location in locations)
             {
                 if (location.Name == eventSplitData[5])
-                {
-                    newEventLocation = location;
-                    break;
-                }
+                { newEventLocation = location;break;}
             }
-
             Event? newEvent = new(newEventTitle, eventType);
             newEvent.Description = newEventDescription;
             newEvent.StartDate = newEventStartDate;
@@ -125,27 +116,17 @@ class HCSystem
             for (int i = 0; i < participants.Length; i++)
             {
                 string[] participantSplitData = participants[i].Split("¤");
-
                 User? partUser = null;
                 Role partRole = Enum.Parse<Role>(participantSplitData[1]);
-
                 foreach (User user in users)
                 {
                     if (participantSplitData[0] == user.SSN)
-                    {
-                        partUser = user;
-                        break;
-                    }
+                    { partUser = user;break;}
                 }
-
                 if (partUser != null)
-                {
-                    participantsList.Add(new(partUser, partRole));
-                }
-                else
-                {
-                    break;
-                }
+                { participantsList.Add(new(partUser, partRole)); }
+
+                else { break; }
                 newEvent.Participants = participantsList;
             }
             eventList.Add(newEvent);
@@ -159,29 +140,22 @@ class HCSystem
             string participantLines = "";
 
             if (events.Participants.Count == 0)
-            {
-                participantLines = $"None¤None";
-            }
+            { participantLines = $"None¤None"; }
             else
             {
                 for (int i = 0; i < events.Participants.Count; i++)
                 {
                     if (i != 0)
-                    {
-                        participantLines += "^";
-                    }
+                    { participantLines += "^";}
                     participantLines += $"{events.Participants[i].User.SSN}¤{events.Participants[i].ParticipantRole}";
                 }
             }
             string eventLocation = "";
             if (events.Location != null)
-            {
-                eventLocation = events.Location.Name;
-            }
-
+            { eventLocation = events.Location.Name; }
+            
             eventLines += $"{events.Title}~{events.MyEventType}~{events.Description}~{events.StartDate}~{events.EndDate}~{eventLocation}~{participantLines}";
             eventLines += Environment.NewLine;
-
         }
         File.WriteAllText(eventsFile, eventLines);
     }
@@ -191,7 +165,6 @@ class HCSystem
         foreach (string locationLine in locationsCsv)
         {
             string[] locationSplitData = locationLine.Split("~");
-
             Region newRegion = Enum.Parse<Region>(locationSplitData[2]);
 
             Location? location = new(locationSplitData[0], locationSplitData[1], newRegion);
@@ -204,20 +177,16 @@ class HCSystem
         foreach (Location location in locations)
         {
             locationLines += $"{location.Name}~{location.Address}~{location.Region}";
-
             locationLines += Environment.NewLine;
         }
         File.WriteAllText(locationsFile, locationLines);
     }
-
     public bool CheckUser(string ssn)
     {
         // Check if user with this SSN already exists
         foreach (User user in users)
         {
-            if (user.SSN == ssn)
-            {
-                return false; // User already exists
+            if (user.SSN == ssn){return false; // User already exists
             }
         }
         // Create new user
@@ -238,7 +207,6 @@ class HCSystem
                 // List of all users except activeuser
                 foreach (User user in users)
                 {
-
                     Console.WriteLine($"\n[{userIndex}] {user.Name} | SSN: {user.SSN}  ");
                     userIndex++;
                 }
@@ -248,27 +216,17 @@ class HCSystem
 
                 string userInput = Console.ReadLine() ?? "".ToLower().Trim();
                 if (userInput == "b")
-                {
-                    return;
-                }
+                { return;}
                 else if (string.IsNullOrEmpty(userInput))
                 {
-
                     Console.Write("\nPlease select a valid user: ");
                     try { Console.Clear(); } catch { }
                     continue;
                 }
-
                 if (!int.TryParse(userInput, out int selectedUser) || selectedUser < 1 || selectedUser > users.Count)
-                {
-                    Console.Write("\nPlease select a valid user: ");
-                }
+                { Console.Write("\nPlease select a valid user: "); }
 
-                else
-                {
-                    targetUser = users[selectedUser - 1];
-                    break;
-                }
+                else { targetUser = users[selectedUser - 1]; break; }
                 try { Console.Clear(); } catch { }
             }
             // MANAGE PERMISSION WITH VIEW
@@ -280,10 +238,8 @@ class HCSystem
                 while (isSelectingperm)
                 {
                     int permIndex = 1;
-                    if (targetUser == null)
-                    {
-                        break;
-                    }
+                    if (targetUser == null) { break; }
+                    
                     Debug.Assert(targetUser != null);
                     Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
                     foreach (Permission perm in allPermissionList)
@@ -307,8 +263,6 @@ class HCSystem
                         }
                         permIndex++;
                     }
-
-
                     Console.WriteLine("==================================");
                     Console.WriteLine("\nWrite 'done' when you are satisfied.");
                     Console.WriteLine($"\nSelect permission to give to: [{targetUser.Name}]");
@@ -316,20 +270,14 @@ class HCSystem
 
                     string userInput = Console.ReadLine() ?? "".ToLower().Trim();
                     if (string.IsNullOrEmpty(userInput))
-                    {
-                        Console.WriteLine("\nPlease select a valid permission:");
-                    }
+                    { Console.WriteLine("\nPlease select a valid permission:"); }
+
                     else if (userInput == "done")
-                    {
-                        SaveUsersToFile();
-                        break;
-                    }
+                    { SaveUsersToFile(); break; }
                     else
                     {
                         if (!int.TryParse(userInput, out int selectedPerm) || selectedPerm < 1 || selectedPerm > allPermissionList.Count)
-                        {
-                            Console.WriteLine("\nPlease select a valid permission:");
-                        }
+                        { Console.WriteLine("\nPlease select a valid permission:"); }
                         else
                         {
                             // add and remove permisson logic
@@ -371,17 +319,15 @@ class HCSystem
                         try { Console.Clear(); } catch { }
                         Console.WriteLine($"\n{targetUser.Name} has no permissions.");
                         Console.WriteLine($"\nPress enter to continue...");
-                        Console.ReadLine();
-                        break;
+                        Console.ReadKey(true); break;
                     }
                     else
                     {
                         try { Console.Clear(); } catch { }
                         int permIndex = 1;
                         if (targetUser == null)
-                        {
-                            return;
-                        }
+                        { return; }
+
                         Debug.Assert(targetUser != null);
                         Console.WriteLine($"\nPermission status for:     [{targetUser.Name}] \n");
                         targetUser.Permissions.Sort();
@@ -402,8 +348,7 @@ class HCSystem
                         }
                         Console.WriteLine("==================================");
                         Console.WriteLine("\nPress enter to continue...");
-                        Console.ReadLine();
-                        break;
+                        Console.ReadKey(true); break;
                     }
                 }
             }
@@ -415,32 +360,19 @@ class HCSystem
         string? newSSN = Console.ReadLine()?.Trim();
 
         if (string.IsNullOrWhiteSpace(newSSN))
-        {
-            Console.Write("\nInvalid SSN. Press ENTER to go back to previous menu. ");
-            Console.ReadLine();
-            return false;
-        }
+        { Console.Write("\nInvalid SSN. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return false;}
 
         Console.Write("Enter password for new User: ");
         string? newPassword = Console.ReadLine();
 
         if (newPassword == null)
-        {
-            Console.Write("\nInvalid password. Press ENTER to go back to previous menu. ");
-            Console.ReadLine();
-            return false;
-        }
+        { Console.Write("\nInvalid password. Press ENTER to go back to previous menu. "); Console.ReadKey(true); return false;}
 
         Console.Write("Enter name for new User: ");
         string? newName = Console.ReadLine();
 
         if (string.IsNullOrWhiteSpace(newName))
-        {
-            Console.Write("\nInvalid name. Press ENTER to go back to previous menu. ");
-            Console.ReadLine();
-            return false;
-        }
-
+        { Console.Write("\nInvalid name. Press ENTER to go back to previous menu. "); Console.ReadLine();return false;}
         if (CheckUser(newSSN))
         {
             User newUser = new(newSSN, newPassword, newName);
@@ -455,9 +387,7 @@ class HCSystem
         {
             Console.WriteLine("\nFailed to create account. A user with this SSN already exists.");
             Console.Write("\nPress ENTER to go back to previous menu. ");
-            Console.ReadLine();
-            return false;
-        }
+            Console.ReadKey(true); return false;}
     }
     public void ViewUserRequests()
     {
@@ -471,22 +401,12 @@ class HCSystem
             foreach (Event singleEvent in eventList)
             {
                 if (singleEvent.MyEventType == eventType && singleEvent.Title != "AppointmentRequest")
-                {
-                    userRequestList.Add(singleEvent);
-                }
+                { userRequestList.Add(singleEvent);}
             }
         }
-        else
-        {
-            Console.WriteLine("Something went wrong, no event type is selected");
-            Console.ReadKey(true);
-            return;
-        }
-
-        if (userRequestList.Count == 0)
-        {
-            Console.WriteLine($"No user requests found.");
-        }
+        else { Console.WriteLine("Something went wrong, no event type is selected"); Console.ReadKey(true); return; }
+        
+        if (userRequestList.Count == 0) {Console.WriteLine($"No user requests found.");}
         else
         {
             int index = 1;
@@ -499,7 +419,6 @@ class HCSystem
                 {
                     Console.WriteLine($"Description: {events.Description}");
                 }
-
                 Console.WriteLine("------------------------");
             }
         }
@@ -507,10 +426,8 @@ class HCSystem
 
         string? userInput = Console.ReadLine();
 
-        if (userInput == "b")
-        {
-            return;
-        }
+        if (userInput == "b") { return; }
+
         else if (int.TryParse(userInput, out int selectedRequest) && selectedRequest >= 1 && selectedRequest <= userRequestList.Count)
         {
             Event SelectedRequest = userRequestList[selectedRequest - 1];
@@ -542,10 +459,7 @@ class HCSystem
                     eventList.Remove(SelectedRequest);
                     SaveEventsToFile();
                 }
-                else
-                {
-                    Console.WriteLine("\nFailed to create account. The request has not been accepted.");
-                }
+                else { Console.WriteLine("\nFailed to create account. The request has not been accepted."); }
             }
             else if (requestChoice == "2")
             {
@@ -556,17 +470,9 @@ class HCSystem
                 SaveEventsToFile();
                 Console.ReadLine();
             }
-            else if (requestChoice == "b")
-            {
-                return;
-            }
-
+            else if (requestChoice == "b") { return; }
         }
-        else
-        {
-            Console.WriteLine("\nWrong input, press ENTER to go back to menu.");
-            Console.ReadKey(true);
-        }
+        else { Console.WriteLine("\nWrong input, press ENTER to go back to menu."); Console.ReadKey(true); }
     }
     public void RequestAppointment(User activeUser)
     {
@@ -607,12 +513,9 @@ class HCSystem
                 if (int.TryParse(selectedLocString, out int selectedLocID) && selectedLocID > 0 && selectedLocID <= locations.Count)
                 {
                     selectedLocation = locations[selectedLocID - 1];
+
                     if ((int)selectedLocation.Region != selectedRegion)
-                    {
-                        Console.Write("\nInvalid input. Press ENTER to continue. ");
-                        Console.ReadLine();
-                        return;
-                    }
+                    { Console.Write("\nInvalid input. Press ENTER to continue. ");Console.ReadKey(true); return; }
 
                     Console.WriteLine("\nDescribe the reason of the appointment:");
                     Console.Write("► ");
@@ -621,10 +524,8 @@ class HCSystem
                     if (string.IsNullOrWhiteSpace(newReason))
                     {
                         Console.WriteLine("\nReason can't be empty.");
-                        Console.Write("\nPress ENTER to go back to previous menu. ");
-                        Console.ReadLine();
-                        return;
-                    }
+                        Console.Write("\nPress ENTER to go back to previous menu. "); 
+                        Console.ReadKey(true); return;}
                     else
                     {
                         Console.WriteLine("\nDo you have a desired date and time? Leave empty if none.\nKeep in mind that the appointment time is subject to availability.");
@@ -660,36 +561,15 @@ class HCSystem
 
                             case "n": return;
 
-                            default:
-                                Console.Write("\nInvalid input. Press ENTER to continue. ");
-                                Console.ReadLine();
-                                break;
+                            default: Console.Write("\nInvalid input. Press ENTER to continue. "); Console.ReadLine(); break;
                         }
                     }
                 }
-                else
-                {
-                    Console.Write("\nInvalid input. Press ENTER to continue. ");
-                    Console.ReadLine();
-                    return;
-                }
-
-
+                else { Console.Write("\nInvalid input. Press ENTER to continue. "); Console.ReadLine();return;}
             }
-            else
-            {
-                Console.Write("\nNo locations found in the selected region. Press ENTER to go back to previous menu. ");
-                Console.ReadLine();
-                return;
-            }
+            else {Console.Write("\nNo locations found in the selected region. Press ENTER to go back to previous menu. "); Console.ReadKey(true);return;}
         }
-        else
-        {
-            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-            Console.ReadLine();
-            return;
-        }
-
+        else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); Console.ReadLine(); return;}
     }
     public void HandleAppointment()
     {
@@ -752,10 +632,8 @@ class HCSystem
                                 Console.Write("\n► ");
                                 int selectedPersonnel = Convert.ToInt32(Console.ReadLine());
                                 if (selectedPersonnel < 1 || selectedPersonnel > users.Count || users[selectedPersonnel - 1] == newEvent.Participants[0].User)
-                                {
-                                    Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-                                    return;
-                                }
+                                { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
+
                                 else
                                 {
                                     newEvent.Title = newEvent.Participants[0].User.SSN;
@@ -772,17 +650,9 @@ class HCSystem
                                     break;
                                 }
                             }
-                            else
-                            {
-                                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-                                return;
-                            }
+                            else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return;}
                         }
-                        else
-                        {
-                            Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-                            return;
-                        }
+                        else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");return;}
 
                     case "n":
                         Debug.Assert(newEvent != null);
@@ -792,15 +662,10 @@ class HCSystem
                         return;
 
                     default:
-                        Console.Write("\nInvalid input. Press ENTER to continue. ");
-                        break;
+                        Console.Write("\nInvalid input. Press ENTER to continue. "); break;
                 }
             }
-            else
-            {
-                Console.Write("\nInvalid input. Press ENTER to go back to previous menu. ");
-                return;
-            }
+            else { Console.Write("\nInvalid input. Press ENTER to go back to previous menu. "); return; }
         }
         else
         {
@@ -809,17 +674,13 @@ class HCSystem
             return;
         }
     }
-
     public void ViewEvent(Event.EventType eventType, User activeUser)
     {
         if (eventType == Event.EventType.Entry)
-        {
-            Console.WriteLine("\nYour Journal");
-        }
+        { Console.WriteLine("\nYour Journal"); }
         else
-        {
-            Console.WriteLine("\nYour Schedule");
-        }
+        { Console.WriteLine("\nYour Schedule"); }
+        
         foreach (Event event1 in eventList)
         {
             if (event1.MyEventType == eventType)
@@ -951,9 +812,6 @@ class HCSystem
             Console.Write("\nPress ENTER to go back to previous menu..");
         }
         else { Console.WriteLine("\nInvalid input"); return; }
-
-
-
     }
     public void CheatersDelight()
     {
@@ -969,10 +827,8 @@ class HCSystem
             {
                 Console.WriteLine("\nAn user with the given SSN exist already.");
                 Console.Write("\nPress ENTER to continue. ");
-                Console.ReadLine();
-                return;
-            }
-
+                Console.ReadKey(true);return;}
+                
             Console.Write("\nPass: ");
             string? adminPass = Console.ReadLine();
             Debug.Assert(adminPass != null);
@@ -985,24 +841,16 @@ class HCSystem
                 foreach (Permission perm in Enum.GetValues(typeof(Permission)))
                 {
                     if (perm != Permission.None)
-                    {
-                        newAdmin.Permissions.Add(perm);
-                    }
+                    { newAdmin.Permissions.Add(perm);}
                 }
                 newAdmin.Permissions.Remove(Permission.None);
                 users.Add(newAdmin);
                 SaveUsersToFile();
                 Console.WriteLine($"\nNew sysadmin added. Welcome {newAdmin.Name}!");
                 Console.Write("\nPress ENTER to continue.");
-                Console.ReadLine();
+                Console.ReadKey(true);
             }
-            else
-            {
-                Console.Write("\nSomething went wrong. Press ENTER to continue. ");
-                Console.ReadLine();
-                return;
-            }
-
+            else { Console.Write("\nSomething went wrong. Press ENTER to continue. "); Console.ReadKey(true); return; }
         }
     }
 }
