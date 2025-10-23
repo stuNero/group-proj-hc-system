@@ -150,12 +150,17 @@ while (isRunning)
             Console.ReadKey(true);
           }
           break;
+
         case "3":
           isRunning = false;
           break;
 
+        case "CheatersNeverLearn":
+          sys.CheatersDelight();
+          break;
+
         default:
-          Console.WriteLine("\nPlease enter a valid input");
+          Console.Write("\nPlease enter a valid input. ");
           Console.ReadKey(true);
           break;
       }
