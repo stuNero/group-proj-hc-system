@@ -628,7 +628,7 @@ class HCSystem
                 switch (Console.ReadLine()?.ToLower())
                 {
                     case "y":
-                        Console.Write("\nAppointment time (DD/MM/YY HH:mm:ss): ");
+                        Console.Write("\nAppointment time (DD/MM/YY HH:mm): ");
                         string? dateInput = Console.ReadLine();
 
                         if (!string.IsNullOrWhiteSpace(dateInput))
